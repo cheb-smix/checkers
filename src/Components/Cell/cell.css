@@ -1,0 +1,19 @@
+.ucell{
+    width: var(--cell-size);
+    height: var(--cell-size);
+    /*border: 1px solid #444;*/
+    display: inline-block;
+    background: transparent;
+    text-align: center;
+    padding: 0px;
+    margin: 0px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.withchecker>.empty{
+    display: none;
+}
+.trnsp{
+    background: rgba(0,0,0,0.6);
+}

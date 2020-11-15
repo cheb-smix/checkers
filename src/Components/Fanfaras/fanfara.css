@@ -1,0 +1,27 @@
+#fanfara{
+    width: 48vw;
+    height: 48vw;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    text-align: center;
+    display: block;
+    position: absolute;
+    z-index: 5;
+}
+#fanfara h3{
+    margin: 0px 0px 10px 0px;
+    font-size: 18px;
+}
+#fanfara.in_game{
+    display: none;
+}
+#fantext{
+    font-size: 16px;
+}
+
+@media (orientation: portrait), (max-aspect-ratio: 10/13){
+    #fanfara{
+        width: 100vw;
+        height: 100vw;
+    }
+}

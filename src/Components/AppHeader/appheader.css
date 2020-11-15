@@ -1,0 +1,93 @@
+.uheader{
+    width: 100%;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+.fa-chess{
+    text-shadow: 1px 0 0 var(--theme-main-color),
+                -1px 0 0 var(--theme-main-color),
+                0 1px 0 var(--theme-main-color),
+                0 -1px 0 var(--theme-main-color),
+                1px 1px var(--theme-main-color),
+                -1px -1px 0 var(--theme-main-color),
+                1px -1px 0 var(--theme-main-color),
+                -1px 1px 0 var(--theme-main-color);
+}
+#uhiconcontainer{
+    /*display: none;*/
+    display: table;
+    position: absolute;
+    flex-grow: 6;
+    justify-content: flex-end;
+    flex-direction: column;
+    top: 1.6em;
+    z-index: 8;
+    background: rgba(0,0,0,0.8);
+    width: 100%;
+}
+.uhicon,#utitle{
+    padding: 0.3em;
+    color: var(--theme-main-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+#uhiconcontainer>.uhicon{
+    display: table-row;
+    justify-content: left;
+    align-items: center;
+    font-family: Federo;
+}
+#uhiconcontainer>.uhicon>*{
+    display: table-cell;
+    padding: 7px 2px;
+}
+.uhicon>i{
+    min-width: 10%;
+    text-align: right;
+    margin-right: 3%;
+}
+#utitle{
+    flex-grow: 3;
+    font-family: Federo;
+    text-transform: uppercase;
+}
+.uhicon>i{
+    margin: 0;
+}
+.uhicon>i.fa-smx-spin:hover::before{
+    content: '\f28d';
+}
+.uhicon:hover{
+    color: var(--theme-secondary-color);
+}
+.warning{
+    color: red;
+}
+#navibut{
+    display: block;
+}
+
+
+
+@media (orientation: portrait), (max-aspect-ratio: 10/13){
+
+}
+@media (min-width: 580px){
+    #navibut{
+        display: none;
+    }
+    #uhiconcontainer{
+        display: flex;
+        flex-direction: row;
+        position: initial;
+        top: initial;
+        width: auto;
+    }
+    .uhicon span{
+        display: none;
+    }
+
+}
+
+
