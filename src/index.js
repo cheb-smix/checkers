@@ -10,6 +10,15 @@ import "animate.css/animate.css";
 
 const history = createBrowserHistory();
 
+Math.coefficient = (n1,n2,f=0) => {
+  n2 = n2>0?n2:1;
+  return (n1 / n2).toFixed(f);
+}
+Math.percent = (n1,n2,f=0) => {
+  n2 = n2>0?n2:1;
+  return (n1 * 100 / n2).toFixed(f)+"%";
+}
+
 ReactDOM.render(
   <Router history={history}>
     <App/>

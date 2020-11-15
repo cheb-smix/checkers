@@ -78,16 +78,16 @@ export default class Corners extends App{
     compareFunc4 = (a,b) => {
         return a.s4!==b.s4?(a.s4>b.s4?-1:1):0;
         ///////New compare based on sorting by multiplication of possibility steps and priority
-        let ax = a.priority.level*a.effectivity*((a.priority.level<0 && a.effectivity<0)?-1:1);
+        /*let ax = a.priority.level*a.effectivity*((a.priority.level<0 && a.effectivity<0)?-1:1);
         let bx = b.priority.level*b.effectivity*((b.priority.level<0 && b.effectivity<0)?-1:1);
-        return ax!==bx ? (ax>bx?-1:1) : (Math.random()<0.5?1:-1);
+        return ax!==bx ? (ax>bx?-1:1) : (Math.random()<0.5?1:-1);*/
     }
     compareFunc5 = (a,b) => {
         return a.s5!==b.s5?(a.s5>b.s5?-1:1):0;
         ///////Secodary compare for pulling up lagging based on sorting by addition of possibility steps and priority
-        let ax = a.priority.level+a.effectivity;
+        /*let ax = a.priority.level+a.effectivity;
         let bx = b.priority.level+b.effectivity;
-        return ax!==bx ? (ax>bx?-1:1) : (a.effectivity!==b.effectivity?(a.effectivity>b.effectivity?-1:1):0);
+        return ax!==bx ? (ax>bx?-1:1) : (a.effectivity!==b.effectivity?(a.effectivity>b.effectivity?-1:1):0);*/
     }
     compareFunc6 = (a,b) => {
         ///////Secodary compare for pulling up lagging based on sorting by priority, possibility
@@ -100,21 +100,21 @@ export default class Corners extends App{
     compareFunc7 = (a,b) => {
         return a.s7!==b.s7?(a.s7>b.s7?-1:1):0;
         ///////Finishing playstage comparator 
-        let ax = Math.abs(a.priority.level) - Math.abs(a.effectivity);
+        /*let ax = Math.abs(a.priority.level) - Math.abs(a.effectivity);
         let bx = Math.abs(b.priority.level) - Math.abs(b.effectivity);
         if(ax!==bx) return ax>bx?-1:1;
-        return 0;
+        return 0;*/
     }
     compareFunc8 = (a,b) => {
         return a.s8!==b.s8?(a.s8>b.s8?-1:1):0;
-        return (a.priority.level/a.effectivity>b.priority.level/b.effectivity && a.effectivity>0)?-1:1;
+        //return (a.priority.level/a.effectivity>b.priority.level/b.effectivity && a.effectivity>0)?-1:1;
     }
     compareFunc9 = (a,b) => {
         return a.s9!==b.s9?(a.s9>b.s9?-1:1):0;
-        let ax = a.effectivity * a.priority.level * a.len;
+        /*let ax = a.effectivity * a.priority.level * a.len;
         let bx = a.effectivity * a.priority.level * a.len;
         if(ax===bx) return 0;
-        return ax>bx?1:-1;
+        return ax>bx?1:-1;*/
     }
 
     genCellObjByKeyAndPoss = (k,p,h=this.state.cells[k].possibilities[p].effectivity) => {
@@ -453,6 +453,52 @@ export default class Corners extends App{
             }
         }
         return cells;
+    }
+
+    checkFutherMoves = (c) => {
+        let kek = this.deepCopy(this.state.cells);
+        kek[c.to].checker = kek[c.from].checker;
+        kek[c.to].color = kek[c.from].color;
+        kek[c.from].checker = false;
+        kek[c.from].color = false;
+        kek = this.regeneratePossibilities(kek);
+        console.log(kek);
+        let nff = false;
+        for(let k in kek){
+            if(kek[k].color===c.color){
+                for(let p in kek[k].possibilities){
+                    let path_a = kek[k].possibilities[p].path.filter((e,i)=>(i%2));
+                    let path_b = kek[k].possibilities[p].path.filter((e,i)=>!(i%2));
+                    if(path_a.indexOf(c.to)>0 || path_b.indexOf(c.from)>0){
+                        if(kek[k].possibilities[p].effectivity > 4 || (!nff && nff.effectivity<kek[k].possibilities[p].effectivity)){
+                            nff = kek[k].possibilities[p];
+                        }
+                    }
+                }
+            }
+        }
+
+        let bfd = false;
+        for(let k in kek){
+            if(kek[k].color!==c.color && kek[k].color!==false){
+                for(let p in kek[k].possibilities){
+                    let path_a = kek[k].possibilities[p].path.filter((e,i)=>(i%2));
+                    let path_b = kek[k].possibilities[p].path.filter((e,i)=>!(i%2));
+                    
+                    if(path_a.indexOf(c.to)>0 || path_b.indexOf(c.from)>0){
+                        if(kek[k].possibilities[p].effectivity > 4 || (!bfd && bfd.effectivity<kek[k].possibilities[p].effectivity)){
+                            bfd = kek[k].possibilities[p];
+                        }
+                    }
+                }
+            }
+        }
+        let analyze = 0;
+        if(nff && bfd) analyze = nff.effectivity-bfd.effectivity;
+        if(!nff && bfd) analyze = 0-bfd.effectivity;
+        if(nff && !bfd) analyze = nff.effectivity;
+        console.log("\n\n\n\n\nFutureAnalyzeResult",analyze,c.from,c.to,"\n",nff,"\n",bfd,"\n\n\n\n\n");
+        return analyze;
     }
 
     dropCheckersToDefaults = (debug = this.state.debug) => {

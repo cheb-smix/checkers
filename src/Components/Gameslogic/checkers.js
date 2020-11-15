@@ -2,8 +2,8 @@ import App from '../App';
 
 const findClosestTarget = (column, row = 8) => {
     for (let n = column-1; n<=column+1; n++) {
-        if (n == column-1 && (column > 4 || Math.random() < 0.5)) continue;
-        if ((row+n)%2==1) return n + ":8";
+        if (n === column-1 && (column > 4 || Math.random() < 0.5)) continue;
+        if ((row+n)%2===1) return n + ":8";
     }
 }
 
@@ -52,7 +52,7 @@ export default class Checkers extends App{
             let hypotenuse = this.calculatePifagor({x:x,y:y},c.priority.target);
             if(Math.abs(hypotenuse)<Math.abs(c.hypotenuse)){
                 if(c.to !== p){
-                    console.log("Changing destination from "+c.to+" to "+p+"["+hypotenuse +"-"+ c.hypotenuse+"] target: ",c.priority.target);
+                    //console.log("Changing destination from "+c.to+" to "+p+"["+hypotenuse +"-"+ c.hypotenuse+"] target: ",c.priority.target);
                     c.to = p;
                     c.hypotenuse = hypotenuse;
                 }
@@ -122,27 +122,71 @@ export default class Checkers extends App{
         let k1 = (x+(1*xe))+":"+(y+(1*ye));
         let k2 = (x+(2*xe))+":"+(y+(2*ye));
 
-        return (
-            typeof(c[k1]) !== "undefined" 
-            && c[k1].checker!==false 
-            && typeof(c[k2]) !== "undefined" 
-            && c[k2].checker===false 
-            && typeof(p[k2])==="undefined" 
-            && c[k1].color !== color
-            )
-            ?[k1,k2]
-            :false;
+        return (typeof(c[k1]) !== "undefined" && c[k1].checker!==false && typeof(c[k2]) !== "undefined" && c[k2].checker===false && typeof(p[k2])==="undefined" 
+            && c[k1].color !== color) ? [k1,k2] : false;
     }
 
-    getPossibilitiesRecursive(koords,oldcells=false,oldpossibilities,color){
+    checkTheDamka = (c,p,x,y,direction="left up",color) => {
+        let vars = [];
+        let xe = -1;
+        let ye = -1;
+        x = Math.abs(x); y = Math.abs(y);
+        if(direction==="right up") xe = 1;
+        if(direction==="left down") ye = 1;
+        if(direction==="right down"){
+            xe=1;ye=1;
+        }
+        let enemyColor = color === "black" ? "white" : "black";
+        let path = [];
+        for(let n=1; n<7; n++){
+            let k1 = (x+(n*xe))+":"+(y+(n*ye));
+            path.push(k1);
+            if (typeof(c[k1]) === "undefined") break;
+            if (c[k1].color !== enemyColor) continue;
+            console.log(`found enemy on ${k1}`);
+
+            let blocker = false;
+            for(let m=n+1; m<7; m++){
+                let k2 = (x+(m*xe))+":"+(y+(m*ye));
+                
+                
+                if (typeof(p[k2]) !== "undefined") continue;
+                if (typeof(c[k2]) === "undefined" || c[k2].checker !== false) {
+                    blocker = true;
+                    break;
+                }
+                path.push(k2);
+                let pathCopy = this.deepArrCopy(path);
+                vars.push(pathCopy);
+            }
+            if (blocker) break;
+        }
+        return vars;
+    }
+
+    getPossibilitiesRecursive(koords,oldcells=false,oldpossibilities,cell,restrictedDirection=-1){
         let possibilities = Object.assign({},oldpossibilities);
         const {0: x, 1: y} = koords.split(":");
-        const directions = ["left up","right up","left down","right down"];
+
+        let directions = ["left up","right up","left down","right down"];
+
+        cell.damka = ((cell.color === "white" && y === '1') || (cell.color === "black" && y === '8'));
+        // дамка почемуто назад сука идет
         for(let i in directions){
-            let k = this.checkTheChecker(oldcells,possibilities,x,y,directions[i],color);
-            if(k!==false){
-                possibilities[k[1]] = [...possibilities[koords],k[0],k[1]];
-                possibilities = this.getPossibilitiesRecursive(k[1],oldcells,possibilities,color);
+            if (i === restrictedDirection) continue;
+            if (cell.damka) {
+                let vars = this.checkTheDamka(oldcells,possibilities,x,y,directions[i],cell.color); 
+                for(let i in vars) {
+                    let last = vars[i][vars[i].length - 1];
+                    possibilities[last] = [...possibilities[koords],...vars[i]];
+                    possibilities = this.getPossibilitiesRecursive(last,oldcells,possibilities,cell,3 - i);
+                }
+            } else {
+                let k = this.checkTheChecker(oldcells,possibilities,x,y,directions[i],cell.color);
+                if(k!==false){
+                    possibilities[k[1]] = [...possibilities[koords],k[0],k[1]];
+                    possibilities = this.getPossibilitiesRecursive(k[1],oldcells,possibilities,cell,3 - i);
+                }
             }
         }
         return possibilities;
@@ -154,22 +198,31 @@ export default class Checkers extends App{
 
         const {x,y} = oldcells[koords];
         possibilities[koords] = [koords];
-        possibilities = this.getPossibilitiesRecursive(koords,oldcells,possibilities,oldcells[koords].color);
+        possibilities = this.getPossibilitiesRecursive(koords,oldcells,possibilities,oldcells[koords]);
 
         let closestCells = [];
 
-        if (oldcells[koords].damka !== true && mustEat===false) {
-            if (oldcells[koords].color === "white") {
-                closestCells = [
-                    (x-1)+":"+(y-1),//left up
-                    (x+1)+":"+(y-1),//right up
-                ];
-            } else if (oldcells[koords].color === "black") {
-                closestCells = [
-                    (x-1)+":"+(y+1),//left down
-                    (x+1)+":"+(y+1),//right down
-                ];
+        if (oldcells[koords].damka !== true) {
+            if (mustEat===false) {
+                if (oldcells[koords].color === "white") {
+                    closestCells = [
+                        (x-1)+":"+(y-1),//left up
+                        (x+1)+":"+(y-1),//right up
+                    ];
+                } else if (oldcells[koords].color === "black") {
+                    closestCells = [
+                        (x-1)+":"+(y+1),//left down
+                        (x+1)+":"+(y+1),//right down
+                    ];
+                }
             }
+        } else {
+            closestCells = [
+                (x-1)+":"+(y-1),//left up
+                (x+1)+":"+(y-1),//right up
+                (x-1)+":"+(y+1),//left down
+                (x+1)+":"+(y+1),//right down
+            ];
         }
         
         for(let i in closestCells){
@@ -254,14 +307,14 @@ export default class Checkers extends App{
         }
         ///////Third 3 in 1 algorithms using sorting
         let rndcomfunc = Math.floor(1 + Math.random() * 3);
-        let a = ["", "h", "h,rnd", "len"];
+        //let a = ["", "h", "h,rnd", "len"];
         /*if(this.state.playstage===3){
             rndcomfunc = 2;
         }else{
             rndcomfunc = 9;
         }
         rndcomfunc = 1;*/
-        console.log("Used compareFunc"+rndcomfunc,a[rndcomfunc]);
+        //console.log("Used compareFunc"+rndcomfunc,a[rndcomfunc]);
         iicells.sort(this["compareFunc"+rndcomfunc]);
         /*
         if(this.state.playstage===3){
@@ -285,7 +338,7 @@ export default class Checkers extends App{
             let c = iicells[index];
             c.possibilities = cells[c.from].possibilities;
 
-            if(c.effectivity<5){
+            if(c.effectivity<2){
                 while(this.checkFutherMoves(c)<0){
                     index++;
                     while(index<iicells.length-1 && index<4 && iicells[index].from===iicells[index-1].from) index++;
@@ -331,7 +384,7 @@ export default class Checkers extends App{
     }
 
     checkOfflineGameStatus = (playerInfo,opponentInfo) => {
-        console.log("Checking offline status");
+        //console.log("Checking offline status");
         if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
 
         let changes = false;
@@ -446,6 +499,40 @@ export default class Checkers extends App{
         return cells;
     }
 
+    checkFutherMoves = (c) => {
+        let kek = this.deepCopy(this.state.cells);
+        let checkinFutureEffectivity = kek[c.from].possibilities[c.to].effectivity;
+        kek[c.to].checker = kek[c.from].checker;
+        kek[c.to].color = kek[c.from].color;
+        kek[c.from].checker = false;
+        kek[c.from].color = false;
+        kek = this.regeneratePossibilities(kek);
+
+        let bfd = null; // bad future
+        
+        for(let k in kek){
+            if(kek[k].color!==c.color && kek[k].color!==false){
+                for(let p in kek[k].possibilities){
+
+                    let path_b = kek[k].possibilities[p].path.filter((e,i)=>(i%2));
+                    //console.log(kek[k].possibilities[p].path,path_b);
+
+                    if(path_b.indexOf(c.to) >= 0){
+                        if(kek[k].possibilities[p].kills > 1 || (!bfd || bfd.kills < kek[k].possibilities[p].kills)){
+                            bfd = kek[k].possibilities[p];
+                        }
+                    }
+
+                }
+            }
+        }
+        if (bfd) checkinFutureEffectivity -= bfd.effectivity;
+
+        //console.log("\n\n\n\n\nFutureAnalyzeResult",checkinFutureEffectivity,c.from,c.to,"\n",bfd,"\n\n\n\n\n");
+
+        return checkinFutureEffectivity;
+    }
+
     dropCheckersToDefaults = (debug = this.state.debug) => {
         let cells = {};
         let key = 1;
@@ -454,9 +541,34 @@ export default class Checkers extends App{
                 let checker = false;
                 let color = false;
                 if(debug){
-                    
+                    if((y+x)%2===1){
+                        if (y>5 && y<9) {
+                            color = "white";
+                            checker = `${color}${key}`;
+                        }
+                        if (y>0 && y<4) {
+                            color = "black";
+                            checker = `${color}${key}`;
+                        }
+                        if(x===1 && y===6){
+                            checker = "black"+key;
+                            color = "black";
+                        }
+                        if(x===2 && y===1){
+                            checker =  "white"+key;
+                            color = "white";
+                        }
+                        if(x===3 && y===2){
+                            checker = false;
+                            color = false;
+                        }
+                        if(x===8 && y===5){
+                            checker =  "black"+key;
+                            color = "black";
+                        }
+                    }
                 }else{
-                    if((y+x)%2==1){
+                    if((y+x)%2===1){
                         if (y>5 && y<9) {
                             color = "white";
                             checker = `${color}${key}`;
@@ -471,19 +583,7 @@ export default class Checkers extends App{
                 key++;
             }
         }
-        let k = 0;
-        if(debug){
-            while(k<24){
-                let x = Math.floor(Math.random()*8)+1;
-                let y = Math.floor(Math.random()*8)+1;
-                if(cells[x+":"+y].color===false){
-                    let color = k<12?"white":"black";
-                    let checker = color+k;
-                    cells[x+":"+y] = {x:x,y:y,k:k*100,checker:checker,color:color,possibilities:{},active:false};
-                    k++;
-                }
-            }
-        }
+        
         return this.regeneratePossibilities(cells);
     }
 

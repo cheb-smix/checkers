@@ -79,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: true,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -129,8 +129,6 @@ export default class App extends React.Component{
         state.isLoading = false;
 
         state.cells = this.dropCheckersToDefaults(state.debug);
-
-        console.log(this.setTargetCells());
 
         state.targetCells = this.setTargetCells();
         
@@ -507,7 +505,7 @@ export default class App extends React.Component{
         if(a.length>2) a = a.filter((e,i)=>!(i%2));
         let stepper = document.getElementById("stepper");
         let headerHeight = document.querySelector(".uheader").offsetHeight;
-        console.log(cells[koordsfrom].checker, stepper);
+        
         let checker = document.getElementById(cells[koordsfrom].checker);
         let lastStepColor = cells[koordsfrom].color;
         const t = 100;
@@ -550,7 +548,6 @@ export default class App extends React.Component{
                             this.theStep(koordsto,koordsfrom,newPlayersStep);
                             this.botStep(lastStepColor);
                         //}
-                        console.log(cells[koordsfrom].checker);
                     }
                 }else{
                     if(a[index-1]!==koordsto){
@@ -850,52 +847,6 @@ export default class App extends React.Component{
         this.setState(o);
     }
 
-    checkFutherMoves = (c) => {
-        let kek = this.deepCopy(this.state.cells);
-        kek[c.to].checker = kek[c.from].checker;
-        kek[c.to].color = kek[c.from].color;
-        kek[c.from].checker = false;
-        kek[c.from].color = false;
-        kek = this.regeneratePossibilities(kek);
-        console.log(kek);
-        let nff = false;
-        for(let k in kek){
-            if(kek[k].color===c.color){
-                for(let p in kek[k].possibilities){
-                    let path_a = kek[k].possibilities[p].path.filter((e,i)=>(i%2));
-                    let path_b = kek[k].possibilities[p].path.filter((e,i)=>!(i%2));
-                    if(path_a.indexOf(c.to)>0 || path_b.indexOf(c.from)>0){
-                        if(kek[k].possibilities[p].effectivity > 4 || (!nff && nff.effectivity<kek[k].possibilities[p].effectivity)){
-                            nff = kek[k].possibilities[p];
-                        }
-                    }
-                }
-            }
-        }
-
-        let bfd = false;
-        for(let k in kek){
-            if(kek[k].color!==c.color && kek[k].color!==false){
-                for(let p in kek[k].possibilities){
-                    let path_a = kek[k].possibilities[p].path.filter((e,i)=>(i%2));
-                    let path_b = kek[k].possibilities[p].path.filter((e,i)=>!(i%2));
-                    
-                    if(path_a.indexOf(c.to)>0 || path_b.indexOf(c.from)>0){
-                        if(kek[k].possibilities[p].effectivity > 4 || (!bfd && bfd.effectivity<kek[k].possibilities[p].effectivity)){
-                            bfd = kek[k].possibilities[p];
-                        }
-                    }
-                }
-            }
-        }
-        let analyze = 0;
-        if(nff && bfd) analyze = nff.effectivity-bfd.effectivity;
-        if(!nff && bfd) analyze = 0-bfd.effectivity;
-        if(nff && !bfd) analyze = nff.effectivity;
-        console.log("\n\n\n\n\nFutureAnalyzeResult",analyze,c.from,c.to,"\n",nff,"\n",bfd,"\n\n\n\n\n");
-        return analyze;
-    }
-
     /*-------------------------*/
     
 
@@ -905,19 +856,24 @@ export default class App extends React.Component{
         return t;
     }
 
+    deepArrCopy = (o) => {
+        let t = [];
+        for(let k in o) t[k] = o[k];
+        return t;
+    }
+
     render(){
         let renderedField = '';
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
-                let {x,y,k,color,checker,priority,possibilities} = this.state.cells[koords];
+                let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
+                let damka = ((color === "black" && y === 8) || (color === "white" && y === 1));
                 let active = koords === this.state.selectedChecker;
-                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={false} color={color} active={active} variable={possibilities} />);
+                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
         }
 
         let fieldClass = this.state.isLoading?"loading":"";
-
-        console.log(this.state.game);
 
         return (
             <div className="ucon">
