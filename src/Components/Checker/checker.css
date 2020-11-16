@@ -26,12 +26,14 @@
     border-radius: 50%;
     display: inline-block;
     margin: 0px;
-    padding: 0.7em;
+    padding: 0px;
 }
 .uchecker.black > i.fa {
     color: #888888;
 }
 .uchecker > i.fa {
+    position: absolute;
+    transform: translate(-0.3em, 0.7em);
     opacity: 0;
 }
 .uchecker.damka > i.fa {

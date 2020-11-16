@@ -79,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: true,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -321,11 +321,12 @@ export default class App extends React.Component{
         let steps = cells[koordsfrom].possibilities[koordsto].len;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
-            
+            //console.log(cells[koordsfrom].possibilities[koordsto]);
             cells[koordsfrom].possibilities[koordsto].kills.forEach((k, v) => {
                 cells[k].checker = false;
                 cells[k].color = false;
                 cells[k].selectedChecker = false;
+                cells[k].damka = false;
                 //cells[k] = {x:cells[k].x,y:cells[k].y,k:cells[k].key,checker:false,color:false,possibilities:{},active:false};
             });
         }
@@ -349,10 +350,12 @@ export default class App extends React.Component{
         }
         cells[koordsto].checker = cells[koordsfrom].checker;
         cells[koordsto].color = cells[koordsfrom].color;
+        cells[koordsto].damka = cells[koordsfrom].possibilities[koordsto].damka;
 
         cells[koordsfrom].checker = false;
         cells[koordsfrom].color = false;
         cells[koordsfrom].selectedChecker = false;
+        cells[koordsfrom].damka = false;
 
         //Regenerate possible steps for all checkers
         cells = this.regeneratePossibilities(cells);
@@ -571,7 +574,7 @@ export default class App extends React.Component{
                         stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
                         stepper.style.left = ooo.offsetLeft + "px";
                         stepper.style.transform = "scale(1.5)";
-                        stepper.style.boxShadow = "10px 10px 3px #111;";
+                        //stepper.style.boxShadow = "10px 10px 3px #111";
 
                         ooo = document.querySelector(`.ucell[koords="${a[index]}"]>.empty`);
                         
@@ -582,11 +585,11 @@ export default class App extends React.Component{
                             stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
                             stepper.style.left = ooo.offsetLeft + "px";
                             stepper.style.transform = "scale(2)";
-                            stepper.style.boxShadow = "7px 7px 14px #111;";
+                            //stepper.style.boxShadow = "7px 7px 14px #111";
                             await this.sleep(t*3);
                             stepper.style.transition = (t/2)+"ms all ease";
                             stepper.style.transform = "scale(1)";
-                            stepper.style.boxShadow = "3px 3px 3px #111;";
+                            //stepper.style.boxShadow = "3px 3px 3px #111";
                         }else{
                             await this.sleep(t);
                             stepper.style.transition = t+"ms all ease-out";
@@ -594,7 +597,7 @@ export default class App extends React.Component{
                             stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
                             stepper.style.left = ooo.offsetLeft + "px";
                             stepper.style.transform = "scale(1)";
-                            stepper.style.boxShadow = "3px 3px 3px #111;";
+                            //stepper.style.boxShadow = "3px 3px 3px #111";
                         }
                     }
                 }
@@ -864,12 +867,13 @@ export default class App extends React.Component{
 
     render(){
         let renderedField = '';
+        let checkers = (this.state.game === "checkers" || this.state.game === "giveaway");
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
                 let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
-                let damka = ((color === "black" && y === 8) || (color === "white" && y === 1));
+                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && checkers);
                 let active = koords === this.state.selectedChecker;
-                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={damka} />);
+                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
         }
 
