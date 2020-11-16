@@ -79,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: true,
+        debug: false,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -869,7 +869,7 @@ export default class App extends React.Component{
                 let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
                 let damka = ((color === "black" && y === 8) || (color === "white" && y === 1));
                 let active = koords === this.state.selectedChecker;
-                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
+                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={damka} />);
             });
         }
 

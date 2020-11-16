@@ -26,7 +26,16 @@
     border-radius: 50%;
     display: inline-block;
     margin: 0px;
-    padding: 0px;
+    padding: 0.7em;
+}
+.uchecker.black > i.fa {
+    color: #888888;
+}
+.uchecker > i.fa {
+    opacity: 0;
+}
+.uchecker.damka > i.fa {
+    opacity: 1;
 }
 .userchecker{
     box-shadow: 0px 0px 10px #fff;
