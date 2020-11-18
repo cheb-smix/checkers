@@ -1,10 +1,15 @@
 import App from '../App';
 
-const findClosestTarget = (column, row = 8) => {
+const findClosestColumn = (column, row = 8) => {
     for (let n = column-1; n<=column+1; n++) {
         if (n === column-1 && (column > 4 || Math.random() < 0.5)) continue;
         if ((row+n)%2===1) return n + ":" + row;
     }
+}
+
+const findClosestDiagonalPossition = (cell) => {
+    if (cell.x < 4 && cell.y>4) return "1:8";
+    return "8:1";
 }
 
 export default class Checkers extends App{
@@ -13,17 +18,21 @@ export default class Checkers extends App{
         
         for(let k in cells){
             if(cells[k].color){
-                if(cells[k].color==="black"){
-                    cells[k].priority = { target: findClosestTarget(cells[k].x, 8), level: 5 };
-                }else{
-                    cells[k].priority = { target: findClosestTarget(cells[k].x, 1), level: 5 };
+                if (cells[k].damka && Math.random()<0.3) {
+                    cells[k].priority = { target: findClosestDiagonalPossition(cells[k]), level: 3 };
+                } else {
+                    if (cells[k].color === "black"){
+                        cells[k].priority = { target: findClosestColumn(cells[k].x, 8), level: 5 };
+                    } else {
+                        cells[k].priority = { target: findClosestColumn(cells[k].x, 1), level: 5 };
+                    }
                 }
             }
         }
         return cells;
     }
 
-    finalizatorCorrection = (c) => {
+    /*finalizatorCorrection = (c) => {
         if(c.dbstep) return c;
         let currentCheckerTargetHypotenuse = this.calculatePifagor(c.koordsfrom,c.priority.target);
         for(let t in this.state.targetCells[c.color]){
@@ -48,16 +57,13 @@ export default class Checkers extends App{
             }
         }
         return c;
-    }
+    }*/
 
     compareFunc1 = (a,b) => {
         return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (a.priority.level!==b.priority.level?(a.priority.level>b.priority.level?-1:1):0);
     }
     compareFunc2 = (a,b) => {
         return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (Math.random()<0.5?1:-1);
-    }
-    compareFunc3 = (a,b) => {
-        return a.priority.level!==b.priority.level ? (a.priority.level>b.priority.level?-1:1) : (a.len!==b.len?(a.len>b.len?-1:1):0);
     }
 
     genCellObjByKeyAndPoss = (k,p,h=this.state.cells[k].possibilities[p].effectivity) => {
@@ -159,7 +165,7 @@ export default class Checkers extends App{
 
         let pathString = possibilities[koords].path.join("|");
 
-        let damka = ((cell.color === "white" && pathString.indexOf(":1") > 0) || (cell.color === "black" && pathString.indexOf(":8") > 0) || cell.damka);
+        let damka = ((cell.color === "white" && pathString.indexOf(":1") > 0) || (cell.color === "black" && pathString.indexOf(":8") > 0));
 
         for(let i=0; i < directions.length; i++){
             
@@ -183,9 +189,8 @@ export default class Checkers extends App{
             } else {
                 let vars = this.checkTheChecker(oldcells,possibilities,x,y,directions[i],cell.color);
                 if(vars !== false){
-                    damka = ((cell.color === "white" && vars.place[2] === '1') || (cell.color === "black" && vars.place[2] === '8'));
                     possibilities[vars.place] = {
-                        damka: damka,
+                        damka: ((cell.color === "white" && vars.place[2] === '1') || (cell.color === "black" && vars.place[2] === '8')),
                         kills: [...possibilities[koords].kills, vars.kill],
                         path: [...possibilities[koords].path, vars.place],
                         len: possibilities[koords].len + vars.len,
@@ -249,8 +254,9 @@ export default class Checkers extends App{
         } else {
             for(let i in closestCells){
                 let k = closestCells[i];
+                let damka = ((oldcells[koords].color === "white" && k[2] === '1') || (oldcells[koords].color === "black" && k[2] === '8'));
                 if(typeof(oldcells[k]) !== "undefined" && oldcells[k].checker===false) possibilities[k] = {
-                    damka: oldcells[koords].damka,
+                    damka: damka,
                     kills: [],
                     len: 1,
                     effectivity: 1,
@@ -335,69 +341,42 @@ export default class Checkers extends App{
             }
         }
         ///////Third 3 in 1 algorithms using sorting
-        let rndcomfunc = Math.floor(1 + Math.random() * 3);
-        //let a = ["", "h", "h,rnd", "len"];
-        /*if(this.state.playstage===3){
-            rndcomfunc = 2;
-        }else{
-            rndcomfunc = 9;
-        }
-        rndcomfunc = 1;*/
-        //console.log("Used compareFunc"+rndcomfunc,a[rndcomfunc]);
+        let rndcomfunc = Math.floor(1 + Math.random() * 2);
+
+        console.log("Used compareFunc"+rndcomfunc);
         iicells.sort(this["compareFunc"+rndcomfunc]);
-        /*
-        if(this.state.playstage===3){
-            //let rndcomfunc = "compareFunc"+Math.floor(1+Math.random()*6);
-            let rndcomfunc = "compareFunc9";
-            console.log("Used "+rndcomfunc);
-            iicells.sort(this[rndcomfunc]);
-        }else{
-            if(Math.random()<0.7){
-                console.log("Used compareFunc",4);
-                iicells.sort(this.compareFunc4);
-            }else{
-                console.log("Used compareFunc",2);
-                iicells.sort(this.compareFunc2);
-            }
-        }*/
-        console.log(iicells);
+
+        //console.log(iicells);
         if(iicells.length > 0){
-            let index = 0;
-            if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.2);
-            let c = iicells[index];
-            c.possibilities = cells[c.from].possibilities;
 
-            if(c.effectivity<2){
-                while(this.checkFutherMoves(c)<0){
-                    index++;
-                    while(index<iicells.length-1 && index<4 && iicells[index].from===iicells[index-1].from) index++;
-                    if(index>iicells.length-1 || index>4) index = 0;
-                    c = iicells[index];
-                    c.possibilities = cells[c.from].possibilities;
-                    if(index===0) break;
-                }
-                if(index > 0){
-                    while(index>0 && iicells[index].effectivity<0){
-                        index--;
-                        c = iicells[index];
-                        c.possibilities = cells[c.from].possibilities;
-                    }
-                }
+            for (let index=0; iicells.length; index++) {
+                let c = iicells[index];
+                if (typeof(c) === "undefined") break;
+                c.possibilities = cells[c.from].possibilities;
+                iicells[index].effectivity = this.checkFutherMoves(c);
             }
+            iicells.sort(this["compareFunc"+rndcomfunc]); // 1 more sorting
+            for (let index=0; iicells.length; index++) {
+                let c = iicells[index];
+                if (typeof(c) === "undefined") break;
+                c.possibilities = cells[c.from].possibilities;
+                iicells[index].effectivity = this.checkFutherMoves(c);
+            }
+            iicells.sort(this["compareFunc"+rndcomfunc]); // 2 more sorting
+
+            let index = 0;
+            if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
+            let c = iicells[index];
             
-            console.log("Taken checker:",index,c);
+            //console.log("Taken checker:",index,c);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
-            ///////Final corrector
 
-            if(this.state.playstage===3) c = this.finalizatorCorrection(c);
-
-            //////Finishing best move calculation
             this.doStep(c.to, c.from, true, false);
         }else{
             if(!force){
                 this.iiStep(color,true,dbstep);
             }else{
-                this.rampage(0,"NO MOVES :(");
+                this.rampage(0,"NO MOVES!");
             }
         }
     }
@@ -413,7 +392,6 @@ export default class Checkers extends App{
     }
 
     checkOfflineGameStatus = (playerInfo,opponentInfo) => {
-        //console.log("Checking offline status");
         if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
 
         let changes = false;
@@ -485,8 +463,6 @@ export default class Checkers extends App{
 
                 if (poss2delete) for(let move in poss2delete) delete cells[nkoords].possibilities[move];
 
-                //if (cells[nkoords].damka) console.log("DAMKA", cells[nkoords]);
-
             }
         }
 
@@ -543,9 +519,11 @@ export default class Checkers extends App{
                 }
             }
         }
-        if (bfd) checkinFutureEffectivity -= bfd.effectivity;
+        if (bfd) {
+            checkinFutureEffectivity -= bfd.effectivity;
 
-        //console.log("\n\n\n\n\nFutureAnalyzeResult",checkinFutureEffectivity,c.from,c.to,"\n",bfd,"\n\n\n\n\n");
+            //console.log("\n\n\n\n\nFutureAnalyzeResult",checkinFutureEffectivity,c.from,c.to,"\n",bfd,"\n\n\n\n\n");
+        }
 
         return checkinFutureEffectivity;
     }
@@ -567,7 +545,7 @@ export default class Checkers extends App{
                             color = "black";
                             checker = `${color}${key}`;
                         }
-                        if((x===3 && y===2) || (x===2 && y===1)){
+                        if((x===3 && y===2) || (x===2 && y===1) || (x===2 && y===3)){
                             checker = false;
                             color = false;
                         }
@@ -575,7 +553,7 @@ export default class Checkers extends App{
                             checker =  "white"+key;
                             color = "white";
                         }
-                        if((x===1 && y===6) || (x===8 && y===5) || (x===3 && y===2)){
+                        if((x===1 && y===4) || (x===8 && y===5) || (x===3 && y===2) || (x===3 && y===4)){
                             checker =  "black"+key;
                             color = "black";
                         }

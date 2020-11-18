@@ -568,7 +568,7 @@ export default class App extends React.Component{
 
             if (typeof(possibility.path[index]) !== "undefined") {
 
-                t = this.calculatePifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - possibility.len);
+                t = this.calculatePifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
                 
                 setTimeout(async () => {
                     this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
@@ -597,7 +597,7 @@ export default class App extends React.Component{
             
         console.log(possibility);
         let index = 1;
-        let t = this.calculatePifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - possibility.len);
+        let t = this.calculatePifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
 
         setTimeout(async () => {
             this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
