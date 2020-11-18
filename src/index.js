@@ -9,6 +9,7 @@ import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 
 const history = createBrowserHistory();
+//const history = new HashHistory();
 
 Math.coefficient = (n1,n2,f=0) => {
   n2 = n2>0?n2:1;

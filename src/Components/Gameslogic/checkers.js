@@ -494,7 +494,7 @@ export default class Checkers extends App{
             for(let nkoords in cells){
                 if(cells[nkoords].color === "black"){
                     for(let p in cells[nkoords].possibilities){
-                        if (cells[nkoords].possibilities[p].kills.length == 0) {
+                        if (cells[nkoords].possibilities[p].kills.length === 0) {
                             delete cells[nkoords].possibilities[p];
                         }
                     }
@@ -506,7 +506,7 @@ export default class Checkers extends App{
             for(let nkoords in cells){
                 if(cells[nkoords].color === "white"){
                     for(let p in cells[nkoords].possibilities){
-                        if (cells[nkoords].possibilities[p].kills.length == 0) {
+                        if (cells[nkoords].possibilities[p].kills.length === 0) {
                             delete cells[nkoords].possibilities[p];
                         }
                     }
