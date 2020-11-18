@@ -25,6 +25,7 @@
     height: var(--checker-size);
     border-radius: 50%;
     display: inline-block;
+    text-align: center;
     margin: 0px;
     padding: 0px;
 }

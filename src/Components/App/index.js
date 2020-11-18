@@ -53,7 +53,7 @@ export default class App extends React.Component{
         playersStep: true,
         lastStep: "",
         lastStepTime: 0,
-        
+        animationSpeed: 50,
         isLoading: true,
         online: false,
         socketOpened: false,
@@ -79,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: true,
+        debug: false,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -502,108 +502,107 @@ export default class App extends React.Component{
         }
     }
 
+    oneAnimatedStep = async (stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells) => {
+        stepper.style.transition = t+"ms all ease-in";
+
+        let k1 = possibility.path[index - 1];
+        let k2 = possibility.path[index];
+        let steps = possibility.path.length;
+
+        let ooo = document.querySelector(`.ucell[koords="${k1}"]`);
+
+        let x1 = ooo.offsetLeft;
+        let y1 = ooo.offsetTop + headerHeight;
+
+        ooo = document.querySelector(`.ucell[koords="${k2}"]>.empty`);
+
+        let x2 = ooo.offsetLeft;
+        let y2 = ooo.offsetTop + headerHeight;
+
+        let dx = x1 - (x1 - x2) / 2;
+        let dy = y1 - (y1 - y2) / 2;
+
+        stepper.style.top = dy + "px";
+        stepper.style.left = dx + "px";
+        stepper.style.transform = "scale(1.5)";
+        
+        await this.sleep(t);
+
+        stepper.style.transition = t+"ms all ease-out";
+        stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
+        stepper.style.left = ooo.offsetLeft + "px";
+        stepper.style.transform = "scale(1)";
+
+        await this.sleep(t);
+        
+        /*if(steps > 4){
+            await this.sleep(t);
+            
+            stepper.style.transition = (t*3)+"ms all ease";
+            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
+            stepper.style.left = ooo.offsetLeft + "px";
+            stepper.style.transform = "scale(2)";
+
+            await this.sleep(t*3);
+            stepper.style.transition = (t/2)+"ms all ease";
+            stepper.style.transform = "scale(1)";
+
+        }else{
+            await this.sleep(t);
+            stepper.style.transition = t+"ms all ease-out";
+            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
+            stepper.style.left = ooo.offsetLeft + "px";
+            stepper.style.transform = "scale(1)";
+        }*/
+        if (koordsto === possibility.path[index] || index === steps) {
+            stepper.style.display = "none";
+            stepper.style.transition = "none";
+            checker.style.opacity = 1;
+            if(steps>2) this.rampage(steps);
+
+            this.theStep(koordsto,koordsfrom,newPlayersStep);
+            this.botStep(lastStepColor);
+            return;
+        } else {
+            index++;
+
+            if (typeof(possibility.path[index]) !== "undefined") {
+
+                t = this.calculatePifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - possibility.len);
+                
+                setTimeout(async () => {
+                    this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
+                }, t*2);
+
+            }
+        }
+    }
+
     stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
         let {cells} = this.state;
-        let a = p?p:Object.values(cells[koordsfrom].possibilities[koordsto].path);
-        if(a.length>2) a = a.filter((e,i)=>!(i%2));
+        let possibility = cells[koordsfrom].possibilities[koordsto];
+        
         let stepper = document.getElementById("stepper");
         let headerHeight = document.querySelector(".uheader").offsetHeight;
         
         let checker = document.getElementById(cells[koordsfrom].checker);
         let lastStepColor = cells[koordsfrom].color;
-        const t = 100;
+        
         checker.style.opacity = 0;
-        stepper.className = "uchecker "+cells[koordsfrom].color;
+        stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
         stepper.style.top = (checker.offsetTop + headerHeight)+"px";
         stepper.style.left = checker.offsetLeft +"px";
         stepper.style.display = "block";
 
-        let ooo;
             
-        if(a === false || a.length === 0 ){
+        console.log(possibility);
+        let index = 1;
+        let t = this.calculatePifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - possibility.len);
 
-            stepper.style.transition = (t*2)+"ms all ease-in-out";
-            ooo = document.querySelector(`.ucell[koords="${koordsto}"]>.empty`);
-            stepper.style.top = (ooo.offsetTop + headerHeight)+"px";
-            stepper.style.left = ooo.offsetLeft + "px";
-
-            setTimeout(()=>{
-                checker.style.opacity = 1;
-                stepper.style.display = "none";
-                stepper.style.transition = "none";
-                if(p===false){
-                    this.theStep(koordsto,koordsfrom,newPlayersStep);
-                    this.botStep(lastStepColor);
-                }
-            },t*4)
-        }else{
-            let index = 1;
-            const steps = a.length - 1;
-            const interval = setInterval(async ()=>{                    
-                if(index>=a.length){
-                    clearInterval(interval);
-                    stepper.style.display = "none";
-                    stepper.style.transition = "none";
-                    checker.style.opacity = 1;
-                    if(steps>2) this.rampage(steps);
-                    if(p===false){
-                        //if(koordsfrom!=="5:2"){
-                            this.theStep(koordsto,koordsfrom,newPlayersStep);
-                            this.botStep(lastStepColor);
-                        //}
-                    }
-                }else{
-                    if(a[index-1]!==koordsto){
-                        stepper.style.transition = t+"ms all ease-in";
-                        let [fx,fy] = a[index-1].split(":");
-                        let [tx,ty] = a[index].split(":");
-                        let dx = fx-tx;
-                        let dy = fy-ty;
-                        if(dx===0){
-                            if(dy<0) fy++;
-                            if(dy>0) fy--;
-                        }
-                        if(dy===0){
-                            if(dx<0) fx++;
-                            if(dx>0) fx--;
-                        }
-                        let koords = fx+":"+fy;
-
-                        ooo = document.querySelector(`.ucell[koords="${koords}"]`);
-
-                        stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                        stepper.style.left = ooo.offsetLeft + "px";
-                        stepper.style.transform = "scale(1.5)";
-                        //stepper.style.boxShadow = "10px 10px 3px #111";
-
-                        ooo = document.querySelector(`.ucell[koords="${a[index]}"]>.empty`);
-                        
-                        if(steps > 7){
-                            await this.sleep(t);
-                            
-                            stepper.style.transition = (t*3)+"ms all ease";
-                            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                            stepper.style.left = ooo.offsetLeft + "px";
-                            stepper.style.transform = "scale(2)";
-                            //stepper.style.boxShadow = "7px 7px 14px #111";
-                            await this.sleep(t*3);
-                            stepper.style.transition = (t/2)+"ms all ease";
-                            stepper.style.transform = "scale(1)";
-                            //stepper.style.boxShadow = "3px 3px 3px #111";
-                        }else{
-                            await this.sleep(t);
-                            stepper.style.transition = t+"ms all ease-out";
-                            if(index>=a.length) index = a.length-1;
-                            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                            stepper.style.left = ooo.offsetLeft + "px";
-                            stepper.style.transform = "scale(1)";
-                            //stepper.style.boxShadow = "3px 3px 3px #111";
-                        }
-                    }
-                }
-                index++;
-            },t*2);
-        }
+        setTimeout(async () => {
+            this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
+            index++;
+        }, t*2);
     }
 
     onCheckerClick = (koords) => {
@@ -870,7 +869,7 @@ export default class App extends React.Component{
         let checkers = (this.state.game === "checkers" || this.state.game === "giveaway");
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
-                let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
+                let {x,y,k,color,checker,possibilities,priority} = this.state.cells[koords];
                 let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && checkers);
                 let active = koords === this.state.selectedChecker;
                 return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
@@ -917,7 +916,7 @@ export default class App extends React.Component{
                         closer={this.hideModal} 
                         modal={this.state.modal}
                 />
-                <div className="uchecker black" id="stepper">&nbsp;</div>
+                <div className="uchecker black" id="stepper"><i className="fa fa-chess-queen"></i>&nbsp;</div>
                 <div className="umaincon">
                     <div className={fieldClass} id="ufield" style={{backgroundImage: Board, transform: this.state.playerInfo.color === "white" ? "rotate(0deg)" : "rotate(180deg)"}}>
                     {renderedField}
