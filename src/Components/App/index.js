@@ -594,8 +594,6 @@ export default class App extends React.Component{
         stepper.style.left = checker.offsetLeft +"px";
         stepper.style.display = "block";
 
-            
-        console.log(possibility);
         let index = 1;
         let t = this.calculatePifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
 
