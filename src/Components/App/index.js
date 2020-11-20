@@ -53,7 +53,7 @@ export default class App extends React.Component{
         playersStep: true,
         lastStep: "",
         lastStepTime: 0,
-        animationSpeed: 50,
+        animationSpeed: 45,
         isLoading: true,
         online: false,
         socketOpened: false,
