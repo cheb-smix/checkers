@@ -33,7 +33,7 @@ export default class Checkers extends App{
     }
 
     compareFunc1 = (a,b) => {
-        return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (a.priority.level!==b.priority.level?(a.priority.level>b.priority.level?-1:1):0);
+        return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (a.priority.level!==b.priority.level?(a.priority.level>b.priority.level?-1:1):(Math.random()<0.5?1:-1));
     }
     compareFunc2 = (a,b) => {
         return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (Math.random()<0.5?1:-1);
@@ -285,12 +285,53 @@ export default class Checkers extends App{
         }
     }
 
+    oneMoreFutureStep = (kek, lastFuture, checkingEnemy = true) => {
+        let {from, to} = lastFuture;
+        kek[to].checker = kek[from].checker;
+        kek[to].color = kek[from].color;
+        kek[to].damka = kek[from].damka;
+        kek[from].checker = false;
+        kek[from].color = false;
+        kek[from].damka = false;
+
+        kek = this.regeneratePossibilities(kek);
+
+        let future = null;
+            
+        console.log(checkingEnemy, lastFuture);
+        for(let k in kek){
+            if(/*(checkingEnemy &&*/ kek[k].color!==kek[to].color && kek[k].color!==false/*) || (!checkingEnemy && kek[k].color===kek[to].color)*/){
+                for(let p in kek[k].possibilities){
+                    if (checkingEnemy) {
+                        if (kek[k].possibilities[p].kills.indexOf(to) >= 0 && kek[k].possibilities[p].effectivity > lastFuture.effectivity) {
+                            if (!future || future.effectivity < kek[k].possibilities[p].effectivity) future = kek[k].possibilities[p];
+                        }
+                    } else {
+                        if (kek[k].possibilities[p].effectivity >= lastFuture.effectivity && (kek[k].possibilities[p].kills.indexOf(to) >= 0 || kek[k].possibilities[p].path.indexOf(from) >= 0)) {
+                            if (!future || future.effectivity < kek[k].possibilities[p].effectivity) future = kek[k].possibilities[p];
+                        }
+                    }
+                }
+            }
+        }
+        if (future) {
+            future.badFuture = checkingEnemy;
+            for (let n in future.kills) {
+                kek[future.kills[n]].checker = false;
+                kek[future.kills[n]].color = false;
+                kek[future.kills[n]].damka = false;
+            }
+        }
+
+        return future;
+    }
+
     watchFuture = (iicells, cells = this.state.cells, compareFunc, limit = 10) => {
 
         iicells.sort(this[compareFunc]);
         if (limit > iicells.length) limit = iicells.length;
 
-        let kek = this.deepCopy(cells);
+        let kek;
         //console.log(kek);
 
         for (let index=0; index < limit; index++) {
@@ -298,8 +339,16 @@ export default class Checkers extends App{
             if (typeof(c) === "undefined") break;
 
             kek = this.deepCopy(cells);
+     
+            let futureSteps = [];
+            if (c) futureSteps.push(c);
+            for (let iteration = 0; iteration < 4; iteration++) {
+                let l = futureSteps.length;
+                if (!futureSteps[l - 1]) break;
+                futureSteps.push(this.oneMoreFutureStep(kek, futureSteps[l - 1], iteration%2===0));
+            }
             
-            kek[c.to].checker = kek[c.from].checker;
+            /*kek[c.to].checker = kek[c.from].checker;
             kek[c.to].color = kek[c.from].color;
             kek[c.to].damka = kek[c.from].damka;
             kek[c.from].checker = false;
@@ -346,11 +395,14 @@ export default class Checkers extends App{
 
             if (goodFuture === null) continue;
 
-            iicells[index].effectivity += goodFuture.effectivity;
+            iicells[index].effectivity += goodFuture.effectivity;*/
 
-            console.log("\nbadFuture\n", badFuture, "\ngoodFuture\n", goodFuture, "\neffectivity\n", iicells[index].effectivity);
-
-            
+            futureSteps.shift();
+            for (let f in futureSteps) {
+                if (!futureSteps[f]) break;
+                iicells[index].effectivity += futureSteps[f].badFuture ? 0 - futureSteps[f].effectivity : futureSteps[f].effectivity;
+            }
+            console.log(iicells[index], futureSteps);
             
         }
 
