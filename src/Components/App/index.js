@@ -43,9 +43,9 @@ export default class App extends React.Component{
         game: window.location.href.split("/").pop(),
         /* USER PREFERENCES */
         usersettings: {
-            autoconnect: "1",
-            animation: "1",
-            difficulty: "easy",
+            autoconnect: 1,
+            animation: 1,
+            difficulty: 1,
             atoken: "",
         },
         /* TECH INFO */

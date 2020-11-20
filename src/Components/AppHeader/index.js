@@ -87,7 +87,7 @@ export default class AppHeader extends React.Component{
     }
 
     dropSettings = () => {
-        let usersettings = {animation: "2", autoconnect: "1", difficulty: "easy"};
+        let usersettings = {animation: 2, autoconnect: 1, difficulty: 1};
         for(let i in usersettings){
             this.props.saveSettingsOption(i,usersettings[i]);
         }
@@ -121,7 +121,7 @@ export default class AppHeader extends React.Component{
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="difficulty"
-                            items={{"hard":"Сложно","middle":"Среднее","easy":"Легко"}}
+                            items={{"3":"Сложно","2":"Среднее","1":"Легко"}}
                             selected={this.props.usersettings.difficulty}
                             placeholder="Сложность бота"
                             onSelect={this.props.saveSettingsOption}

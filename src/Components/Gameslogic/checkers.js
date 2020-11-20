@@ -254,7 +254,6 @@ export default class Checkers extends App{
             }
         }
 
-        //console.log(iicells);
         if(iicells.length > 0){
 
             ///////Third 3 in 1 algorithms using sorting
@@ -262,11 +261,7 @@ export default class Checkers extends App{
 
             //console.log("Used compareFunc"+rndcomfunc);
 
-            //console.log(iicells);
-
-            iicells = this.watchFuture(iicells, cells, `compareFunc${rndcomfunc}`, 7);
-
-            //console.log(iicells);
+            iicells = this.watchFuture(iicells, cells, `compareFunc${rndcomfunc}`, 10);
 
             let index = 0;
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
@@ -285,8 +280,9 @@ export default class Checkers extends App{
         }
     }
 
-    oneMoreFutureStep = (kek, lastFuture, checkingEnemy = true) => {
+    oneMoreFutureStep = (kek, lastFuture, iteration = 0) => {
         let {from, to} = lastFuture;
+        let checkingEnemy = iteration % 2 === 0;
         kek[to].checker = kek[from].checker;
         kek[to].color = kek[from].color;
         kek[to].damka = kek[from].damka;
@@ -298,12 +294,11 @@ export default class Checkers extends App{
 
         let future = null;
             
-        console.log(checkingEnemy, lastFuture);
         for(let k in kek){
             if(/*(checkingEnemy &&*/ kek[k].color!==kek[to].color && kek[k].color!==false/*) || (!checkingEnemy && kek[k].color===kek[to].color)*/){
                 for(let p in kek[k].possibilities){
                     if (checkingEnemy) {
-                        if (kek[k].possibilities[p].kills.indexOf(to) >= 0 && kek[k].possibilities[p].effectivity > lastFuture.effectivity) {
+                        if (kek[k].possibilities[p].kills.indexOf(to) >= 0 && kek[k].possibilities[p].effectivity > (iteration ? 0 :lastFuture.effectivity)) {
                             if (!future || future.effectivity < kek[k].possibilities[p].effectivity) future = kek[k].possibilities[p];
                         }
                     } else {
@@ -332,7 +327,6 @@ export default class Checkers extends App{
         if (limit > iicells.length) limit = iicells.length;
 
         let kek;
-        //console.log(kek);
 
         for (let index=0; index < limit; index++) {
             let c = iicells[index];
@@ -342,67 +336,18 @@ export default class Checkers extends App{
      
             let futureSteps = [];
             if (c) futureSteps.push(c);
-            for (let iteration = 0; iteration < 4; iteration++) {
+            for (let iteration = 0; iteration < this.state.usersettings.difficulty * 3; iteration++) {
                 let l = futureSteps.length;
                 if (!futureSteps[l - 1]) break;
-                futureSteps.push(this.oneMoreFutureStep(kek, futureSteps[l - 1], iteration%2===0));
+                futureSteps.push(this.oneMoreFutureStep(kek, futureSteps[l - 1], iteration));
             }
-            
-            /*kek[c.to].checker = kek[c.from].checker;
-            kek[c.to].color = kek[c.from].color;
-            kek[c.to].damka = kek[c.from].damka;
-            kek[c.from].checker = false;
-            kek[c.from].color = false;
-            kek[c.from].damka = false;
-            kek = this.regeneratePossibilities(kek);
-
-            let badFuture = null; // bad future
-            
-            for(let k in kek){
-                if(kek[k].color!==c.color && kek[k].color!==false){
-                    for(let p in kek[k].possibilities){
-                        if(kek[k].possibilities[p].kills.indexOf(c.to) >= 0 || kek[k].possibilities[p].effectivity > iicells[index].effectivity){
-                            if (!badFuture || badFuture.effectivity < kek[k].possibilities[p].effectivity) badFuture = kek[k].possibilities[p];
-                        }
-                    }
-                }
-            }
-
-            if (badFuture === null) continue;
-
-            iicells[index].effectivity -= badFuture.effectivity;
-            if (badFuture.damka) iicells[index].effectivity -= 7;
-            
-            kek[badFuture.to].checker = kek[badFuture.from].checker;
-            kek[badFuture.to].color = kek[badFuture.from].color;
-            kek[badFuture.to].damka = kek[badFuture.from].damka;
-            kek[badFuture.from].checker = false;
-            kek[badFuture.from].color = false;
-            kek[badFuture.from].damka = false;
-            kek = this.regeneratePossibilities(kek);
-
-            let goodFuture = null; // good future
-            
-            for(let k in kek){
-                if(kek[k].color===c.color){
-                    for(let p in kek[k].possibilities){
-                        if(kek[k].possibilities[p].kills.indexOf(badFuture.to) >= 0 || kek[k].possibilities[p].effectivity > badFuture.effectivity){
-                            if (!goodFuture || goodFuture.effectivity < kek[k].possibilities[p].effectivity) goodFuture = kek[k].possibilities[p];
-                        }
-                    }
-                }
-            }
-
-            if (goodFuture === null) continue;
-
-            iicells[index].effectivity += goodFuture.effectivity;*/
 
             futureSteps.shift();
             for (let f in futureSteps) {
                 if (!futureSteps[f]) break;
                 iicells[index].effectivity += futureSteps[f].badFuture ? 0 - futureSteps[f].effectivity : futureSteps[f].effectivity;
             }
-            console.log(iicells[index], futureSteps);
+            console.log(iicells[index].from, iicells[index].to, futureSteps);
             
         }
 
@@ -478,8 +423,9 @@ export default class Checkers extends App{
                 let poss2delete = [];
 
                 for(let p in cells[nkoords].possibilities){
+                    if (cells[nkoords].possibilities[p].damka) cells[nkoords].possibilities[p].effectivity *= 2;
 
-                    for(let move in cells[nkoords].possibilities[p]){
+                    for(let move = 1; move < cells[nkoords].possibilities[p].path.length; move++){
                         if (typeof(cells[nkoords].possibilities[move]) !== "undefined" && cells[nkoords].possibilities[move].kills.length < cells[nkoords].possibilities[p].kills.length) {
                             poss2delete[move] = 1;
                         }
@@ -576,15 +522,15 @@ export default class Checkers extends App{
                             color = "black";
                             checker = `${color}${key}`;
                         }
-                        if((x===3 && y===2) || (x===2 && y===1) || (x===2 && y===3)){
+                        if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
                             checker = false;
                             color = false;
                         }
-                        if(x===4 && y===3){
+                        if((x===6 && y===5) || (x===7 && y===6)){
                             checker =  "white"+key;
                             color = "white";
                         }
-                        if((x===1 && y===4) || (x===8 && y===5) || (x===3 && y===2) || (x===3 && y===4)){
+                        if((x===6 && y===3)){
                             checker =  "black"+key;
                             color = "black";
                         }
