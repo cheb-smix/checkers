@@ -1,0 +1,121 @@
+@font-face {
+    font-family: 'Neon';
+    src: url('../Fonts/AA-Neon.ttf');
+}
+.console{
+    position: relative;
+}
+#rampageContainer{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+#consoleParentino{
+    background: black;
+    color: white;
+    display: inline-block;
+    width: 48vw;
+    text-align: center;
+}
+#playerName{
+    text-align: right;
+    font-style: italic;
+    width: 92%;
+    padding: 0%;
+    margin: 3%;
+    color: white;
+    font-family: Federo;
+}
+#consoleParentino>table{
+    width: 100%;
+}
+#consoleParentino>table>tbody>tr>td{
+    padding: 2%;
+    font-family: ForwardExtra-Light;
+    font-weight: bold;
+    font-size: var(--regular-text-size);
+    vertical-align: top;
+    text-align: left;
+}
+#consoleParentino>table>tbody>tr>td+td{
+    text-align: right;
+}
+#avgtime{
+    width: 65%;
+}
+
+
+.oswithfa::before,.oswithfa::before{
+    font-family: 'Font Awesome\ 5 Free';
+    content: '\f111 ';
+    font-style: normal;
+}
+.onlinespan,.oswithfa::before{
+    text-shadow: var(--neon-border-color) 0px 0px 10px ;
+    color: var(--neon-border-color);
+}
+.offlinespan,.oswithfa::before{
+    text-shadow: var(--neon-text-color) 0px 0px 10px ;
+    color: var(--neon-text-color);
+}
+
+.neonconsole {
+    font-size: 2.5vh;
+    font-style: italic;
+    font-family: Neon;
+    color: #fff;
+    width: 93%;
+    height: 14vh;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vh;
+    margin: 2vh;
+    margin-top: 0px;
+    border: 0.2rem solid #fff;
+    border-radius: 2vh;
+    text-transform: uppercase;
+    animation: flicker 10.5s infinite alternate;     
+  }
+  
+  
+  @keyframes flicker {
+      0%, 0.2%, 20.8%, 21%, 24.8%, 25%, 55.8%, 56%, 88.8%, 89%, 100% {
+          text-shadow:
+              -0.2rem -0.2rem 1rem #fff,
+              0.2rem 0.2rem 1rem #fff,
+              0 0 2rem var(--neon-text-color),
+              0 0 4rem var(--neon-text-color),
+              0 0 6rem var(--neon-text-color),
+              0 0 8rem var(--neon-text-color),
+              0 0 10rem var(--neon-text-color);
+          
+          box-shadow:
+              0 0 .5rem #fff,
+              inset 0 0 .5rem #fff,
+              0 0 2rem var(--neon-border-color),
+              inset 0 0 2rem var(--neon-border-color),
+              0 0 4rem var(--neon-border-color),
+              inset 0 0 4rem var(--neon-border-color);        
+      }
+      
+      0.1%, 20.9%, 24.9%, 55.9%, 88.9% {        
+          text-shadow: none;
+          box-shadow: none;
+      }    
+}
+@media (orientation: portrait), (max-aspect-ratio: 10/13){
+    #consoleParentino{
+        height: auto;
+        width: 100%;
+        font-size: 2vh;
+        max-width: none;
+    }
+    .neonconsole{
+        width: 100%;
+        box-sizing: border-box;
+        margin: 3vw;
+    }
+}
