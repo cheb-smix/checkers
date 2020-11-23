@@ -71,7 +71,7 @@ export default class Checkers extends App{
             && c[k1].color !== color && p[x+':'+y].kills.indexOf(k2)<0) ? {place: k2, kill: k1, len: 2} : false;
     }
 
-    checkTheDamka = (c, p, x, y, direction="left up", color, freeRide=false, kills = []) => {
+    checkTheDamka = (c, p, x, y, direction="left up", color, freeRide=false) => {
         let vars = [];
         let xe = -1;
         let ye = -1;
@@ -116,7 +116,7 @@ export default class Checkers extends App{
 
         let pathString = possibilities[koords].path.join("|");
 
-        let damka = ((cell.color === "white" && pathString.indexOf(":1") > 0) || (cell.color === "black" && pathString.indexOf(":8") > 0));
+        let damka = ((cell.color === "white" && pathString.indexOf(":1") > 0) || (cell.color === "black" && pathString.indexOf(":8") > 0) || cell.damka);
 
         for(let i=0; i < directions.length; i++){
 
@@ -293,7 +293,7 @@ export default class Checkers extends App{
         let future = null;
             
         for(let k in kek){
-            if(/*(checkingEnemy &&*/ kek[k].color!==kek[to].color && kek[k].color!==false/*) || (!checkingEnemy && kek[k].color===kek[to].color)*/){
+            if(kek[k].color!==kek[to].color && kek[k].color!==false){
                 for(let p in kek[k].possibilities){
                     if (checkingEnemy) {
                         if (kek[k].possibilities[p].kills.indexOf(to) >= 0 && kek[k].possibilities[p].effectivity > (iteration ? 0 :lastFuture.effectivity)) {
@@ -346,7 +346,7 @@ export default class Checkers extends App{
                 if (!futureSteps[f]) break;
                 iicells[index].effectivity += futureSteps[f].badFuture ? 0 - futureSteps[f].effectivity : futureSteps[f].effectivity;
             }
-            if (futureSteps.length > 2) console.log(iicells[index].from, iicells[index].to, futureSteps, iicells[index].effectivity);
+            if (futureSteps.length > 1 || iicells[index].damka) console.log(iicells[index].from, iicells[index].to, futureSteps, iicells[index].effectivity);
             
         }
 
@@ -424,14 +424,19 @@ export default class Checkers extends App{
                 for(let p in cells[nkoords].possibilities){
                     if (cells[nkoords].possibilities[p].damka) cells[nkoords].possibilities[p].effectivity *= 2;
 
-                    for(let move = 1; move < cells[nkoords].possibilities[p].path.length; move++){
-                        if (typeof(cells[nkoords].possibilities[move]) !== "undefined" && cells[nkoords].possibilities[move].kills.length < cells[nkoords].possibilities[p].kills.length) {
+                    for(let idx = 1; idx < cells[nkoords].possibilities[p].path.length - 1; idx++){
+                        let move = cells[nkoords].possibilities[p].path[idx];
+                        if (typeof(cells[nkoords].possibilities[move]) !== "undefined") {
                             poss2delete[move] = 1;
                         }
                     }
 
                     if (cells[nkoords].possibilities[p].kills.length > 0) {
                         mustEat[cells[nkoords].color] = nkoords;
+                    } else {
+                        if (cells[nkoords].damka) {
+                            cells[nkoords].possibilities[p].effectivity *= 0.5;
+                        }
                     }
 
                 }

@@ -79,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: true,
         autochess: false,
         writesteps: false,
         writestats: false,
