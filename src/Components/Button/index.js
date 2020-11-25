@@ -20,7 +20,7 @@ export default class Button extends React.Component{
             if (a) a.className = "animate__fadeOut animate__animated";
 
             setTimeout(() => {
-                this.props.history.push(this.props.href);
+                if (this.props.history) this.props.history.push(this.props.href);
             }, 1000);
         }
     }

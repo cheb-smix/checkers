@@ -3,7 +3,21 @@ import './console.css';
 
 export default class Console extends React.Component{
 
+    state = {
+        isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+    }
+
     render(){
+        let consoleClassName = "console neonconsole";
+        if(this.state.isMobile){
+            consoleClassName = "console glitch";
+            /*let c = document.querySelector('.neonconsole');
+            c.className = "console glitch";
+            c.style.textAlign = "center";
+            c.style.fontSize = "18px";
+            c.style.fontFamily = "Federo";
+            c.style.textTransform = "uppercase";*/
+        }
         let avgtime = this.props.serverInfo.avgwaittime['avg'];
         if(this.props.serverInfo.avgwaittime["cnt"]===0){
             avgtime = "∞";
@@ -17,7 +31,7 @@ export default class Console extends React.Component{
         if(this.props.rec) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
         return (
             <div id="consoleParentino">
-            <div className="console neonconsole" data-text={this.props.text}><div id="rampageContainer">{this.props.rampageCode}</div><p>{consoleText}</p></div>
+            <div className={consoleClassName} data-text={this.props.text}><div id="rampageContainer">{this.props.rampageCode}</div><p>{consoleText}</p></div>
             <table><tbody><tr>
                 <td id="avgtime">{serverInfo}</td>
                 <td id="playerName">

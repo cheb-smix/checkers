@@ -54,7 +54,7 @@ export default class Setting extends React.Component{
                             href="/home" 
                             history={this.props.history} 
                             value="По умолчанию" 
-                            theme="grey"
+                            theme="neon"
                             strong="true"
                         />
                     </div>
@@ -64,7 +64,7 @@ export default class Setting extends React.Component{
                             href="/home" 
                             history={this.props.history} 
                             value="Назад" 
-                            theme="light"
+                            theme="grey"
                             strong="true"
                         />
                     </div>

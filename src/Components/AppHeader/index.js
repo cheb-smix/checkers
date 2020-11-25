@@ -4,6 +4,7 @@ import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Settings from '../../Funcs/settings';
+import Button from '../Button';
 
 export default class AppHeader extends React.Component{
 
@@ -64,10 +65,24 @@ export default class AppHeader extends React.Component{
                             <h5>Вы уверены в том, что хотите покинуть игру?</h5><h5 className="warning">Вам будет засчитано поражение!</h5>
                         </div>
                         <div className="col-md-6 col-12">
-                                <div className="sbtn grey-sbtn" onClick={this.props.hideModal}>Отмена</div>
+                            <Button
+                                action={this.props.hideModal} 
+                                href="" 
+                                history="" 
+                                value="Отмена" 
+                                theme="neon"
+                                strong="true"
+                            />
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn light-sbtn" onClick={this.props.quit}>Выйти из игры</div>
+                            <Button
+                                action={this.props.quit} 
+                                href="" 
+                                history="" 
+                                value="Выйти из игры" 
+                                theme="neon"
+                                strong="light"
+                            />
                         </div>
                     </div>
                 </div>,
@@ -84,10 +99,24 @@ export default class AppHeader extends React.Component{
                             {approxtext}
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn grey-sbtn" onClick={this.props.hideModal}>Отмена</div>
+                            <Button
+                                action={this.props.hideModal} 
+                                href="" 
+                                history="" 
+                                value="Отмена" 
+                                theme="neon"
+                                strong="true"
+                            />
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn light-sbtn" onClick={this.stopSearchingOpponent}>Прекратить поиск</div>
+                            <Button
+                                action={this.stopSearchingOpponent} 
+                                href="" 
+                                history="" 
+                                value="Прекратить поиск" 
+                                theme="light"
+                                strong="true"
+                            />
                         </div>
                     </div>
                 </div>,
@@ -99,7 +128,8 @@ export default class AppHeader extends React.Component{
     }
 
     dropSettings = () => {
-        this.state.settings.dropSettings();
+        let us = this.state.settings.dropSettings();
+        for (let k in us) this.props.updateSetting(k, us[k]);
         this.props.hideModal();
     }
 
@@ -148,7 +178,14 @@ export default class AppHeader extends React.Component{
                         />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.dropSettings}>По умолчанию</div>
+                        <Button
+                            action={this.dropSettings} 
+                            href="" 
+                            history="" 
+                            value="По умолчанию" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,
@@ -213,7 +250,14 @@ export default class AppHeader extends React.Component{
                         <input type="password" id="pass2" placeholder="Повторите пароль" minLength="6" maxLength="60" />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.gogoRegister}>Зарегистрироваться</div>
+                        <Button
+                            action={this.gogoRegister} 
+                            href="" 
+                            history="" 
+                            value="Зарегистрироваться" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,
@@ -255,7 +299,14 @@ export default class AppHeader extends React.Component{
                         <input type="password" id="pass" placeholder="Пароль" />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.gogoSign}>Войти</div>
+                        <Button
+                            action={this.gogoSign} 
+                            href="" 
+                            history="" 
+                            value="Войти" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,

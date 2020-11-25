@@ -33,7 +33,10 @@ class App extends Component{
             r = Math.floor(Math.random() * this.state.playlist.length);
             c++;
         }
-        musicplayer.src = this.state.playlist[r];
+        setTimeout(() => {
+            musicplayer.src = this.state.playlist[r];
+        }, 500);
+        
         console.log("set new track",musicplayer.src);
         //musicplayer.play();
     }

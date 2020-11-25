@@ -56,7 +56,6 @@ export default class App extends React.Component{
         socketOpened: false,
         botspeed: 1,
         playstage: 1,
-        isMobile: null,
         consoleText: "",
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
@@ -87,7 +86,6 @@ export default class App extends React.Component{
     componentDidMount() {
         let state = {};
         state.usersettings = this.state.settings.getSettings();
-        state.isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
         let param = {action:"checkcheck"};
         if(state.usersettings.atoken!==""){
             param = {action:"auth",token:state.usersettings.atoken};
@@ -112,7 +110,7 @@ export default class App extends React.Component{
                 this.saveSettingsOption("atoken");
             }
         }
-        if(state.usersettings.autoconnect==="1") this.connectSocket();
+        if(state.usersettings.mode === "online") this.connectSocket();
         if(data){
             state.writesteps = data.WriteSteps;
             state.writestats = data.WriteStats;
@@ -132,14 +130,6 @@ export default class App extends React.Component{
         
         this.setMazafuckinState(state);
         
-        if(state.isMobile){
-            let c = document.querySelector('.neonconsole');
-            c.className = "console glitch";
-            c.style.textAlign = "center";
-            c.style.fontSize = "18px";
-            c.style.fontFamily = "Federo";
-            c.style.textTransform = "uppercase";
-        }
         if(this.state.autochess) this.botStep("black");
     }
 
@@ -319,13 +309,11 @@ export default class App extends React.Component{
         let steps = cells[koordsfrom].possibilities[koordsto].len;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
-            //console.log(cells[koordsfrom].possibilities[koordsto]);
             cells[koordsfrom].possibilities[koordsto].kills.forEach((k, v) => {
                 cells[k].checker = false;
                 cells[k].color = false;
                 cells[k].selectedChecker = false;
                 cells[k].damka = false;
-                //cells[k] = {x:cells[k].x,y:cells[k].y,k:cells[k].key,checker:false,color:false,possibilities:{},active:false};
             });
         }
         
@@ -473,7 +461,6 @@ export default class App extends React.Component{
                 this.iiStep(color);
             }else{
                 if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
-                    //this.iiStep(color,false,data.data);
                     this.doStep(data.data.to, data.data.from, true, null);
                 }else{
                     this.iiStep(color);
@@ -487,7 +474,7 @@ export default class App extends React.Component{
 
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === "in_game") || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === "in_game"));
         
-        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked){
+        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && this.state.usersettings.mode === "bot"){
             setTimeout(()=>{
 
                 if(this.state.XMLHRAvailable && !this.state.autochess){
@@ -603,9 +590,10 @@ export default class App extends React.Component{
 
     onCheckerClick = (koords) => {
         let {cells} = this.state;
-        if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status==="in_game"){
+        if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status==="in_game")
+        {
             //Cell exists and it is a players turn to do a step
-            if(this.state.cells[koords].color===this.state.playerInfo.color || this.state.cells[koords].color===false/* || (this.state.cells[koords].color==="white" && this.state.online===false)*/){
+            if(this.state.cells[koords].color===this.state.playerInfo.color || this.state.cells[koords].color===false){
                 //If checker is player`s one or empty cell
                 if(cells[koords].checker!==false){
                     //New checker click

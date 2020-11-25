@@ -25,6 +25,9 @@ export default class Settings{
         for(let i in this.defaultusersettings){
             this.saveSetting(i, this.defaultusersettings[i]);
         }
+        document.querySelector("#musicplayer").volume = this.defaultusersettings.musicvolume / 100;
+        document.querySelector("#soundplayer").volume = this.defaultusersettings.soundvolume / 100;
+        return this.defaultusersettings;
     }
 
     loadSettings = () => {
@@ -42,6 +45,15 @@ export default class Settings{
         this.usersettings[key] = value;
         if(value==="") localStorage.removeItem(key);
         else localStorage.setItem(key,value);
+
+        if (key === "musicvolume") {
+            let musicplayer = document.querySelector("#musicplayer");
+            musicplayer.volume = value / 100;
+            if (value > 0 && musicplayer.paused) musicplayer.play();
+            if (value === 0 && !musicplayer.paused) musicplayer.pause();
+            
+        }
+        if (key === "soundvolume") document.querySelector("#soundplayer").volume = value / 100;
     }
 
     getSettings = (key = false) => {
