@@ -1,15 +1,52 @@
 .ubutton {
     padding: 2vh;
     font-size: 3vh;
-    color: var(--theme-main-color);
     text-align: center;
-    border: 1px var(--theme-main-color) solid;
     border-radius: 5px;
+    cursor: pointer;
     margin: 2vw;
-    background: var(--theme-bg-color);
     font-family: ForwardExtra-Light;
-    transition: background 0.3s ease;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
-.ubutton:hover{
+
+.ubutton.maintheme:hover{
     background: var(--theme-bg-secondary-color);
+}
+
+.ubutton.maintheme{
+    color: var(--theme-main-color);
+    border: 1px var(--theme-main-color) solid;
+    background: var(--theme-bg-color);
+}
+
+.ubutton.strong{
+    padding: 0.8em;
+    border-radius: 0; 
+    margin: 0;
+    font-size: inherit;
+}
+
+.ubutton.grey:hover{
+    border: 2px solid #9ca6ad;
+    color: white;
+    background: #616568;
+}
+
+.ubutton.grey{
+    border: 2px solid #485761;
+    color: #9c9c9c;
+    background: #3a3d3f;
+}
+
+.ubutton.light:hover{
+    border: 2px solid #57617c;
+    color: #3a3a3a;
+    background: #b6bbcc;
+}
+
+.ubutton.light{
+    border: 2px solid #5c5c5c;
+    color: #5c5c5c;
+    background: #c7c7c7;
 }

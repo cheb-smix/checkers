@@ -6,7 +6,6 @@ export default class Button extends React.Component{
 
     buttonAction = () => {
         if (this.props.action !== "") {
-            console.log(this.props.action);
             this.props.action();
         }
         if (this.props.href !== "") {
@@ -17,7 +16,7 @@ export default class Button extends React.Component{
             a = document.querySelector(".umaincon");
             if (a) a.className = "umaincon animate__fadeOutLeft animate__animated";
 
-            a = document.querySelector("#homeButtons");
+            a = document.querySelector("#btnContainer");
             if (a) a.className = "animate__fadeOut animate__animated";
 
             setTimeout(() => {
@@ -27,8 +26,10 @@ export default class Button extends React.Component{
     }
 
     render(){
+        let className = "ubutton" + (this.props.theme ? " " + this.props.theme : " maintheme");
+        if (this.props.strong) className += " strong";
         return (
-            <div onClick={this.buttonAction} className="ubutton">{this.props.value}</div>
+            <div onClick={this.buttonAction} className={className}>{this.props.value}</div>
         );
     }
 }

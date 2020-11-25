@@ -3,10 +3,13 @@ import "./appheader.css";
 import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
+import Settings from '../../Funcs/settings';
+
 export default class AppHeader extends React.Component{
 
     state = {
         naviActive: null,
+        settings: new Settings()
     }
 
     
@@ -96,13 +99,14 @@ export default class AppHeader extends React.Component{
     }
 
     dropSettings = () => {
-        let usersettings = {animation: 2, autoconnect: 1, difficulty: 1};
-        for(let i in usersettings){
-            this.props.saveSettingsOption(i,usersettings[i]);
-        }
+        this.state.settings.dropSettings();
         this.props.hideModal();
     }
 
+    saveSetting = (key, val) => {
+        this.state.settings.saveSetting(key, val);
+        this.props.updateSetting(key, val);
+    }
 
 
     settingsClick = () => {
@@ -115,7 +119,7 @@ export default class AppHeader extends React.Component{
                             items={{"2":"Расширенная","1":"Упрощенная","0":"Без анимации"}}
                             selected={this.props.usersettings.animation}
                             placeholder="Анимация"
-                            onSelect={this.props.saveSettingsOption}
+                            onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
@@ -124,7 +128,7 @@ export default class AppHeader extends React.Component{
                             items={{"3":"Сложно","2":"Среднее","1":"Легко"}}
                             selected={this.props.usersettings.difficulty}
                             placeholder="Сложность бота"
-                            onSelect={this.props.saveSettingsOption}
+                            onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
@@ -132,7 +136,7 @@ export default class AppHeader extends React.Component{
                             id="soundvolume"
                             placeholder="Громкость звуков"
                             value={this.props.usersettings.soundvolume}
-                            onSet={this.props.saveSettingsOption}
+                            onSet={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
@@ -140,7 +144,7 @@ export default class AppHeader extends React.Component{
                             id="musicvolume"
                             placeholder="Громкость музыки"
                             value={this.props.usersettings.musicvolume}
-                            onSet={this.props.saveSettingsOption}
+                            onSet={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
@@ -235,7 +239,7 @@ export default class AppHeader extends React.Component{
         this.props.XMLHR({action:"register",name:document.getElementById("name").value,login:document.getElementById("login").value,pass:sha1(document.getElementById("pass").value)},(d)=>{
             m.className = d.success?"success":"error";
             m.innerHTML = d.response;
-            this.props.saveSettingsOption("atoken",d.data.token);
+            this.saveSetting("atoken",d.data.token);
             if(d.success) window.location.reload();
         });
     }
@@ -264,7 +268,7 @@ export default class AppHeader extends React.Component{
             m.innerHTML = d.response;
             if(d.success){
                 m.className = "success";
-                this.props.saveSettingsOption("atoken",d.data.token);
+                this.saveSetting("atoken",d.data.token);
                 window.location.reload();
             }else{
                 m.className = "error";
@@ -272,7 +276,7 @@ export default class AppHeader extends React.Component{
         });
     }
     signOut = () => {
-        this.props.saveSettingsOption("atoken","");
+        this.saveSetting("atoken","");
         window.location.reload();
     }
     goHome = () => {

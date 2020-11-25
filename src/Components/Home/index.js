@@ -1,23 +1,40 @@
 import React from 'react';
 
-import Modal from '../Modal';
 import Button from '../Button';
-import Droplist from '../Droplist';
+import Settings from '../../Funcs/settings';
 
-import './home.css';
 
-// import './home.css';
 
 export default class Home extends React.Component{
 
+    state = {
+        settings: new Settings()
+    }
+
     render(){
-        console.log(this.props);
         return (
-            <div id="homeButtons" className="animate__fadeIn animate__animated">
-                <Button action={this.props.GSS} href="/checkers" history={this.props.history} value="Против бота" />
-                <Button action={this.props.GSS} href="/checkers" history={this.props.history} value="Локальная игра" />
-                <Button action={this.props.GSS} href="/checkers" history={this.props.history} value="Онлайн" />
+            <div id="btnContainer" className="animate__fadeIn animate__animated">
+                <h5 className="">Checkers</h5>
+                <Button 
+                    action={()=>this.state.settings.saveSetting("mode", "bot")} 
+                    href="/checkers" 
+                    history={this.props.history} 
+                    value="Против бота" 
+                />
+                <Button 
+                    action={()=>this.state.settings.saveSetting("mode", "local")} 
+                    href="/checkers" 
+                    history={this.props.history} 
+                    value="Локальная игра" 
+                />
+                <Button 
+                    action={()=>this.state.settings.saveSetting("mode", "online")} 
+                    href="/checkers" 
+                    history={this.props.history} 
+                    value="Онлайн" 
+                />
                 <Button action="" href="/checkers" history={this.props.history} value="Войти" />
+                <Button action="" href="/settings" history={this.props.history} value="Настройки" />
             </div>
         );
     };

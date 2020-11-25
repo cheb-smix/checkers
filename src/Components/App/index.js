@@ -7,6 +7,7 @@ import Fanfara from '../Fanfaras';
 import Modal from '../Modal';
 import Rampage from '../Rampage';
 import Board from './wood_texture.jpg';
+import Settings from '../../Funcs/settings';
 
 import './app.css';
 
@@ -42,15 +43,8 @@ export default class App extends React.Component{
         },
         game: window.location.href.split("/").pop(),
         /* USER PREFERENCES */
-        usersettings: {
-            autoconnect: 1,
-            animation: 1,
-            difficulty: 1,
-            soundvolume: 70,
-            musicvolume: 70,
-            mode: "bot",
-            atoken: "",
-        },
+        settings: new Settings(),
+        usersettings: {},
         /* TECH INFO */
         selectedChecker: false,
         playersStep: true,
@@ -91,12 +85,13 @@ export default class App extends React.Component{
     };
 
     componentDidMount() {
-        let state = this.loadSettings();
+        let state = {};
+        state.usersettings = this.state.settings.getSettings();
+        state.isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
         let param = {action:"checkcheck"};
         if(state.usersettings.atoken!==""){
             param = {action:"auth",token:state.usersettings.atoken};
         }
-        //state.usersettings.autoconnect = "1";
         
         this.XMLHR(param,(data)=>{
             this.initiation(state,data);
@@ -654,7 +649,7 @@ export default class App extends React.Component{
         this.setMazafuckinState({consoleText: text});
     }
 
-    loadSettings = () => {
+    /*loadSettings = () => {
         let {usersettings} = this.state;
         let o = {usersettings:usersettings};
         for(let key in o.usersettings){
@@ -675,6 +670,12 @@ export default class App extends React.Component{
         this.setMazafuckinState({usersettings:usersettings});
         if(value==="") localStorage.removeItem(key);
         else localStorage.setItem(key,value);
+    }*/
+
+    updateSetting = (key, val) => {
+        let {usersettings} = this.state;
+        usersettings[key] = val;
+        this.setState({usersettings: usersettings});
     }
 
     socketSend = (param) => {
@@ -897,7 +898,7 @@ export default class App extends React.Component{
                         showModal={this.showModal}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
-                        saveSettingsOption={this.saveSettingsOption}
+                        updateSetting={this.updateSetting}
                         usersettings={this.state.usersettings}
                         XMLHR={this.XMLHR}
                         quit={this.quit}

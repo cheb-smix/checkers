@@ -127,6 +127,21 @@ input[type=text]:focus{
     margin: 0px;
     padding: 0px;
 }
+#btnContainer{
+    padding-top: 22vh
+}
+#btnContainer>h5{
+    text-align: center;
+    font-family: ForwardExtra-Light;
+    text-transform: uppercase;
+    color: #cccccc;
+}
+#btnContainer>h5.maintheme{
+  color: var(--theme-main-color);
+}
+#btnContainer>h5.neon{
+  color: var(--neon-border-color);
+}
 .sbtn{
     font-family: ForwardExtra-Light;
     padding: 0.8em;
@@ -135,26 +150,7 @@ input[type=text]:focus{
     transition: all 0.3s ease;
     font-weight: bold;
 }
-.grey-sbtn{
-    border: 2px solid #485761;
-    color: #9c9c9c;
-    background: #3a3d3f;
-}
-.grey-sbtn:hover{
-    border: 2px solid #9ca6ad;
-    color: white;
-    background: #616568;
-}
-.light-sbtn{
-    border: 2px solid #5c5c5c;
-    color: #5c5c5c;
-    background: #c7c7c7;
-}
-.light-sbtn:hover{
-    border: 2px solid #57617c;
-    color: #3a3a3a;
-    background: #b6bbcc;
-}
+
 #message{
     width: 100%;
     padding: 1em ;
