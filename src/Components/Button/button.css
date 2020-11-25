@@ -1,0 +1,15 @@
+.ubutton {
+    padding: 2vh;
+    font-size: 3vh;
+    color: var(--theme-main-color);
+    text-align: center;
+    border: 1px var(--theme-main-color) solid;
+    border-radius: 5px;
+    margin: 2vw;
+    background: var(--theme-bg-color);
+    font-family: ForwardExtra-Light;
+    transition: background 0.3s ease;
+}
+.ubutton:hover{
+    background: var(--theme-bg-secondary-color);
+}

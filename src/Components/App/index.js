@@ -46,6 +46,9 @@ export default class App extends React.Component{
             autoconnect: 1,
             animation: 1,
             difficulty: 1,
+            soundvolume: 70,
+            musicvolume: 70,
+            mode: "bot",
             atoken: "",
         },
         /* TECH INFO */
@@ -879,6 +882,7 @@ export default class App extends React.Component{
         return (
             <div className="ucon">
                 <AppHeader 
+                        history={this.props.history} 
                         gamename={this.state.game} 
                         playerName={this.state.playerInfo.name}
                         playerColor={this.state.playerInfo.color}
@@ -915,7 +919,7 @@ export default class App extends React.Component{
                         modal={this.state.modal}
                 />
                 <div className="uchecker black" id="stepper"><i className="fa fa-chess-queen"></i>&nbsp;</div>
-                <div className="umaincon">
+                <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield" style={{backgroundImage: Board, transform: this.state.playerInfo.color === "white" ? "rotate(0deg)" : "rotate(180deg)"}}>
                     {renderedField}
                     </div>

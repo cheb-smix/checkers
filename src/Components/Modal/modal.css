@@ -20,7 +20,7 @@
     cursor: pointer;
 }
 #modal .fa-times:hover{
-    color: #1e6899;
+    color: var(--neon-bg-color);
 }
 #modal{
     padding-bottom: 10vh;
@@ -55,8 +55,8 @@
     font-size: 20px;
     padding-bottom: 1em;
     font-weight: bold;
-    color: #1e6899;
-    border-bottom: 1px solid #1e6899;
+    color: var(--neon-bg-color);
+    border-bottom: 1px solid var(--neon-bg-color);
 }
 
 

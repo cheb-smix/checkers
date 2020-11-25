@@ -10,10 +10,13 @@
     --theme-main-color: #fac83d;
     --theme-secondary-color: #eeff00;
     --theme-third-color: #cedd00;
+    --theme-bg-hover-color: #30260a;
     --theme-bg-color: black;
+    --theme-bg-secondary-color: rgb(51, 29, 0);
     --theme-bg-image: none;
     --neon-text-color: #f40;
     --neon-border-color: #08f;
+    --neon-bg-color: #1e6899;
     --field-size: 48vw;
     --cell-size: 6vw;
     --checker-size: 4.5vw;
