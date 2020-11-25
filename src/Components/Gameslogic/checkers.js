@@ -273,7 +273,7 @@ export default class Checkers extends App{
             if(!force){
                 this.iiStep(color,true,dbstep);
             }else{
-                this.rampage(0,"NO MOVES!");
+                this.rampage(0, "NO MOVES!", "opponent");
             }
         }
     }
@@ -365,7 +365,7 @@ export default class Checkers extends App{
         return n;
     }
 
-    checkOfflineGameStatus = (playerInfo,opponentInfo) => {
+    checkOfflineGameStatus = (playerInfo, opponentInfo) => {
         if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
 
         let changes = false;

@@ -20,6 +20,7 @@ export default class App extends React.Component{
     state = {
         /* USERS DYNAMIC INFO */
         cells: {},
+        possibilities: {},
         bestMove: null,
         playerInfo: {
             name: "player"+Math.round(Math.random()*1000 + 1000), 
@@ -286,11 +287,27 @@ export default class App extends React.Component{
         this.consoleLog(response.response);
     }
 
-    rampage = (steps,word="") => {
+    rampage = (steps, word="", target="") => {
         clearTimeout(this.state.rampageTO);
-        this.setMazafuckinState({rampageCode:<Rampage steps={steps} word={word} />,rampageTO:setTimeout(()=>{
-            this.setMazafuckinState({rampageCode:"",rampageTO:null});
-        },3000)});
+        let newstate = {
+            rampageCode:<Rampage steps={steps} word={word} />,
+            rampageTO:setTimeout(()=>{
+                this.setMazafuckinState({rampageCode:"",rampageTO:null});
+            },3000)
+        };
+        if (steps === 0 && word === "NO MOVES!") {
+            let {playerInfo, opponentInfo} = this.state;
+            if (target === "opponent") {
+                playerInfo.winner = true;
+                opponentInfo.winner = false;
+            } else {
+                playerInfo.winner = false;
+                opponentInfo.winner = true;
+            }
+            newstate.playerInfo = playerInfo;
+            newstate.opponentInfo = opponentInfo;
+        }
+        this.setMazafuckinState(newstate);
     }
 
     sleep = (ms) => {

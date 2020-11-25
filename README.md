@@ -3,8 +3,9 @@
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
-4. copy build folder to cordova/www
-5. cordova build
+4. build/static/js/main.*.chunk.js* > "/music/" to "music/"
+5. copy build folder to cordova/www
+6. cordova build
 
 # TODO
 1. Обработка патов
@@ -16,6 +17,8 @@
 7. Звуки
 8. Придумать реализацию режима local (onCheckerClick event)
 9. Фон страницы Home ?
+-  Стоит вынести Modal
+-  Стоит собирать possibilities не в cells, а отдельно
 
 # Баги
 - 20-30 fps - херовенько...
