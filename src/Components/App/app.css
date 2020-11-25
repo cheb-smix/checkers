@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'Federo';
-    src: url('../Fonts/Federo.ttf');
+    src: url('../../Fonts/Federo.ttf');
 }
 @font-face {
     font-family: 'ForwardExtra-Light';
-    src: url('../Fonts/ForwardExtra-Light.otf');
+    src: url('../../Fonts/ForwardExtra-Light.otf');
 }
 :root{
     --theme-main-color: #fac83d;
