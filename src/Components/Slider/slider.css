@@ -1,0 +1,42 @@
+.slider{
+    position: relative;
+    width: 100%;
+    padding: 0px;
+}
+.slider > .val{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 0;
+    width: 100%;
+    height: 3em;
+    margin: 0px;
+    background: linear-gradient(to right, var(--neon-bg-color), var(--neon-border-color));
+    transition: all 0.3s ease;
+}
+.slider > .placeholder{
+    position: relative;
+    width: 100%;
+    height: 3em;
+    font-family: ForwardExtra-Light;
+    font-weight: bold;
+    padding: 1em;
+    padding-right: 0;
+    color: #9c9c9c;
+    cursor: pointer;
+    z-index: 2;
+    text-align: left;
+}
+.slider > .placeholder{
+    padding-top: 0.6em;
+}
+.slider > .placeholder::after{
+    font-family: ForwardExtra-Light;
+    font-size: 0.5em;
+    position: absolute;
+    content: attr(val);
+    color: var(--neon-border-color);
+    font-size: 0.8em;
+    left: 1.2em;
+    bottom: 0.3em;
+}

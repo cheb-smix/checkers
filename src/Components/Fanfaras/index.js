@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button';
 import "./fanfara.css";
 
 export default class Fanfara extends React.Component{
@@ -97,13 +98,34 @@ export default class Fanfara extends React.Component{
             <div className="container" style={{height:"auto"}}>
                 <div className="row">
                     <div className="col-12">
-                        <div className="sbtn grey-sbtn" onClick={()=>{this.props.quit(false)}}>Закрыть</div>
+                        <Button
+                            action={()=>{this.props.quit(false)}} 
+                            href="" 
+                            history="" 
+                            value="Закрыть" 
+                            theme="grey"
+                            strong="true"
+                        />
                     </div>
                     <div className="col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.props.continueWithSameOpponent}>{"Продолжить с "+opponentInfo.name}</div>
+                        <Button
+                            action={this.props.continueWithSameOpponent} 
+                            href="" 
+                            history="" 
+                            value={"Продолжить с "+opponentInfo.name} 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                     <div className="col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.props.searchNewOpponent}>Найти другого противника</div>
+                        <Button
+                            action={this.props.searchNewOpponent} 
+                            href="" 
+                            history="" 
+                            value="Найти другого противника" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>;

@@ -1,6 +1,7 @@
 .droplist{
     width: 100%;
-    min-width: 80vw;
+    min-width: 70vw;
+    display: inline-block;
     height: 3em;
     position: relative;
     transition: transform 0.3s ease;
@@ -11,7 +12,7 @@
         min-width: 30vh;
     }
 }
-.listitem,.placeholder{
+.listitem, .droplist > .placeholder{
     position: relative;
     width: 100%;
     height: 3em;
@@ -19,7 +20,7 @@
     font-weight: bold;
     padding: 1em;
     padding-right: 0;
-    background: #485761;
+    background: #55585e;
     color: #9c9c9c;
     cursor: pointer;
     text-align: left;
@@ -29,10 +30,10 @@
 .listitem{
     position: absolute;
 }
-.placeholder{
+.droplist > .placeholder{
     padding-top: 0.6em;
 }
-.placeholder::before{
+.droplist > .placeholder::before{
     font-family: 'Font Awesome\ 5 Free';
     content: '\f107';
     position: absolute;
@@ -41,7 +42,7 @@
     transform: rotate(0deg);
     transition: all 0.3s ease;
 }
-.placeholder::after{
+.droplist > .placeholder::after{
     font-family: ForwardExtra-Light;
     font-size: 0.5em;
     position: absolute;
@@ -51,11 +52,11 @@
     left: 1.2em;
     bottom: 0.3em;
 }
-.placeholder:hover{
+.droplist > .placeholder:hover{
     color: white;
-    background: #1e6899;
+    background: var(--neon-bg-color);
 }
-.placeholder:hover::before{
+.droplist > .placeholder:hover::before{
     transform: rotate(90deg);
 }
 .droplist.opened{
@@ -88,7 +89,7 @@
 .listitem:hover{
     padding-left: 2.5em;
     color: white;
-    background: #1e6899;
+    background: var(--neon-bg-color);
 }
 .listitem:hover::before{
     opacity: 0.2;

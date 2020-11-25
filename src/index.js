@@ -2,14 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { Router } from "react-router-dom";
-import {createBrowserHistory} from 'history';
+import {createBrowserHistory, createHashHistory} from 'history';
 import App from './App.js';
 
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 
-const history = createBrowserHistory();
-//const history = new HashHistory();
+const history = window.cordova ? createHashHistory() : createBrowserHistory();
 
 Math.coefficient = (n1,n2,f=0) => {
   n2 = n2>0?n2:1;

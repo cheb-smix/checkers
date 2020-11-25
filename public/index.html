@@ -9,8 +9,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="#fac83d">
     <link rel="shortcut icon" href="favicon.ico">
     <title>Checkers</title>
+    <style>
+      .App-logo {
+        text-align: center;
+        position: absolute;
+        width: 10vw;
+        left: 45vw;
+        top: 30vh;
+        pointer-events: none;
+        transition: top 0.5s ease;
+      }
+    </style>
   </head>
   <body>
+    <img src="favicon.ico" alt="Checkers" class="App-logo">
+    <audio id="musicplayer" autoplay="autoplay" type="audio/mpeg"></audio>
+    <audio id="soundplayer" autoplay="autoplay" type="audio/mpeg"></audio>
     <div id="root"></div>
   </body>
 </html>

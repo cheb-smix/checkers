@@ -15,7 +15,6 @@
                 -1px 1px 0 var(--theme-main-color);
 }
 #uhiconcontainer{
-    /*display: none;*/
     display: table;
     position: absolute;
     flex-grow: 6;
@@ -23,8 +22,16 @@
     flex-direction: column;
     top: 1.6em;
     z-index: 8;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.9);
     width: 100%;
+    padding: 5vh 0vh;
+}
+#utitle.initial{
+    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+    -webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    opacity: 0;
 }
 .uhicon,#utitle{
     padding: 0.3em;
@@ -32,11 +39,19 @@
     transition: all 0.3s ease;
     cursor: pointer;
 }
+#uhiconcontainer .uhicon{
+    font-size: 24px;
+}
+#uhiconcontainer.hidden{
+    opacity: 0;
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+}
 #uhiconcontainer>.uhicon{
     display: table-row;
     justify-content: left;
     align-items: center;
-    font-family: Federo;
+    font-family: ForwardExtra-Light;
 }
 #uhiconcontainer>.uhicon>*{
     display: table-cell;

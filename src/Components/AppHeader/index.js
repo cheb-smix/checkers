@@ -1,11 +1,16 @@
 import React from 'react';
 import "./appheader.css";
 import Droplist from "../Droplist";
+import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
+import Settings from '../../Funcs/settings';
+import Button from '../Button';
+
 export default class AppHeader extends React.Component{
 
     state = {
-        naviActive: false,
+        naviActive: null,
+        settings: new Settings()
     }
 
     
@@ -28,9 +33,17 @@ export default class AppHeader extends React.Component{
                             selected={this.props.gamename}
                             placeholder="Игра &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; "
                             onSelect={(k, v)=>{
-                                window.location.href = "/" + v;
+                                this.props.hideModal();
+                                document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
+                                document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
+                                setTimeout(() => {
+                                    this.props.history.push("/" + v);
+                                    //document.querySelector(".umaincon").className = "umaincon animate__fadeInRight animate__animated";
+                                    //window.location.href = "/" + v;
+                                }, 1000);
                             }}
                         />
+                        <i className="fa fa-play fa-2x"></i>
                     </div>
                 </div>
             </div>,
@@ -52,10 +65,24 @@ export default class AppHeader extends React.Component{
                             <h5>Вы уверены в том, что хотите покинуть игру?</h5><h5 className="warning">Вам будет засчитано поражение!</h5>
                         </div>
                         <div className="col-md-6 col-12">
-                                <div className="sbtn grey-sbtn" onClick={this.props.hideModal}>Отмена</div>
+                            <Button
+                                action={this.props.hideModal} 
+                                href="" 
+                                history="" 
+                                value="Отмена" 
+                                theme="neon"
+                                strong="true"
+                            />
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn light-sbtn" onClick={this.props.quit}>Выйти из игры</div>
+                            <Button
+                                action={this.props.quit} 
+                                href="" 
+                                history="" 
+                                value="Выйти из игры" 
+                                theme="neon"
+                                strong="light"
+                            />
                         </div>
                     </div>
                 </div>,
@@ -72,10 +99,24 @@ export default class AppHeader extends React.Component{
                             {approxtext}
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn grey-sbtn" onClick={this.props.hideModal}>Отмена</div>
+                            <Button
+                                action={this.props.hideModal} 
+                                href="" 
+                                history="" 
+                                value="Отмена" 
+                                theme="neon"
+                                strong="true"
+                            />
                         </div>
                         <div className="col-md-6 col-12">
-                            <div className="sbtn light-sbtn" onClick={this.stopSearchingOpponent}>Прекратить поиск</div>
+                            <Button
+                                action={this.stopSearchingOpponent} 
+                                href="" 
+                                history="" 
+                                value="Прекратить поиск" 
+                                theme="light"
+                                strong="true"
+                            />
                         </div>
                     </div>
                 </div>,
@@ -87,13 +128,15 @@ export default class AppHeader extends React.Component{
     }
 
     dropSettings = () => {
-        let usersettings = {animation: 2, autoconnect: 1, difficulty: 1};
-        for(let i in usersettings){
-            this.props.saveSettingsOption(i,usersettings[i]);
-        }
+        let us = this.state.settings.dropSettings();
+        for (let k in us) this.props.updateSetting(k, us[k]);
         this.props.hideModal();
     }
 
+    saveSetting = (key, val) => {
+        this.state.settings.saveSetting(key, val);
+        this.props.updateSetting(key, val);
+    }
 
 
     settingsClick = () => {
@@ -106,16 +149,7 @@ export default class AppHeader extends React.Component{
                             items={{"2":"Расширенная","1":"Упрощенная","0":"Без анимации"}}
                             selected={this.props.usersettings.animation}
                             placeholder="Анимация"
-                            onSelect={this.props.saveSettingsOption}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Droplist
-                            id="autoconnect"
-                            items={{"1":"Включено","0":"Отключено"}}
-                            selected={this.props.usersettings.autoconnect}
-                            placeholder="Автоподключение"
-                            onSelect={this.props.saveSettingsOption}
+                            onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
@@ -124,11 +158,34 @@ export default class AppHeader extends React.Component{
                             items={{"3":"Сложно","2":"Среднее","1":"Легко"}}
                             selected={this.props.usersettings.difficulty}
                             placeholder="Сложность бота"
-                            onSelect={this.props.saveSettingsOption}
+                            onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.dropSettings}>По умолчанию</div>
+                        <Slider
+                            id="soundvolume"
+                            placeholder="Громкость звуков"
+                            value={this.props.usersettings.soundvolume}
+                            onSet={this.saveSetting}
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Slider
+                            id="musicvolume"
+                            placeholder="Громкость музыки"
+                            value={this.props.usersettings.musicvolume}
+                            onSet={this.saveSetting}
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={this.dropSettings} 
+                            href="" 
+                            history="" 
+                            value="По умолчанию" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,
@@ -193,7 +250,14 @@ export default class AppHeader extends React.Component{
                         <input type="password" id="pass2" placeholder="Повторите пароль" minLength="6" maxLength="60" />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.gogoRegister}>Зарегистрироваться</div>
+                        <Button
+                            action={this.gogoRegister} 
+                            href="" 
+                            history="" 
+                            value="Зарегистрироваться" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,
@@ -219,7 +283,7 @@ export default class AppHeader extends React.Component{
         this.props.XMLHR({action:"register",name:document.getElementById("name").value,login:document.getElementById("login").value,pass:sha1(document.getElementById("pass").value)},(d)=>{
             m.className = d.success?"success":"error";
             m.innerHTML = d.response;
-            this.props.saveSettingsOption("atoken",d.data.token);
+            this.saveSetting("atoken",d.data.token);
             if(d.success) window.location.reload();
         });
     }
@@ -235,7 +299,14 @@ export default class AppHeader extends React.Component{
                         <input type="password" id="pass" placeholder="Пароль" />
                     </div>
                     <div className="col-md-6 col-12">
-                        <div className="sbtn grey-sbtn" onClick={this.gogoSign}>Войти</div>
+                        <Button
+                            action={this.gogoSign} 
+                            href="" 
+                            history="" 
+                            value="Войти" 
+                            theme="neon"
+                            strong="true"
+                        />
                     </div>
                 </div>
             </div>,
@@ -248,7 +319,7 @@ export default class AppHeader extends React.Component{
             m.innerHTML = d.response;
             if(d.success){
                 m.className = "success";
-                this.props.saveSettingsOption("atoken",d.data.token);
+                this.saveSetting("atoken",d.data.token);
                 window.location.reload();
             }else{
                 m.className = "error";
@@ -256,8 +327,16 @@ export default class AppHeader extends React.Component{
         });
     }
     signOut = () => {
-        this.props.saveSettingsOption("atoken","");
+        this.saveSetting("atoken","");
         window.location.reload();
+    }
+    goHome = () => {
+        document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
+        document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
+        this.setState({naviActive: false});
+        setTimeout(() => {
+            this.props.history.push("/home");
+        }, 1000);
     }
     navigatorClick = () => {
         this.setState({naviActive: !this.state.naviActive});
@@ -268,7 +347,7 @@ export default class AppHeader extends React.Component{
     }
     componentDidMount = () => {
         let title = document.getElementById('utitle');
-        title.className = "animate__rotateInDownLeft animate__animated fa-2x";
+        title.className = "animate__backInLeft animate__animated fa-2x";
         title.addEventListener("animationend",(event) => {
             event.target.className = "fa-2x";
         });
@@ -284,7 +363,8 @@ export default class AppHeader extends React.Component{
         if(this.props.searching) gametitle = "Остановить поиск";
 
         let uhcclass = "fa-2x";
-        uhcclass = this.state.naviActive ? "animate__fadeInRight animate__animated fa-2x" : "animate__fadeOutRight animate__animated fa-2x";
+        uhcclass = this.state.naviActive ? "animate__fadeInLeft animate__animated fa-2x" : "animate__fadeOutLeft animate__animated fa-2x";
+        if (this.state.naviActive === null) uhcclass = "hidden fa-2x";
 
         let accDiv = <React.Fragment>
             <div className="uhicon" onClick={this.gameButClick} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
@@ -292,18 +372,23 @@ export default class AppHeader extends React.Component{
         </React.Fragment>;
 
         if(this.props.playerSigned){
-            accDiv = <div id="uhiconcontainer" className={uhcclass}>
-                <div className="uhicon" onClick={this.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerName}</span></div>
-                {accDiv}
-                <div className="uhicon" onClick={this.signOut}><i className="fa fa-times"></i><span> Выйти из аккаунта</span></div>
-                </div>;
+            accDiv = <React.Fragment>
+                        <div className="uhicon" onClick={this.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerName}</span></div>
+                        {accDiv}
+                        <div className="uhicon" onClick={this.signOut}><i className="fa fa-times"></i><span> Выйти из аккаунта</span></div>
+                    </React.Fragment>;
         }else{
-            accDiv = <div id="uhiconcontainer" className={uhcclass}>
-                <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> Вход</span></div>
-                <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> Регистрация</span></div>
-                {accDiv}
-                </div>;
+            accDiv = <React.Fragment>
+                        <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> Вход</span></div>
+                        <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> Регистрация</span></div>
+                        {accDiv}
+                    </React.Fragment>;
         }
+
+        accDiv = <div id="uhiconcontainer" className={uhcclass}>
+                    <div className="uhicon" onClick={this.goHome}><i className="fa fa-home"></i><span> Главное меню</span></div>
+                    {accDiv}
+                </div>;
 
         return (
             <div className="uheader">
