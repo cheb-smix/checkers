@@ -37,8 +37,6 @@ class App extends Component{
             musicplayer.src = this.state.playlist[r];
         }, 500);
         
-        console.log("set new track",musicplayer.src);
-        //musicplayer.play();
     }
 
     componentDidMount = () => {

@@ -10,7 +10,7 @@ export default class Console extends React.Component{
     render(){
         let consoleClassName = "console neonconsole";
         if(this.state.isMobile){
-            consoleClassName = "console glitch";
+            //consoleClassName = "console glitch";
             /*let c = document.querySelector('.neonconsole');
             c.className = "console glitch";
             c.style.textAlign = "center";
@@ -40,6 +40,7 @@ export default class Console extends React.Component{
                     {writeStepsBlock!==""?<br/>:""}
                     {writeStepsBlock}
                 </td>
+                <td id="fps"></td>
             </tr></tbody></table>
             </div>
         );
