@@ -96,6 +96,48 @@ export default class App extends React.Component{
         },()=>{
             this.initiation(state);
         });
+
+        /* FPS COUNTER */
+        let busy = false;
+        let frameCount = function _fc(timeStart, state){
+        
+            let now = performance.now();
+            let duration = now - timeStart;
+            
+            if(duration < 100){
+                _fc.counter++;
+            } else {
+                _fc.fps = _fc.counter * 10;
+                _fc.counter = 0;
+                timeStart = now; 
+                if (document.querySelector("#fps")) document.querySelector("#fps").innerHTML = _fc.fps;
+                
+                if (_fc.fps < 50 && !busy) {
+                    /*console.log("Lowing down animation!");
+                    busy = true;
+                    let currentAnimationLevel = state.settings.getSettings("animation");
+                    if (currentAnimationLevel > 0) {
+                        state.settings.saveSetting("animation", currentAnimationLevel - 1);
+                    }*/
+                    let c = document.querySelector('.neonconsole');
+                    if (c) {
+                        c.className = "console glitch";
+                        c.style.textAlign = "center";
+                        c.style.fontSize = "18px";
+                        c.style.fontFamily = "Federo";
+                        c.style.textTransform = "uppercase";
+                    }
+                    busy = false;
+                }
+        
+            }
+            requestAnimationFrame(() => frameCount(timeStart, state)); 
+        }
+        
+        frameCount.counter = 0;
+        frameCount.fps = 0;
+        
+        frameCount(performance.now(), this.state)
     }
 
     initiation = (state,data=false) => {
@@ -637,30 +679,8 @@ export default class App extends React.Component{
         this.setMazafuckinState({consoleText: text});
     }
 
-    /*loadSettings = () => {
-        let {usersettings} = this.state;
-        let o = {usersettings:usersettings};
-        for(let key in o.usersettings){
-            let v = localStorage.getItem(key);
-            if(typeof(v)==="string"){
-                v = v==="true"?true:v;
-                v = v==="false"?false:v;
-                o.usersettings[key]=v;
-            }
-        }
-        o.isMobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-        return o;
-    }
-
-    saveSettingsOption = (key,value="") => {
-        let {usersettings} = this.state;
-        usersettings[key] = value;
-        this.setMazafuckinState({usersettings:usersettings});
-        if(value==="") localStorage.removeItem(key);
-        else localStorage.setItem(key,value);
-    }*/
-
     updateSetting = (key, val) => {
+        console.log("state updated");
         let {usersettings} = this.state;
         usersettings[key] = val;
         this.setState({usersettings: usersettings});
