@@ -10,7 +10,7 @@ export default class Console extends React.Component{
     render(){
         let consoleClassName = "console neonconsole";
         
-        if(this.state.isMobile) consoleClassName = "console glitch";
+        if(this.state.isMobile) consoleClassName = "console altneonconsole";
         
         let avgtime = this.props.serverInfo.avgwaittime['avg'];
         if(this.props.serverInfo.avgwaittime["cnt"]===0){
