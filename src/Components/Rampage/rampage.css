@@ -260,7 +260,7 @@
     opacity: 0;
     animation: redtextanimation  3s linear;
     text-shadow:
-        0 1px 0 rgba(200,0,0,1),
+        0 1px 0 rgba(200,0,0,1)/*,
         0 2px 0 rgba(198,0,0,1),
         0 3px 0 rgba(196,0,0,1),
         0 4px 0 rgba(194,0,0,1),
@@ -275,7 +275,7 @@
         0 3px 5px rgba(0,0,0,.2),
         0 5px 10px rgba(0,0,0,.25),
         0 10px 10px rgba(0,0,0,.2),
-        0 20px 20px rgba(0,0,0,.15);
+        0 20px 20px rgba(0,0,0,.15);*/
 }
 @keyframes redtextanimation{
     0% {    transform: translate(0px,-200px); opacity: 0; }

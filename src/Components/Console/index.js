@@ -25,7 +25,7 @@ export default class Console extends React.Component{
         if(this.props.rec) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
         return (
             <div id="consoleParentino">
-            <div className={consoleClassName} data-text={this.props.text}><div id="rampageContainer">{this.props.rampageCode}</div><p>{consoleText}</p></div>
+            <div className={consoleClassName} data-text={this.props.text}><p>{consoleText}</p></div>
             <table><tbody><tr>
                 <td id="avgtime">{serverInfo}</td>
                 <td id="playerName">
@@ -36,6 +36,7 @@ export default class Console extends React.Component{
                 </td>
                 <td id="fps"></td>
             </tr></tbody></table>
+            <div id="rampageContainer">{this.props.rampageCode}</div>
             </div>
         );
     }

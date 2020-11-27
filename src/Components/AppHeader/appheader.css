@@ -5,14 +5,7 @@
     justify-content: space-between;
 }
 .fa-chess{
-    text-shadow: 1px 0 0 var(--theme-main-color),
-                -1px 0 0 var(--theme-main-color),
-                0 1px 0 var(--theme-main-color),
-                0 -1px 0 var(--theme-main-color),
-                1px 1px var(--theme-main-color),
-                -1px -1px 0 var(--theme-main-color),
-                1px -1px 0 var(--theme-main-color),
-                -1px 1px 0 var(--theme-main-color);
+    -webkit-text-stroke: 1px var(--theme-main-color);
 }
 #uhiconcontainer{
     display: table;

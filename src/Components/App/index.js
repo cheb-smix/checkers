@@ -101,41 +101,7 @@ export default class App extends React.Component{
             this.initiation(state);
         });
 
-        /* FPS COUNTER */
-        /*let busy = false;
-        let frameCount = function _fc(timeStart, state){
-        
-            let now = performance.now();
-            let duration = now - timeStart;
-            
-            if(duration < 100){
-                _fc.counter++;
-            } else {
-                _fc.fps = _fc.counter * 10;
-                _fc.counter = 0;
-                timeStart = now; 
-                if (document.querySelector("#fps")) document.querySelector("#fps").innerHTML = _fc.fps;
-                
-                if (_fc.fps < 50 && !busy) {
-                    let c = document.querySelector('.neonconsole');
-                    if (c) {
-                        c.className = "console glitch";
-                        c.style.textAlign = "center";
-                        c.style.fontSize = "18px";
-                        c.style.fontFamily = "Federo";
-                        c.style.textTransform = "uppercase";
-                    }
-                    busy = false;
-                }
-        
-            }
-            requestAnimationFrame(() => frameCount(timeStart, state)); 
-        }
-        
-        frameCount.counter = 0;
-        frameCount.fps = 0;
-        
-        frameCount(performance.now(), this.state)*/
+        setTimeout(()=>this.rampage(4), 2000);
     }
 
     initiation = (state,data=false) => {
@@ -536,18 +502,12 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        //stepper.style.top = dy + "px";
-        //stepper.style.left = dx + "px";
         stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
-        //stepper.style.transform = "scale(1.5)";
         
         await this.sleep(t);
 
         stepper.style.transition = t+"ms all ease-out";
-        //stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-        //stepper.style.left = ooo.offsetLeft + "px";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
-        //stepper.style.transform = "scale(1)";
 
         await this.sleep(t);
         
@@ -606,8 +566,6 @@ export default class App extends React.Component{
         checker.style.opacity = 0;
         stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
         stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop + headerHeight}px)`;
-        //stepper.style.top = (checker.offsetTop + headerHeight)+"px";
-        //stepper.style.left = checker.offsetLeft +"px";
         stepper.style.display = "block";
 
         let index = 1;
