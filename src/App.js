@@ -13,6 +13,8 @@ import Checkers from "./Components/Gameslogic/checkers";
 import Setting from './Components/Setting';
 import Settings from './Funcs/settings';
 
+import './Funcs/fps';
+
 class App extends Component{
 
     state = {

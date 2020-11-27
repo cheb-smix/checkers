@@ -82,7 +82,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: true,
+        debug: false,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -104,7 +104,7 @@ export default class App extends React.Component{
             this.initiation(state);
         });
 
-        setTimeout(()=>this.consoleLog("Вы должны взять больше!"), 2000);
+        //setTimeout(()=>this.consoleLog("Вы должны взять больше!"), 2000);
     }
 
     initiation = (state,data=false) => {
