@@ -79,6 +79,13 @@
     text-transform: uppercase;
     animation: flicker 10.5s infinite alternate;     
   }
+
+  .console.glitch{
+    text-align: center;
+    font-size: 18px;
+    font-family: Federo;
+    text-transform: uppercase;
+  }
   
   
   @keyframes flicker {

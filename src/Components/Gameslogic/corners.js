@@ -19,13 +19,13 @@ export default class Corners extends App{
             if(color){
                 let abstractPriority=null, possiblePriority=null, level=0;
                 if(color==="black"){
-                    abstractPriority = { target: b, level: this.calculatePifagorColored(cells[k],b,color) };
+                    abstractPriority = { target: b, level: Math.pifagorColored(cells[k],b,color) };
                 }else{
-                    abstractPriority = { target: w, level: this.calculatePifagorColored(cells[k],w,color) };
+                    abstractPriority = { target: w, level: Math.pifagorColored(cells[k],w,color) };
                 }
                 for(let t in targetCells[color+"reverse"]){
                     if(cells[t].color===color) continue;
-                    level = this.calculatePifagorColored(cells[k],targetCells[color+"reverse"][t],color);
+                    level = Math.pifagorColored(cells[k],targetCells[color+"reverse"][t],color);
                     if(typeof(cells[k].possibilities[t])!=="undefined" && (possiblePriority === null || level > possiblePriority.level)){
                         possiblePriority = { target: targetCells[color+"reverse"][t], level: level };
                     }
@@ -38,10 +38,10 @@ export default class Corners extends App{
 
     finalizatorCorrection = (c) => {
         if(c.dbstep) return c;
-        let currentCheckerTargetHypotenuse = this.calculatePifagor(c.koordsfrom,c.priority.target);
+        let currentCheckerTargetHypotenuse = Math.pifagor(c.koordsfrom,c.priority.target);
         for(let t in this.state.targetCells[c.color]){
             if(this.state.cells[t]===false){
-                let h1 = this.calculatePifagor(c.koordsfrom,this.state.targetCells[c.color][t]);
+                let h1 = Math.pifagor(c.koordsfrom,this.state.targetCells[c.color][t]);
                 if(currentCheckerTargetHypotenuse < h1){
                     c.priority.target = this.state.targetCells[c.color][t];
                     currentCheckerTargetHypotenuse = h1;
@@ -51,7 +51,7 @@ export default class Corners extends App{
         if(c.priority.target.x+":"+c.priority.target.y === c.to) return c;
         for(let p in c.possibilities){
             let [x,y] = p.split(":");
-            let hypotenuse = this.calculatePifagor({x:x,y:y},c.priority.target);
+            let hypotenuse = Math.pifagor({x:x,y:y},c.priority.target);
             if(Math.abs(hypotenuse)<Math.abs(c.hypotenuse)){
                 if(c.to !== p){
                     console.log("Changing destination from "+c.to+" to "+p+"["+hypotenuse +"-"+ c.hypotenuse+"] target: ",c.priority.target);
@@ -437,7 +437,7 @@ export default class Corners extends App{
                     }
 
                     let [x,y] = p.split(":");
-                    let DE = this.calculateDiagonalEffectivity(cells[nkoords],{x:x,y:y},cells[nkoords].color);
+                    let DE = Math.diagonalEffectivity(cells[nkoords],{x:x,y:y},cells[nkoords].color, this.state.playstage);
                     for(let n in DE) o[n] = DE[n];
 
                     if(typeof(this.state.targetCells.lessPriorityCells)!=="undefined" && typeof(this.state.targetCells.lessPriorityCells[p])!=="undefined"){
