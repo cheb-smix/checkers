@@ -655,8 +655,42 @@ export default class App extends React.Component{
                             }
                         }else{
                             //Unable to go there
-                            cells[this.state.selectedChecker].active = false;
-                            this.consoleLog("Ход не возможен");
+                            //cells[this.state.selectedChecker].active = false;
+                            let needToEatMore = false;
+                            if (this.state.game === "checkers" || this.state.game === "giveaway") {
+                                console.log(cells[this.state.selectedChecker].possibilities);
+                                for (let p in cells[this.state.selectedChecker].possibilities) {
+                                    let pos = cells[this.state.selectedChecker].possibilities[p];
+                                    if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
+                                        needToEatMore = {kills: pos.kills, more: true};
+                                        break;
+                                    }
+                                }
+                                if (!needToEatMore) {
+                                    for (let c in cells) {
+                                        if (cells[c].color !== cells[this.state.selectedChecker].color) continue;
+                                        for (let p in cells[c].possibilities) {
+                                            let pos = cells[c].possibilities[p];
+                                            if (pos.kills.length > 0) {
+                                                needToEatMore = {kills: pos.kills, more: false};
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (needToEatMore) {
+                                if (needToEatMore.more) this.consoleLog("Вы должны съесть больше");
+                                else this.consoleLog("Вы должны есть!");
+                                for (let k in needToEatMore.kills) {
+                                    let ch = document.querySelector(`.ucell[koords='${needToEatMore.kills[k]}'] .uchecker`);
+                                    ch.className = `${ch.className} deadly`;
+                                }
+                            } else {
+                                this.consoleLog("Ход не возможен");
+                            }
+                            
                         }
                     }
                 }

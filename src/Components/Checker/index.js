@@ -12,7 +12,7 @@ export default class Checker extends React.Component{
             <div className={classNames} c={color} checker={checker} id={checker}>&nbsp;</div>
         );*/
         return (
-            <div className={classNames} c={color} checker={checker} id={checker}><i className="fa fa-chess-queen"></i>&nbsp;</div>
+            <div className={classNames} c={color} checker={checker} id={checker}><i className="fa fa-chess-queen"></i><i className="fa fa-crosshairs"></i>&nbsp;</div>
         );
         /*
         if (damka) {
