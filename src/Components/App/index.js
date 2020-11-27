@@ -352,16 +352,18 @@ export default class App extends React.Component{
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
-        if(this.state.usersettings.animation!=="0"){
-            this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
-        }else{
+        console.log(this.state.usersettings.animation, this.state.usersettings.animation==="0")
+        if(this.state.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
+        }else{
+            this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
         }
     }
 
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
         console.log("step",koordsfrom,koordsto);
         let {playerInfo,opponentInfo,bestMove,cells} = this.state;
+        let {color} = cells[koordsfrom];
         let steps = cells[koordsfrom].possibilities[koordsto].len;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
@@ -433,6 +435,8 @@ export default class App extends React.Component{
             selectedChecker: false,
             cells:cells
         });
+
+        setTimeout(() => this.botStep(color), 300);
     }
 
     getDeskMask = (cells = this.state.cells, colors=false) => {
@@ -573,7 +577,6 @@ export default class App extends React.Component{
             if(steps>2) this.rampage(steps);
 
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-            this.botStep(lastStepColor);
             return;
         } else {
             index++;
