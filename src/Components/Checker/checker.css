@@ -34,12 +34,20 @@
 }
 .uchecker > i.fa {
     position: absolute;
-    transform: translate(-0.3em, 0.7em);
+    transform: translate(-0.35em, 0.6em);
     opacity: 0;
+    font-size: 1.2em;
 }
-.uchecker.damka > i.fa {
+.uchecker > i.fa-crosshairs {
+    color: red !important;
+}
+.uchecker.damka > i.fa.fa-chess-queen {
     opacity: 1;
 }
+.uchecker.deadly > i.fa.fa-crosshairs {
+    opacity: 1;
+}
+
 .userchecker{
     box-shadow: 0px 0px 10px #fff;
     transform: translate(10px,-10px);

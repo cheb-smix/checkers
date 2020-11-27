@@ -273,7 +273,7 @@ export default class Checkers extends App{
             if(!force){
                 this.iiStep(color,true,dbstep);
             }else{
-                this.rampage(0,"NO MOVES!");
+                this.rampage(0, "NO MOVES!", "opponent");
             }
         }
     }
@@ -356,25 +356,31 @@ export default class Checkers extends App{
     }
 
     countDoneCheckers = (cells,c) => {
-        c = c === "black" ? "white" : "black";
-        let n = 12;
+        let o = {
+            black: {cells: 0, done: 12, possibilities: 0},
+            white: {cells: 0, done: 12, possibilities: 0}
+        };
         for(let k in cells){
-            if(cells[k].color === c) n--;
+            if(cells[k].color){
+                o[cells[k].color].cells++;
+                o[cells[k].color].possibilities += Object.keys(cells[k].possibilities).length;
+            }
         }
-        
-        return n;
+        o.black.done = 12 - o.white.cells;
+        o.white.done = 12 - o.black.cells;
+        return o;
     }
 
-    checkOfflineGameStatus = (playerInfo,opponentInfo) => {
+    checkOfflineGameStatus = (playerInfo, opponentInfo) => {
         if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
 
         let changes = false;
-        if(playerInfo.done===12 && playerInfo.status==="in_game"){
+        if((playerInfo.done===12 || opponentInfo.possibilities===0) && playerInfo.status==="in_game"){
             changes = true;
             playerInfo.status = "winner";
             opponentInfo.status = "looser";
         }
-        if(opponentInfo.done===12 && opponentInfo.status==="in_game"){
+        if((opponentInfo.done===12 || playerInfo.possibilities===0) && opponentInfo.status==="in_game"){
             changes = true;
             playerInfo.status = "looser";
             opponentInfo.status = "winner";
@@ -486,23 +492,23 @@ export default class Checkers extends App{
                 let color = false;
                 if(debug){
                     if((y+x)%2===1){
-                        if (y>5 && y<9) {
+                        /*if (y>4 && y<9) {
                             color = "white";
                             checker = `${color}${key}`;
                         }
                         if (y>0 && y<4) {
                             color = "black";
                             checker = `${color}${key}`;
-                        }
-                        if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
+                        }*/
+                        /*if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
                             checker = false;
                             color = false;
-                        }
-                        if((x===6 && y===5) || (x===7 && y===6)){
+                        }*/
+                        if((x===1 && y===2) || (x===7 && y===2)){
                             checker =  "white"+key;
                             color = "white";
                         }
-                        if((x===6 && y===3)){
+                        if((x===2 && y===7)){
                             checker =  "black"+key;
                             color = "black";
                         }

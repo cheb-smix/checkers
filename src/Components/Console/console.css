@@ -7,16 +7,19 @@
 }
 #rampageContainer{
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    z-index: 10;
+    height: 20vh;
+    z-index: 15;
 }
 #consoleParentino{
-    background: black;
+    position: relative;
     color: white;
     display: inline-block;
     width: 48vw;
     text-align: center;
+    padding-top: 11vh;
 }
 #playerName{
     text-align: right;
@@ -48,25 +51,26 @@
 
 .oswithfa::before,.oswithfa::before{
     font-family: 'Font Awesome\ 5 Free';
-    content: '\f111 ';
+    content: '\f111  ';
     font-style: normal;
 }
 .onlinespan,.oswithfa::before{
-    text-shadow: var(--neon-border-color) 0px 0px 10px ;
     color: var(--neon-border-color);
 }
 .offlinespan,.oswithfa::before{
-    text-shadow: var(--neon-text-color) 0px 0px 10px ;
     color: var(--neon-text-color);
 }
 
 .neonconsole {
-    font-size: 2.5vh;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    font-size: 2.3vh;
     font-style: italic;
     font-family: Neon;
     color: #fff;
     width: 93%;
-    height: 14vh;
+    height: 10vh;
     text-align: center;
     display: flex;
     align-items: center;
@@ -78,6 +82,35 @@
     border-radius: 2vh;
     text-transform: uppercase;
     animation: flicker 10.5s infinite alternate;     
+}
+
+.altneonconsole{
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    font-size: 2.2vh;
+    font-style: italic;
+    font-family: Neon;
+    color: #fff;
+    width: 100%;
+    height: 15vh;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    background: url(./neon.png) top center no-repeat;
+    background-size: 110% 100%;
+    margin-bottom: -3vh;
+    text-shadow: 0 0 5px var(--neon-text-color), 0 0 10px var(--neon-text-color);
+    animation: flicker2 10.5s infinite alternate;
+}
+
+  .console.glitch{
+    text-align: center;
+    font-size: 18px;
+    font-family: Federo;
+    text-transform: uppercase;
   }
   
   
@@ -105,6 +138,15 @@
           text-shadow: none;
           box-shadow: none;
       }    
+}
+@keyframes flicker2 {
+    0%, 0.2%, 20.8%, 21%, 24.8%, 25%, 55.8%, 56%, 88.8%, 89%, 100% {
+        opacity: 1;   
+    }
+    
+    0.1%, 20.9%, 24.9%, 55.9%, 88.9% {        
+        opacity: 0.1;
+    }    
 }
 @media (orientation: portrait), (max-aspect-ratio: 10/13){
     #consoleParentino{

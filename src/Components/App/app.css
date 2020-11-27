@@ -11,7 +11,7 @@
     --theme-secondary-color: #eeff00;
     --theme-third-color: #cedd00;
     --theme-bg-hover-color: #30260a;
-    --theme-bg-color: black;
+    --theme-bg-color: #111111;
     --theme-bg-secondary-color: rgb(51, 29, 0);
     --theme-bg-image: none;
     --neon-text-color: #f40;
@@ -58,13 +58,15 @@
     position: absolute;
     z-index: 1000;
     display: none;
+    top: 0;
+    left: 0;
 }
 html, body {
     overflow-x: hidden;
 }
 body{
     margin: 0;
-    background: black;
+    background: var(--theme-bg-color);
     -moz-user-select: none; 
     -ms-user-select: none; 
     -khtml-user-select: none; 

@@ -28,7 +28,9 @@ export default class App extends React.Component{
             signed: false,
             steps: 0,
             moves: 0,
+            cells: 12,
             done: 0,
+            possibilities: 10,
             statistics: {
                 games:0,won:0,lost:0,steps:0,moves:0,exp:0,lvl:1
             }
@@ -39,7 +41,9 @@ export default class App extends React.Component{
             color: "black",
             steps: 0,
             moves: 0,
+            cells: 12,
             done: 0,
+            possibilities: 10,
         },
         game: window.location.href.split("/").pop(),
         /* USER PREFERENCES */
@@ -59,6 +63,9 @@ export default class App extends React.Component{
         consoleText: "",
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
+        },
+        gameTotalStat: {
+            TWD: 0, TBD: 0, TC: 24, MC: 0
         },
         rampageCode: "",
         rampageTO: null,
@@ -97,47 +104,7 @@ export default class App extends React.Component{
             this.initiation(state);
         });
 
-        /* FPS COUNTER */
-        let busy = false;
-        let frameCount = function _fc(timeStart, state){
-        
-            let now = performance.now();
-            let duration = now - timeStart;
-            
-            if(duration < 100){
-                _fc.counter++;
-            } else {
-                _fc.fps = _fc.counter * 10;
-                _fc.counter = 0;
-                timeStart = now; 
-                if (document.querySelector("#fps")) document.querySelector("#fps").innerHTML = _fc.fps;
-                
-                if (_fc.fps < 50 && !busy) {
-                    /*console.log("Lowing down animation!");
-                    busy = true;
-                    let currentAnimationLevel = state.settings.getSettings("animation");
-                    if (currentAnimationLevel > 0) {
-                        state.settings.saveSetting("animation", currentAnimationLevel - 1);
-                    }*/
-                    let c = document.querySelector('.neonconsole');
-                    if (c) {
-                        c.className = "console glitch";
-                        c.style.textAlign = "center";
-                        c.style.fontSize = "18px";
-                        c.style.fontFamily = "Federo";
-                        c.style.textTransform = "uppercase";
-                    }
-                    busy = false;
-                }
-        
-            }
-            requestAnimationFrame(() => frameCount(timeStart, state)); 
-        }
-        
-        frameCount.counter = 0;
-        frameCount.fps = 0;
-        
-        frameCount(performance.now(), this.state)
+        setTimeout(()=>this.consoleLog("Вы должны взять больше!"), 2000);
     }
 
     initiation = (state,data=false) => {
@@ -286,11 +253,27 @@ export default class App extends React.Component{
         this.consoleLog(response.response);
     }
 
-    rampage = (steps,word="") => {
+    rampage = (steps, word="", target="") => {
         clearTimeout(this.state.rampageTO);
-        this.setMazafuckinState({rampageCode:<Rampage steps={steps} word={word} />,rampageTO:setTimeout(()=>{
-            this.setMazafuckinState({rampageCode:"",rampageTO:null});
-        },3000)});
+        let newstate = {
+            rampageCode:<Rampage steps={steps} word={word} />,
+            rampageTO:setTimeout(()=>{
+                this.setMazafuckinState({rampageCode:"",rampageTO:null});
+            },3000)
+        };
+        if (steps === 0 && word === "NO MOVES!") {
+            let {playerInfo, opponentInfo} = this.state;
+            if (target === "opponent") {
+                playerInfo.winner = true;
+                opponentInfo.winner = false;
+            } else {
+                playerInfo.winner = false;
+                opponentInfo.winner = true;
+            }
+            newstate.playerInfo = playerInfo;
+            newstate.opponentInfo = opponentInfo;
+        }
+        this.setMazafuckinState(newstate);
     }
 
     sleep = (ms) => {
@@ -338,16 +321,18 @@ export default class App extends React.Component{
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
-        if(this.state.usersettings.animation!=="0"){
-            this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
-        }else{
+        console.log(this.state.usersettings.animation, this.state.usersettings.animation==="0")
+        if(this.state.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
+        }else{
+            this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
         }
     }
 
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
         console.log("step",koordsfrom,koordsto);
-        let {playerInfo,opponentInfo,bestMove,cells} = this.state;
+        let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
+        let {color} = cells[koordsfrom];
         let steps = cells[koordsfrom].possibilities[koordsto].len;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
@@ -387,9 +372,12 @@ export default class App extends React.Component{
 
         //Regenerate possible steps for all checkers
         cells = this.regeneratePossibilities(cells);
+
+        let doneStat = this.countDoneCheckers(cells);
         
-        playerInfo.done = this.countDoneCheckers(cells,this.state.playerInfo.color);
-        opponentInfo.done = this.countDoneCheckers(cells,this.state.opponentInfo.color);
+        for (let d in doneStat[this.state.playerInfo.color]) playerInfo[d] = doneStat[this.state.playerInfo.color][d];
+        for (let d in doneStat[this.state.opponentInfo.color]) opponentInfo[d] = doneStat[this.state.opponentInfo.color][d];
+
         let consoleText = newPlayersStep?"Ваш ход!":"Ожидание хода противника";
         if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = "Игра окончена";
 
@@ -406,6 +394,26 @@ export default class App extends React.Component{
                 opponentInfo = o.opponentInfo;
             }
         }
+        if (this.state.game === "checkers" || this.state.game === "giveaway") {
+            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.white.damka`).length;
+            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.black.damka`).length;
+            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.black,.ucell .uchecker.white`).length;
+            if (totalWhiteDamkas || totalBlackDamkas) {
+                if (totalWhiteDamkas > gameTotalStat.TWD || totalBlackDamkas > gameTotalStat.TBD || totalCheckers < gameTotalStat.TC) {
+                    gameTotalStat = {
+                        TWD: totalWhiteDamkas, TBD: totalBlackDamkas, TC: totalCheckers, MC: 0
+                    }
+                }
+                if (totalWhiteDamkas === gameTotalStat.TWD && totalBlackDamkas === gameTotalStat.TBD && totalCheckers === gameTotalStat.TC) {
+                    gameTotalStat.MC++;
+                    if (gameTotalStat.MC === 15) {
+                        playerInfo.status = "done";
+                        opponentInfo.status = "done";
+                    }
+                }
+            }
+        }
+        
         this.setMazafuckinState({
             playerInfo:playerInfo,
             opponentInfo:opponentInfo,
@@ -414,8 +422,11 @@ export default class App extends React.Component{
             playstage:playstage,
             consoleText: consoleText,
             selectedChecker: false,
-            cells:cells
+            cells:cells,
+            gameTotalStat:gameTotalStat
         });
+
+        setTimeout(() => this.botStep(color), 300);
     }
 
     getDeskMask = (cells = this.state.cells, colors=false) => {
@@ -439,7 +450,7 @@ export default class App extends React.Component{
             pflag: pflag,
             from: koordsfrom,
             to: koordsto,
-            effectivity: this.calculateDiagonalEffectivity(cells[koordsfrom],cells[koordsto],cells[koordsfrom].color),
+            effectivity: Math.diagonalEffectivity(cells[koordsfrom],cells[koordsto],cells[koordsfrom].color, this.state.playstage),
             color: cells[koordsfrom].color[0],
             game_id: this.state.game_id,
             gtoken: this.state.gtoken,
@@ -455,40 +466,6 @@ export default class App extends React.Component{
                 }
             }
         });
-    }
-
-    calculateDiagonalEffectivity = (c1,c2,color="any") => {
-        let diagonalCorrection = 1;
-        let dia1 = c1.x-c1.y;
-        let dia2 = c2.x-c2.y;
-        let dd = Math.abs(dia1 - dia2);
-        if((dia1 > dia2 && color==="white") || ( dia1 < dia2 && color==="black")) diagonalCorrection = -1;
-        if(dia1 === dia2) diagonalCorrection = this.state.playstage===3?1:0;
-        let lessPriorityCellsCorrection = 1/(Math.abs(4.5-c2.x) * Math.abs(4.5-c2.y) / 4);
-        lessPriorityCellsCorrection = 1;
-        let hypotenuse = this.calculatePifagor(c1,c2);
-        let p = (hypotenuse * lessPriorityCellsCorrection + dd) * diagonalCorrection;
-        //console.log("c1",c1.x,c1.y,"c2",c2,"dia",dia1,dia2,dd,diagonalCorrection,"pif",p);
-        return {effectivity: p,dia1,dia2,dd,diagonalCorrection,lessPriorityCellsCorrection,hypotenuse};
-    }
-
-    calculatePifagor = (c1,c2) => {
-        return Math.sqrt(Math.pow(c1.x - c2.x,2)+Math.pow(c1.y - c2.y,2));
-    }
-    
-    calculatePifagorColored = (c1,c2,color="any") => {
-        let dx = 0, dy = 0, directionCorrection = 1;
-        if(color==="black"){
-            dx = c1.x - c2.x;
-            dy = c2.y - c1.y;
-        }else{
-            dx = c2.x - c1.x;
-            dy = c1.y - c2.y;
-        }
-        if(color!=="any"){
-            if(dx<0 || dy<0) directionCorrection = -1;
-        }
-        return Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2)) * directionCorrection;
     }
 
     getBotStep = (color) => {
@@ -549,16 +526,12 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        stepper.style.top = dy + "px";
-        stepper.style.left = dx + "px";
-        stepper.style.transform = "scale(1.5)";
+        stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
         
         await this.sleep(t);
 
         stepper.style.transition = t+"ms all ease-out";
-        stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-        stepper.style.left = ooo.offsetLeft + "px";
-        stepper.style.transform = "scale(1)";
+        stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
 
         await this.sleep(t);
         
@@ -588,14 +561,13 @@ export default class App extends React.Component{
             if(steps>2) this.rampage(steps);
 
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-            this.botStep(lastStepColor);
             return;
         } else {
             index++;
 
             if (typeof(possibility.path[index]) !== "undefined") {
 
-                t = this.calculatePifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
+                t = Math.pifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
                 
                 setTimeout(async () => {
                     this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
@@ -617,12 +589,11 @@ export default class App extends React.Component{
         
         checker.style.opacity = 0;
         stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
-        stepper.style.top = (checker.offsetTop + headerHeight)+"px";
-        stepper.style.left = checker.offsetLeft +"px";
+        stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop + headerHeight}px)`;
         stepper.style.display = "block";
 
         let index = 1;
-        let t = this.calculatePifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
+        let t = Math.pifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
 
         setTimeout(async () => {
             this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
@@ -666,8 +637,42 @@ export default class App extends React.Component{
                             }
                         }else{
                             //Unable to go there
-                            cells[this.state.selectedChecker].active = false;
-                            this.consoleLog("Ход не возможен");
+                            //cells[this.state.selectedChecker].active = false;
+                            let needToEatMore = false;
+                            if (this.state.game === "checkers" || this.state.game === "giveaway") {
+                                console.log(cells[this.state.selectedChecker].possibilities);
+                                for (let p in cells[this.state.selectedChecker].possibilities) {
+                                    let pos = cells[this.state.selectedChecker].possibilities[p];
+                                    if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
+                                        needToEatMore = {kills: pos.kills, more: true};
+                                        break;
+                                    }
+                                }
+                                if (!needToEatMore) {
+                                    for (let c in cells) {
+                                        if (cells[c].color !== cells[this.state.selectedChecker].color) continue;
+                                        for (let p in cells[c].possibilities) {
+                                            let pos = cells[c].possibilities[p];
+                                            if (pos.kills.length > 0) {
+                                                needToEatMore = {kills: pos.kills, more: false};
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (needToEatMore) {
+                                if (needToEatMore.more) this.consoleLog("Вы должны взять больше!");
+                                else this.consoleLog("Вы должны есть!");
+                                for (let k in needToEatMore.kills) {
+                                    let ch = document.querySelector(`.ucell[koords='${needToEatMore.kills[k]}'] .uchecker`);
+                                    ch.className = `${ch.className} deadly`;
+                                }
+                            } else {
+                                this.consoleLog("Ход не возможен");
+                            }
+                            
                         }
                     }
                 }
