@@ -20,7 +20,6 @@ export default class App extends React.Component{
     state = {
         /* USERS DYNAMIC INFO */
         cells: {},
-        possibilities: {},
         bestMove: null,
         playerInfo: {
             name: "player"+Math.round(Math.random()*1000 + 1000), 
@@ -29,7 +28,9 @@ export default class App extends React.Component{
             signed: false,
             steps: 0,
             moves: 0,
+            cells: 12,
             done: 0,
+            possibilities: 10,
             statistics: {
                 games:0,won:0,lost:0,steps:0,moves:0,exp:0,lvl:1
             }
@@ -40,7 +41,9 @@ export default class App extends React.Component{
             color: "black",
             steps: 0,
             moves: 0,
+            cells: 12,
             done: 0,
+            possibilities: 10,
         },
         game: window.location.href.split("/").pop(),
         /* USER PREFERENCES */
@@ -76,7 +79,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: true,
+        debug: false,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -99,7 +102,7 @@ export default class App extends React.Component{
         });
 
         /* FPS COUNTER */
-        let busy = false;
+        /*let busy = false;
         let frameCount = function _fc(timeStart, state){
         
             let now = performance.now();
@@ -114,12 +117,6 @@ export default class App extends React.Component{
                 if (document.querySelector("#fps")) document.querySelector("#fps").innerHTML = _fc.fps;
                 
                 if (_fc.fps < 50 && !busy) {
-                    /*console.log("Lowing down animation!");
-                    busy = true;
-                    let currentAnimationLevel = state.settings.getSettings("animation");
-                    if (currentAnimationLevel > 0) {
-                        state.settings.saveSetting("animation", currentAnimationLevel - 1);
-                    }*/
                     let c = document.querySelector('.neonconsole');
                     if (c) {
                         c.className = "console glitch";
@@ -138,7 +135,7 @@ export default class App extends React.Component{
         frameCount.counter = 0;
         frameCount.fps = 0;
         
-        frameCount(performance.now(), this.state)
+        frameCount(performance.now(), this.state)*/
     }
 
     initiation = (state,data=false) => {
@@ -404,9 +401,12 @@ export default class App extends React.Component{
 
         //Regenerate possible steps for all checkers
         cells = this.regeneratePossibilities(cells);
+
+        let doneStat = this.countDoneCheckers(cells);
         
-        playerInfo.done = this.countDoneCheckers(cells,this.state.playerInfo.color);
-        opponentInfo.done = this.countDoneCheckers(cells,this.state.opponentInfo.color);
+        for (let d in doneStat[this.state.playerInfo.color]) playerInfo[d] = doneStat[this.state.playerInfo.color][d];
+        for (let d in doneStat[this.state.opponentInfo.color]) opponentInfo[d] = doneStat[this.state.opponentInfo.color][d];
+
         let consoleText = newPlayersStep?"Ваш ход!":"Ожидание хода противника";
         if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = "Игра окончена";
 

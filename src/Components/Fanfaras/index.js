@@ -134,22 +134,32 @@ export default class Fanfara extends React.Component{
 
         if(playerInfo.status!=="winner" && playerInfo.status!=="looser" && playerInfo.status!=="done") playerInfo.status = "in_game";
 
-        if(playerInfo.status==="winner" && playerInfo.done === 12){
+        if(playerInfo.status==="winner"){
             header = "Поздравляем!";
-            podtext = "Вы отмудохали противника с отрывом";
-            if(opponentCheckersUnDone===1) podtext += " всего на одну шашку";
-            if(opponentCheckersUnDone>1 && opponentCheckersUnDone<5) podtext += " в "+opponentCheckersUnDone+" шашки";
-            if(opponentCheckersUnDone>4) podtext += " аж на "+opponentCheckersUnDone+" шашек";
+            let diff = opponentCheckersUnDone;
+            if (playerInfo.done === 12) {
+                podtext = "Вы отмудохали противника с отрывом";
+            } else {
+                podtext = "Вы зажали противника в угол с отрывом";
+                diff = opponentCheckersUnDone - playersCheckersUnDone;
+            }
+            if(diff===1) podtext += " всего на одну шашку";
+            if(diff>1 && diff<5) podtext += " в "+diff+" шашки";
+            if(diff>4) podtext += " аж на "+diff+" шашек";
             podtext += " ("+opercent+"%)!";
             gonnashow = true;
         }
-        if(playerInfo.status==="looser" && opponentInfo.done === 12){
+        if(playerInfo.status==="looser"){
             header = "Сожалеем";
-            podtext = "Вы проиграли в этой партии, отстав";
-            if(playersCheckersUnDone===1) podtext += " всего на одну шашку";
-            if(playersCheckersUnDone>1 && playersCheckersUnDone<5) podtext += " на "+playersCheckersUnDone+" шашки";
-            if(playersCheckersUnDone>4) podtext += " на целых "+playersCheckersUnDone+" шашек";
-            podtext += " ("+ppercent+"%)!";
+            if (opponentInfo.done === 12) {
+                podtext = "Вы проиграли в этой партии, отстав";
+                if(playersCheckersUnDone===1) podtext += " всего на одну шашку";
+                if(playersCheckersUnDone>1 && playersCheckersUnDone<5) podtext += " на "+playersCheckersUnDone+" шашки";
+                if(playersCheckersUnDone>4) podtext += " на целых "+playersCheckersUnDone+" шашек";
+                podtext += " ("+ppercent+"%)!";
+            } else {
+                podtext = "Вы проиграли в этой партии, оставшись без ходов";
+            }
             gonnashow = true;
         }
         if(playerInfo.status==="done" && opponentInfo.status==="done" && playerInfo.done === 12 && opponentInfo.done === 12){

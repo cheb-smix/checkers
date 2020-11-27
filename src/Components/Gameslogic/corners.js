@@ -361,7 +361,7 @@ export default class Corners extends App{
         }
     }
 
-    countDoneCheckers = (cells,c) => {
+    cdc = (cells,c) => {
         const d = {"black":{xs:1,xe:4,ys:6,ye:8},"white":{xs:5,xe:8,ys:1,ye:3}};
         let n = 0;
         for(let x=d[c].xs;x<=d[c].xe;x++){
@@ -370,6 +370,13 @@ export default class Corners extends App{
             }
         }
         return n;
+    }
+
+    countDoneCheckers = (cells) => {
+        return {
+            black: {done: this.cdc(cells, "black")},
+            white: {done: this.cdc(cells, "white")}
+        };
     }
 
     checkOfflineGameStatus = (playerInfo,opponentInfo) => {
