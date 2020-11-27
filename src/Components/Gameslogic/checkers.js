@@ -492,26 +492,26 @@ export default class Checkers extends App{
                 let color = false;
                 if(debug){
                     if((y+x)%2===1){
-                        if (y>4 && y<9) {
+                        /*if (y>4 && y<9) {
                             color = "white";
                             checker = `${color}${key}`;
                         }
                         if (y>0 && y<4) {
                             color = "black";
                             checker = `${color}${key}`;
-                        }
+                        }*/
                         /*if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
                             checker = false;
                             color = false;
-                        }
-                        if((x===6 && y===5) || (x===7 && y===6)){
+                        }*/
+                        if((x===1 && y===2) || (x===7 && y===2)){
                             checker =  "white"+key;
                             color = "white";
                         }
-                        if((x===6 && y===3)){
+                        if((x===2 && y===7)){
                             checker =  "black"+key;
                             color = "black";
-                        }*/
+                        }
                     }
                 }else{
                     if((y+x)%2===1){

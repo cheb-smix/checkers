@@ -162,7 +162,7 @@ export default class Fanfara extends React.Component{
             }
             gonnashow = true;
         }
-        if(playerInfo.status==="done" && opponentInfo.status==="done" && playerInfo.done === 12 && opponentInfo.done === 12){
+        if(playerInfo.status==="done" && opponentInfo.status==="done" /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
             header = "Неплохо!";
             podtext = "Ничья лучше проигрыша!";
             gonnashow = true;

@@ -64,6 +64,9 @@ export default class App extends React.Component{
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
         },
+        gameTotalStat: {
+            TWD: 0, TBD: 0, TC: 24, MC: 0
+        },
         rampageCode: "",
         rampageTO: null,
         targetCells: {}, 
@@ -79,7 +82,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: true,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -101,7 +104,7 @@ export default class App extends React.Component{
             this.initiation(state);
         });
 
-        setTimeout(()=>this.rampage(4), 2000);
+        setTimeout(()=>this.consoleLog("Вы должны взять больше!"), 2000);
     }
 
     initiation = (state,data=false) => {
@@ -328,7 +331,7 @@ export default class App extends React.Component{
 
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
         console.log("step",koordsfrom,koordsto);
-        let {playerInfo,opponentInfo,bestMove,cells} = this.state;
+        let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
         let {color} = cells[koordsfrom];
         let steps = cells[koordsfrom].possibilities[koordsto].len;
 
@@ -391,6 +394,26 @@ export default class App extends React.Component{
                 opponentInfo = o.opponentInfo;
             }
         }
+        if (this.state.game === "checkers" || this.state.game === "giveaway") {
+            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.white.damka`).length;
+            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.black.damka`).length;
+            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.black,.ucell .uchecker.white`).length;
+            if (totalWhiteDamkas || totalBlackDamkas) {
+                if (totalWhiteDamkas > gameTotalStat.TWD || totalBlackDamkas > gameTotalStat.TBD || totalCheckers < gameTotalStat.TC) {
+                    gameTotalStat = {
+                        TWD: totalWhiteDamkas, TBD: totalBlackDamkas, TC: totalCheckers, MC: 0
+                    }
+                }
+                if (totalWhiteDamkas === gameTotalStat.TWD && totalBlackDamkas === gameTotalStat.TBD && totalCheckers === gameTotalStat.TC) {
+                    gameTotalStat.MC++;
+                    if (gameTotalStat.MC === 15) {
+                        playerInfo.status = "done";
+                        opponentInfo.status = "done";
+                    }
+                }
+            }
+        }
+        
         this.setMazafuckinState({
             playerInfo:playerInfo,
             opponentInfo:opponentInfo,
@@ -399,7 +422,8 @@ export default class App extends React.Component{
             playstage:playstage,
             consoleText: consoleText,
             selectedChecker: false,
-            cells:cells
+            cells:cells,
+            gameTotalStat:gameTotalStat
         });
 
         setTimeout(() => this.botStep(color), 300);
@@ -639,7 +663,7 @@ export default class App extends React.Component{
                             }
                             
                             if (needToEatMore) {
-                                if (needToEatMore.more) this.consoleLog("Вы должны съесть больше");
+                                if (needToEatMore.more) this.consoleLog("Вы должны взять больше!");
                                 else this.consoleLog("Вы должны есть!");
                                 for (let k in needToEatMore.kills) {
                                     let ch = document.querySelector(`.ucell[koords='${needToEatMore.kills[k]}'] .uchecker`);
