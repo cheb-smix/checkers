@@ -507,7 +507,8 @@ export default class App extends React.Component{
     }
 
     oneAnimatedStep = async (stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells) => {
-        stepper.style.transition = t+"ms all ease-in";
+        
+        stepper.style.transition = t+"ms transform ease-in";
 
         let k1 = possibility.path[index - 1];
         let k2 = possibility.path[index];
@@ -526,41 +527,67 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
-        
-        await this.sleep(t);
+        if (steps > 1 && index === steps - 1) {
 
-        stepper.style.transition = t+"ms all ease-out";
-        stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
+            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1.5)`;
+            stepper.className = stepper.className.replace(" animated", "") + " animated";
 
-        await this.sleep(t);
-        
-        /*if(steps > 4){
-            await this.sleep(t);
+            await this.sleep(1000);
+
+            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
+            stepper.className = stepper.className.replace(" animated", "");
+
+            await this.sleep(5);
+            stepper.style.display = "none";
+            stepper.style.transition = "none";
+            checker.style.opacity = 1;
+
+            this.theStep(koordsto,koordsfrom,newPlayersStep);
+
+            let k = document.querySelectorAll(".uchecker");
+            for( let n = 0; n < k.length; n++) {
+                if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
+                    k[n].className += ` animate__bounce animate__animated`;
+                }
+            }
+            let u = document.querySelectorAll(`#ufield, #${cells[koordsto].checker}`);
+            for( let n = 0; n < k.length; n++) {
+                if (typeof(u[n]) === "undefined") continue;
+                u[n].className += ` animate__shakeY animate__animated`;
+            }
+
+            await this.sleep(1000);
+
+            for( let n = 0; n < k.length; n++) {
+                if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
+                    k[n].className = k[n].className.replace(" animate__bounce", "").replace(" animate__animated", "");
+                }
+            }
+            for( let n = 0; n < k.length; n++) {
+                if (typeof(u[n]) === "undefined") continue;
+                u[n].className = u[n].className.replace(" animate__shakeY", "").replace(" animate__animated", "");
+            }
+
+        } else {
+
+            stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
             
-            stepper.style.transition = (t*3)+"ms all ease";
-            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-            stepper.style.left = ooo.offsetLeft + "px";
-            stepper.style.transform = "scale(2)";
-
-            await this.sleep(t*3);
-            stepper.style.transition = (t/2)+"ms all ease";
-            stepper.style.transform = "scale(1)";
-
-        }else{
             await this.sleep(t);
-            stepper.style.transition = t+"ms all ease-out";
-            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-            stepper.style.left = ooo.offsetLeft + "px";
-            stepper.style.transform = "scale(1)";
-        }*/
+
+            stepper.style.transition = t+"ms transform ease-out";
+            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
+
+            await this.sleep(t);
+
+        }
+
         if (koordsto === possibility.path[index] || index === steps) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
             if(steps>2) this.rampage(steps);
 
-            this.theStep(koordsto,koordsfrom,newPlayersStep);
+            //this.theStep(koordsto,koordsfrom,newPlayersStep);
             return;
         } else {
             index++;
