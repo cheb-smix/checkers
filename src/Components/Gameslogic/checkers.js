@@ -129,7 +129,7 @@ export default class Checkers extends App{
                         kills:  [...possibilities[koords].kills, vars[k].kill],
                         path:   [...possibilities[koords].path, vars[k].place],
                         len:    possibilities[koords].len + vars[k].len,
-                        effectivity: possibilities[koords].effectivity + 2,
+                        effectivity: possibilities[koords].effectivity + (oldcells[vars[k].kill].damka ? 5 : 2),
                         from:   possibilities[koords].path[0],
                         to:     vars[k].place,
                         priority: cell.priority,
@@ -146,7 +146,7 @@ export default class Checkers extends App{
                         kills: [...possibilities[koords].kills, vars.kill],
                         path: [...possibilities[koords].path, vars.place],
                         len: possibilities[koords].len + vars.len,
-                        effectivity: possibilities[koords].effectivity + 2,
+                        effectivity: possibilities[koords].effectivity + (oldcells[vars.kill].damka ? 5 : 2),
                         from:   possibilities[koords].path[0],
                         to:     vars.place,
                         priority: cell.priority,
@@ -252,12 +252,25 @@ export default class Checkers extends App{
             }
         }
 
+        // prededicate kills
+        if (this.state.usersettings.difficulty > 1) { 
+            for (let c in iicells) {
+                for(let k in cells){
+                    if(cells[k].color && cells[k].color!==color){                   
+                        for( let p in cells[k].possibilities){
+                            if(cells[k].possibilities[p].path.indexOf(iicells[c].to) > 0 && cells[k].possibilities[p].kills.length > 0){
+                                iicells[c].effectivity += cells[k].possibilities[p].effectivity;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if(iicells.length > 0){
 
             ///////Third 3 in 1 algorithms using sorting
             let rndcomfunc = Math.floor(1 + Math.random() * 2);
-
-            //console.log("Used compareFunc"+rndcomfunc);
 
             iicells = this.watchFuture(iicells, cells, `compareFunc${rndcomfunc}`, 10);
 
@@ -265,7 +278,7 @@ export default class Checkers extends App{
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
             let c = iicells[index];
             
-            //console.log("Taken checker:",index,c);
+            console.log("Taken checker:",index,c,iicells);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
 
             this.doStep(c.to, c.from, true, false);
@@ -273,7 +286,7 @@ export default class Checkers extends App{
             if(!force){
                 this.iiStep(color,true,dbstep);
             }else{
-                this.rampage(0, "NO MOVES!", "opponent");
+                this.rampage(0, "NO MOVES!");
             }
         }
     }
@@ -490,27 +503,30 @@ export default class Checkers extends App{
             for(let x=1;x<9;x++){
                 let checker = false;
                 let color = false;
+                let damka = false;
                 if(debug){
                     if((y+x)%2===1){
-                        /*if (y>4 && y<9) {
+                        if (y>5 && y<9) {
                             color = "white";
                             checker = `${color}${key}`;
                         }
                         if (y>0 && y<4) {
                             color = "black";
                             checker = `${color}${key}`;
-                        }*/
-                        /*if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
+                        }
+                        if((x===4 && y===3) || (x===6 && y===3) || (x===5 && y===6) || (x===7 && y===6) || (x===8 && y===7)){
                             checker = false;
                             color = false;
-                        }*/
+                        }
                         if((x===1 && y===2) || (x===7 && y===2)){
                             checker =  "white"+key;
                             color = "white";
+                            damka = true;
                         }
                         if((x===2 && y===7)){
                             checker =  "black"+key;
                             color = "black";
+                            damka = true;
                         }
                     }
                 }else{
@@ -525,7 +541,7 @@ export default class Checkers extends App{
                         }
                     }
                 }
-                cells[x+":"+y] = {x:x,y:y,k:key,checker:checker,color:color,possibilities:{},active:false};
+                cells[x+":"+y] = {x:x,y:y,k:key,checker:checker,color:color,possibilities:{},active:false, damka: damka};
                 key++;
             }
         }

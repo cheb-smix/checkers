@@ -82,7 +82,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: true,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -253,7 +253,7 @@ export default class App extends React.Component{
         this.consoleLog(response.response);
     }
 
-    rampage = (steps, word="", target="") => {
+    rampage = (steps, word="", returnObj=false) => {
         clearTimeout(this.state.rampageTO);
         let newstate = {
             rampageCode:<Rampage steps={steps} word={word} />,
@@ -261,18 +261,7 @@ export default class App extends React.Component{
                 this.setMazafuckinState({rampageCode:"",rampageTO:null});
             },3000)
         };
-        if (steps === 0 && word === "NO MOVES!") {
-            let {playerInfo, opponentInfo} = this.state;
-            if (target === "opponent") {
-                playerInfo.winner = true;
-                opponentInfo.winner = false;
-            } else {
-                playerInfo.winner = false;
-                opponentInfo.winner = true;
-            }
-            newstate.playerInfo = playerInfo;
-            newstate.opponentInfo = opponentInfo;
-        }
+        if (returnObj) return newstate;
         this.setMazafuckinState(newstate);
     }
 
@@ -321,7 +310,7 @@ export default class App extends React.Component{
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
-        console.log(this.state.usersettings.animation, this.state.usersettings.animation==="0")
+        
         if(this.state.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
         }else{
@@ -330,7 +319,7 @@ export default class App extends React.Component{
     }
 
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
-        console.log("step",koordsfrom,koordsto);
+        //console.log("step",koordsfrom,koordsto);
         let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
         let {color} = cells[koordsfrom];
         let steps = cells[koordsfrom].possibilities[koordsto].len;
@@ -413,18 +402,20 @@ export default class App extends React.Component{
                 }
             }
         }
-        
-        this.setMazafuckinState({
-            playerInfo:playerInfo,
-            opponentInfo:opponentInfo,
-            bestMove:bestMove,
-            playersStep:newPlayersStep,
-            playstage:playstage,
-            consoleText: consoleText,
-            selectedChecker: false,
-            cells:cells,
-            gameTotalStat:gameTotalStat
-        });
+        let newstate = {}
+        if(steps>2) newstate = this.rampage(steps, "", true);
+
+        newstate.playerInfo = playerInfo;
+        newstate.opponentInfo = opponentInfo;
+        newstate.bestMove = bestMove;
+        newstate.playersStep = newPlayersStep;
+        newstate.playstage = playstage;
+        newstate.consoleText =  consoleText;
+        newstate.selectedChecker =  false;
+        newstate.cells = cells;
+        newstate.gameTotalStat = gameTotalStat;  
+
+        this.setMazafuckinState(newstate);
 
         setTimeout(() => this.botStep(color), 300);
     }
@@ -527,7 +518,7 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        if (steps > 1 && index === steps - 1) {
+        if (index === steps - 1 && steps > 4 && Math.random() > 0.5 && !cells[koordsfrom].damka) {
 
             stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1.5)`;
             stepper.className = stepper.className.replace(" animated", "") + " animated";
@@ -568,39 +559,32 @@ export default class App extends React.Component{
                 u[n].className = u[n].className.replace(" animate__shakeY", "").replace(" animate__animated", "");
             }
 
-        } else {
-
-            stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
-            
-            await this.sleep(t);
-
-            stepper.style.transition = t+"ms transform ease-out";
-            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
-
-            await this.sleep(t);
-
+            return; // end of epic last step
         }
 
-        if (koordsto === possibility.path[index] || index === steps) {
+        stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
+        await this.sleep(t)
+        stepper.style.transition = t+"ms transform ease-out";
+        stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`
+        await this.sleep(t);
+
+        if (index === steps - 1) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
-            if(steps>2) this.rampage(steps);
+            this.theStep(koordsto,koordsfrom,newPlayersStep);
 
-            //this.theStep(koordsto,koordsfrom,newPlayersStep);
-            return;
-        } else {
-            index++;
+            return; // end of default last step
+        } 
 
-            if (typeof(possibility.path[index]) !== "undefined") {
+        index++;
 
-                t = Math.pifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
-                
-                setTimeout(async () => {
-                    this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
-                }, t*2);
-
-            }
+        if (typeof(possibility.path[index]) !== "undefined") {
+            t = Math.pifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
+            
+            setTimeout(async () => {
+                this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
+            }, t*2);
         }
     }
 
