@@ -1,34 +1,39 @@
-.black{
-    /*background-image: url("../../Images/dark_wood.jpg");*/
-    background-color: black;
-    box-shadow: 0px 1px 0 #222222,
-                0px 2px 0 #222222,
-                0px 3px 0 #222222,
-                1px 4px 0 #222222,
-                1px 5px 0 #222222,
-                1px 6px 0 #222222,
-                6px 10px 7px #333333;
-}
-.white{
-    /*background-image: url("../../Images/light_wood.jpg");*/
-    background-color: white;
-    box-shadow: 0px 1px 0 #888888,
-                0px 2px 0 #888888,
-                0px 3px 0 #888888,
-                1px 4px 0 #888888,
-                1px 5px 0 #888888,
-                1px 6px 0 #888888,
-                6px 10px 7px #333333;
-}
 .uchecker,.empty,.userchecker{
-    width: var(--checker-size);
-    height: var(--checker-size);
-    border-radius: 50%;
+    width: var(--cell-size);
+    height: var(--cell-size);
     display: inline-block;
     text-align: center;
     margin: 0px;
     padding: 0px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 110% 110%;
 }
+.black{
+    background-image: url("./black.checker.png");
+}
+.uchecker.black.damka{
+    background-image: url("./black.damka.png");
+}
+.uchecker.black.animated{
+    background-image: url("./black-animated.gif");
+}
+.white{
+    background-image: url("./white.checker.png");
+}
+.uchecker.white.damka{
+    background-image: url("./white.damka.png");
+}
+.uchecker.white.animated{
+    background-image: url("./white-animated.gif");
+}
+.uchecker.active{
+    background-image: url("./active.checker.png");
+}
+.uchecker.damka.active{
+    background-image: url("./active.damka.png");
+}
+
 .uchecker.black > i.fa {
     color: #888888;
 }
@@ -41,26 +46,12 @@
 .uchecker > i.fa-crosshairs {
     color: red !important;
 }
-.uchecker.damka > i.fa.fa-chess-queen {
-    opacity: 1;
-}
-.uchecker.deadly > i.fa.fa-crosshairs {
-    opacity: 1;
+.uchecker.deadly{
+    background-color: rgba(255, 0, 0, 0.5);
 }
 
 .userchecker{
-    box-shadow: 0px 0px 10px #fff;
     transform: translate(10px,-10px);
-}
-.active{
-    background: #eeff00;
-    box-shadow: 0px 1px 0 #8a9401,
-                0px 2px 0 #8a9401,
-                0px 3px 0 #8a9401,
-                1px 4px 0 #8a9401,
-                1px 5px 0 #8a9401,
-                1px 6px 0 #8a9401,
-                6px 10px 7px #333333;
 }
 .drag{
     position: absolute;
