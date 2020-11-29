@@ -234,7 +234,6 @@ export default class Checkers extends App{
     }
 
     iiStep = (color, force=false, dbstep=false) => {
-        if(force) console.log("FORCED step");
         let iicells = [];
         /*if(dbstep){
             iicells.push(this.genCellObjByKeyAndPoss(dbstep.from,dbstep.to,dbstep.effectivity*10));
@@ -272,13 +271,13 @@ export default class Checkers extends App{
             ///////Third 3 in 1 algorithms using sorting
             let rndcomfunc = Math.floor(1 + Math.random() * 2);
 
-            iicells = this.watchFuture(iicells, cells, `compareFunc${rndcomfunc}`, 10);
+            iicells = this.watchFuture2(iicells, cells, `compareFunc${rndcomfunc}`, 10);
 
             let index = 0;
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
             let c = iicells[index];
             
-            console.log("Taken checker:",index,c,iicells);
+            //console.log("Taken checker:",index,c,iicells);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
 
             this.doStep(c.to, c.from, true, false);
@@ -332,6 +331,63 @@ export default class Checkers extends App{
         return future;
     }
 
+    watchFuture2 = (iicells, cells = this.state.cells, compareFunc, limit = 10) => {
+
+        iicells.sort(this[compareFunc]);
+        if (limit > iicells.length) limit = iicells.length;
+
+        for (let index=0; index < limit; index++) {
+
+            if (typeof(iicells[index]) === "undefined") break;
+
+            iicells[index].effectivity = this.watchFutureRecoursive(cells, iicells[index], iicells[index].effectivity, 0);
+            
+        }
+        iicells.sort(this[compareFunc]);
+        
+        return iicells;
+    }
+
+    watchFutureRecoursive = (cells = this.state.cells, possibility, FE = 0, iteration = 0) => {
+        if (iteration === this.state.usersettings.difficulty * 2) return 0;
+        let kek = this.deepCopy(cells);
+        let watchEnemy = iteration % 2 == 0;
+        kek[possibility.to].checker = kek[possibility.from].checker;
+        kek[possibility.to].color = kek[possibility.from].color;
+        kek[possibility.to].damka = kek[possibility.from].damka;
+        kek[possibility.from].checker = false;
+        kek[possibility.from].color = false;
+        kek[possibility.from].damka = false;
+        if (typeof(possibility.kills) !== "undefined") {
+            for (let k in possibility.kills) {
+                kek[possibility.kills[k]].checker = false;
+                kek[possibility.kills[k]].color = false;
+                kek[possibility.kills[k]].damka = false;
+            }
+        }
+
+        kek = this.regeneratePossibilities(kek);
+        
+        for (let k in kek) {
+            if (kek[k].color && kek[k].color!==kek[possibility.to].color) {
+                for (let p in kek[k].possibilities) {
+                    if (watchEnemy) {
+                        if (kek[k].possibilities[p].kills.indexOf(possibility.to) >= 0) {
+                            FE -= kek[k].possibilities[p].effectivity;
+                            FE = this.watchFutureRecoursive(kek, kek[k].possibilities[p], FE, iteration + 1);
+                        }
+                    } else {
+                        if (kek[k].possibilities[p].kills.indexOf(possibility.to) >= 0 || kek[k].possibilities[p].path.indexOf(possibility.from) >= 0) {
+                            FE += kek[k].possibilities[p].effectivity;
+                            FE = this.watchFutureRecoursive(kek, kek[k].possibilities[p], FE, iteration + 1);
+                        }
+                    }
+                }
+            }
+        }
+        return FE;
+    }
+
     watchFuture = (iicells, cells = this.state.cells, compareFunc, limit = 10) => {
 
         iicells.sort(this[compareFunc]);
@@ -359,7 +415,6 @@ export default class Checkers extends App{
                 if (!futureSteps[f]) break;
                 iicells[index].effectivity += futureSteps[f].badFuture ? 0 - futureSteps[f].effectivity : futureSteps[f].effectivity;
             }
-            if (futureSteps.length > 1 || iicells[index].damka) console.log(iicells[index].from, iicells[index].to, futureSteps, iicells[index].effectivity);
             
         }
 

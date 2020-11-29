@@ -82,7 +82,7 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: true,
+        debug: false,
         autochess: false,
         writesteps: false,
         writestats: false,
@@ -590,6 +590,9 @@ export default class App extends React.Component{
 
     stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
         let {cells} = this.state;
+        if (this.state.game === "corners" && cells[koordsfrom].possibilities[koordsto].path.length > 2) {
+            cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v,k) => k%2==0);
+        }
         let possibility = cells[koordsfrom].possibilities[koordsto];
         
         let stepper = document.getElementById("stepper");

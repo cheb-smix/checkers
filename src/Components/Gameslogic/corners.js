@@ -54,7 +54,7 @@ export default class Corners extends App{
             let hypotenuse = Math.pifagor({x:x,y:y},c.priority.target);
             if(Math.abs(hypotenuse)<Math.abs(c.hypotenuse)){
                 if(c.to !== p){
-                    console.log("Changing destination from "+c.to+" to "+p+"["+hypotenuse +"-"+ c.hypotenuse+"] target: ",c.priority.target);
+                    //console.log("Changing destination from "+c.to+" to "+p+"["+hypotenuse +"-"+ c.hypotenuse+"] target: ",c.priority.target);
                     c.to = p;
                     c.hypotenuse = hypotenuse;
                 }
@@ -218,7 +218,6 @@ export default class Corners extends App{
     }
 
     iiStep = (color, force=false, dbstep=false) => {
-        if(force) console.log("FORCED step");
         let iicells = [];
         if(dbstep){
             iicells.push(this.genCellObjByKeyAndPoss(dbstep.from,dbstep.to,dbstep.effectivity*10));
@@ -302,7 +301,6 @@ export default class Corners extends App{
             rndcomfunc = 9;
         }
         rndcomfunc = 1;
-        console.log("Used compareFunc"+rndcomfunc,a[rndcomfunc]);
         iicells.sort(this["compareFunc"+rndcomfunc]);
         /*
         if(this.state.playstage===3){
@@ -319,9 +317,9 @@ export default class Corners extends App{
                 iicells.sort(this.compareFunc2);
             }
         }*/
-        console.log(iicells);
+        
         if(iicells.length > 0){
-            let index = 0;//Math.floor(Math.random()*iicells.length*0.03);
+            let index = Math.floor(Math.random()*iicells.length*0.1);
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.2);
             let c = iicells[index];
             c.possibilities = cells[c.from].possibilities;
@@ -344,7 +342,7 @@ export default class Corners extends App{
                 }
             }
             
-            console.log("Taken checker:",index,c);
+            //console.log("Taken checker:",index,c);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
             ///////Final corrector
 
@@ -380,7 +378,6 @@ export default class Corners extends App{
     }
 
     checkOfflineGameStatus = (playerInfo,opponentInfo) => {
-        console.log("Checking offline status");
         if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
 
         let changes = false;
@@ -469,7 +466,7 @@ export default class Corners extends App{
         kek[c.from].checker = false;
         kek[c.from].color = false;
         kek = this.regeneratePossibilities(kek);
-        console.log(kek);
+
         let nff = false;
         for(let k in kek){
             if(kek[k].color===c.color){
@@ -504,7 +501,7 @@ export default class Corners extends App{
         if(nff && bfd) analyze = nff.effectivity-bfd.effectivity;
         if(!nff && bfd) analyze = 0-bfd.effectivity;
         if(nff && !bfd) analyze = nff.effectivity;
-        console.log("\n\n\n\n\nFutureAnalyzeResult",analyze,c.from,c.to,"\n",nff,"\n",bfd,"\n\n\n\n\n");
+        //console.log("\n\n\n\n\nFutureAnalyzeResult",analyze,c.from,c.to,"\n",nff,"\n",bfd,"\n\n\n\n\n");
         return analyze;
     }
 
@@ -606,109 +603,5 @@ export default class Corners extends App{
             targetCells.whitereverse[key] = {x:x,y:y};
         }
         return targetCells;
-    }
-
-    stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
-        let {cells} = this.state;
-        let a = p?p:Object.values(cells[koordsfrom].possibilities[koordsto].path);
-        if(a.length>2) a = a.filter((e,i)=>!(i%2));
-        let stepper = document.getElementById("stepper");
-        let headerHeight = document.querySelector(".uheader").offsetHeight;
-        
-        let checker = document.getElementById(cells[koordsfrom].checker);
-        let lastStepColor = cells[koordsfrom].color;
-        let t = 100;
-        checker.style.opacity = 0;
-        stepper.className = "uchecker "+cells[koordsfrom].color;
-        stepper.style.top = (checker.offsetTop + headerHeight)+"px";
-        stepper.style.left = checker.offsetLeft +"px";
-        stepper.style.display = "block";
-
-        let ooo;
-            
-        if(a === false || a.length === 0 ){
-
-            stepper.style.transition = (t*2)+"ms all ease-in-out";
-            ooo = document.querySelector(`.ucell[koords="${koordsto}"]>.empty`);
-            stepper.style.top = (ooo.offsetTop + headerHeight)+"px";
-            stepper.style.left = ooo.offsetLeft + "px";
-
-            setTimeout(()=>{
-                checker.style.opacity = 1;
-                stepper.style.display = "none";
-                stepper.style.transition = "none";
-                if(p===false){
-                    this.theStep(koordsto,koordsfrom,newPlayersStep);
-                    this.botStep(lastStepColor);
-                }
-            },t*4)
-        }else{
-            let index = 1;
-            const steps = a.length - 1;
-            const interval = setInterval(async ()=>{                    
-                if(index>=a.length){
-                    clearInterval(interval);
-                    stepper.style.display = "none";
-                    stepper.style.transition = "none";
-                    checker.style.opacity = 1;
-                    if(steps>2) this.rampage(steps);
-                    if(p===false){
-                        //if(koordsfrom!=="5:2"){
-                            this.theStep(koordsto,koordsfrom,newPlayersStep);
-                            this.botStep(lastStepColor);
-                        //}
-                    }
-                }else{
-                    if(a[index-1]!==koordsto){
-                        stepper.style.transition = t+"ms all ease-in";
-                        let [fx,fy] = a[index-1].split(":");
-                        let [tx,ty] = a[index].split(":");
-                        let dx = fx-tx;
-                        let dy = fy-ty;
-                        if(dx===0){
-                            if(dy<0) fy++;
-                            if(dy>0) fy--;
-                        }
-                        if(dy===0){
-                            if(dx<0) fx++;
-                            if(dx>0) fx--;
-                        }
-                        let koords = fx+":"+fy;
-
-                        ooo = document.querySelector(`.ucell[koords="${koords}"]`);
-
-                        stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                        stepper.style.left = ooo.offsetLeft + "px";
-                        stepper.style.transform = "scale(1.5)";
-                        //stepper.style.boxShadow = "10px 10px 3px #111";
-
-                        ooo = document.querySelector(`.ucell[koords="${a[index]}"]>.empty`);
-                        
-                        if(steps > 4){
-                            await this.sleep(t);
-                            
-                            stepper.style.transition = (t*3)+"ms all ease";
-                            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                            stepper.style.left = ooo.offsetLeft + "px";
-                            stepper.style.transform = "scale(2)";
-                            //stepper.style.boxShadow = "7px 7px 14px #111";
-                            await this.sleep(t*3);
-                            stepper.style.transition = (t/2)+"ms all ease";
-                            stepper.style.transform = "scale(1)";
-                            //stepper.style.boxShadow = "3px 3px 3px #111";
-                        }else{
-                            await this.sleep(t);
-                            stepper.style.transition = t+"ms all ease-out";
-                            if(index>=a.length) index = a.length-1;
-                            stepper.style.top = (ooo.offsetTop + headerHeight) + "px";
-                            stepper.style.left = ooo.offsetLeft + "px";
-                            stepper.style.transform = "scale(1)";
-                            //stepper.style.boxShadow = "3px 3px 3px #111";
-                        }
-                    }
-                }
-                index++;
-            },t*2);
-        }
     }
 }
