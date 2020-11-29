@@ -33,26 +33,11 @@ export default class Checkers extends App{
     }
 
     compareFunc1 = (a,b) => {
-        return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (a.priority.level!==b.priority.level?(a.priority.level>b.priority.level?-1:1):(Math.random()<0.5?1:-1));
+        return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (this.state.cells[a.from].priority.level!==this.state.cells[b.from].priority.level?(this.state.cells[a.from].priority.level>this.state.cells[b.from].priority.level?-1:1):(Math.random()<0.5?1:-1));
     }
     compareFunc2 = (a,b) => {
         return a.effectivity!==b.effectivity ? (a.effectivity>b.effectivity?-1:1) : (Math.random()<0.5?1:-1);
     }
-
-    /*genCellObjByKeyAndPoss = (k,p,h=this.state.cells[k].possibilities[p].effectivity) => {
-        let c = this.state.cells[k];
-        return {
-            from:       k, 
-            to:         p, 
-            priority:   c.priority, 
-            len:        c.possibilities[p].len,
-            path:       c.possibilities[p].path,
-            effectivity: h,
-            color:      c.color,
-            koordsfrom: {x:k[0],y:k[2]}, 
-            koordsto:   {x:p[0],y:p[2]}
-        }
-    }*/
 
     checkTheChecker = (c,p,x,y,direction="left up",color) => {
         //left up check default
@@ -129,10 +114,9 @@ export default class Checkers extends App{
                         kills:  [...possibilities[koords].kills, vars[k].kill],
                         path:   [...possibilities[koords].path, vars[k].place],
                         len:    possibilities[koords].len + vars[k].len,
-                        effectivity: possibilities[koords].effectivity + (oldcells[vars[k].kill].damka ? 5 : 2),
+                        effectivity: possibilities[koords].effectivity + (oldcells[vars[k].kill].damka ? 5 : 2) + (vars[k].place.indexOf("1:")===0 || vars[k].place.indexOf("8:")===0) ? 1 : 0,
                         from:   possibilities[koords].path[0],
                         to:     vars[k].place,
-                        priority: cell.priority,
                         color:  cell.color
                     };
 
@@ -146,10 +130,9 @@ export default class Checkers extends App{
                         kills: [...possibilities[koords].kills, vars.kill],
                         path: [...possibilities[koords].path, vars.place],
                         len: possibilities[koords].len + vars.len,
-                        effectivity: possibilities[koords].effectivity + (oldcells[vars.kill].damka ? 5 : 2),
+                        effectivity: possibilities[koords].effectivity + (oldcells[vars.kill].damka ? 5 : 2) + (vars.place.indexOf("1:")===0 || vars.place.indexOf("8:")===0) ? 1 : 0,
                         from:   possibilities[koords].path[0],
                         to:     vars.place,
-                        priority: cell.priority,
                         color:  cell.color
                     };
                     possibilities = this.getPossibilitiesRecursive(vars.place,oldcells,possibilities,cell);
@@ -202,10 +185,9 @@ export default class Checkers extends App{
                             kills: [],
                             path: [koords, vars[k].place],
                             len: vars[k].len,
-                            effectivity: 1,
+                            effectivity: (vars[k].place.indexOf("1:")===0 || vars[k].place.indexOf("8:")===0) ? 2 : 1,
                             from:   koords,
                             to:     vars[k].place,
-                            priority: oldcells[koords].priority,
                             color: oldcells[koords].color
                         };
                     }
@@ -219,11 +201,10 @@ export default class Checkers extends App{
                     damka: damka,
                     kills: [],
                     len: 1,
-                    effectivity: 1,
+                    effectivity: (k.indexOf("1:")===0 || k.indexOf("8:")===0) ? 2 : 1,
                     path: [koords, k],
                     from:   koords,
                     to:     k,
-                    priority: oldcells[koords].priority,
                     color: oldcells[koords].color
                 };
             }
@@ -271,13 +252,15 @@ export default class Checkers extends App{
             ///////Third 3 in 1 algorithms using sorting
             let rndcomfunc = Math.floor(1 + Math.random() * 2);
 
+            //console.log(iicells);
+
             iicells = this.watchFuture2(iicells, cells, `compareFunc${rndcomfunc}`, 10);
 
             let index = 0;
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
             let c = iicells[index];
             
-            //console.log("Taken checker:",index,c,iicells);
+            //console.log("Taken checker:",index,c);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
 
             this.doStep(c.to, c.from, true, false);

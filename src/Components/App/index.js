@@ -6,7 +6,7 @@ import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Modal from '../Modal';
 import Rampage from '../Rampage';
-import Board from './wood_texture.jpg';
+//import Board from './wood_texture.jpg';
 import Settings from '../../Funcs/settings';
 
 import './app.css';
@@ -59,6 +59,7 @@ export default class App extends React.Component{
         online: false,
         socketOpened: false,
         botspeed: 1,
+        epicstepnum: 2,
         playstage: 1,
         consoleText: "",
         modal: {
@@ -108,7 +109,7 @@ export default class App extends React.Component{
     }
 
     initiation = (state,data=false) => {
-        let {playerInfo} = this.state;
+        let {playerInfo, opponentInfo} = this.state;
         if(state.usersettings.atoken!=="" && data){
             if(data.success){
                 playerInfo.signed = true;
@@ -131,15 +132,28 @@ export default class App extends React.Component{
         }
 
         state.playerInfo = playerInfo;
+
+        if (state.usersettings.mode === "bot") {
+            if (Math.random() > 0.5) {
+                state.playerInfo.color = "white";
+                opponentInfo.color = "black";
+            } else {
+                state.playerInfo.color = "black";
+                opponentInfo.color = "white";
+            }
+            state.opponentInfo = opponentInfo;
+            state.playersStep = state.playerInfo.color === "white";
+        }
+        
         state.isLoading = false;
 
-        state.cells = this.dropCheckersToDefaults(state.debug);
-
         state.targetCells = this.setTargetCells();
+
+        state.cells = this.dropCheckersToDefaults(state.debug);
         
         this.setMazafuckinState(state);
         
-        if(this.state.autochess) this.botStep("black");
+        if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
     }
 
     socketReplyProcessing(response){
@@ -322,7 +336,7 @@ export default class App extends React.Component{
         //console.log("step",koordsfrom,koordsto);
         let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
         let {color} = cells[koordsfrom];
-        let steps = cells[koordsfrom].possibilities[koordsto].len;
+        let steps = cells[koordsfrom].possibilities[koordsto].path.length;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
             cells[koordsfrom].possibilities[koordsto].kills.forEach((k, v) => {
@@ -497,7 +511,7 @@ export default class App extends React.Component{
         }
     }
 
-    oneAnimatedStep = async (stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells) => {
+    oneAnimatedStep = async (stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells) => {
         
         stepper.style.transition = t+"ms transform ease-in";
 
@@ -508,24 +522,24 @@ export default class App extends React.Component{
         let ooo = document.querySelector(`.ucell[koords="${k1}"]`);
 
         let x1 = ooo.offsetLeft;
-        let y1 = ooo.offsetTop + headerHeight;
+        let y1 = ooo.offsetTop;
 
         ooo = document.querySelector(`.ucell[koords="${k2}"]>.empty`);
 
         let x2 = ooo.offsetLeft;
-        let y2 = ooo.offsetTop + headerHeight;
+        let y2 = ooo.offsetTop;
 
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        if (index === steps - 1 && steps > 4 && Math.random() > 0.5 && !cells[koordsfrom].damka) {
+        if (index === steps - 1 && steps > this.state.epicstepnum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
 
-            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1.5)`;
+            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1.5)`;
             stepper.className = stepper.className.replace(" animated", "") + " animated";
 
             await this.sleep(1000);
 
-            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`;
+            stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`;
             stepper.className = stepper.className.replace(" animated", "");
 
             await this.sleep(5);
@@ -535,28 +549,31 @@ export default class App extends React.Component{
 
             this.theStep(koordsto,koordsfrom,newPlayersStep);
 
+            let ant1 = this.state.playerInfo.color === "black" ? "animate__revbounce" : "animate__bounce";
+            let ant2 = this.state.playerInfo.color === "black" ? "animate__revshakeX" : "animate__shakeX";
+
             let k = document.querySelectorAll(".uchecker");
             for( let n = 0; n < k.length; n++) {
                 if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
-                    k[n].className += ` animate__bounce animate__animated`;
+                    k[n].className += ` ${ant1} animate__animated`;
                 }
             }
             let u = document.querySelectorAll(`#ufield, #${cells[koordsto].checker}`);
             for( let n = 0; n < k.length; n++) {
                 if (typeof(u[n]) === "undefined") continue;
-                u[n].className += ` animate__shakeY animate__animated`;
+                u[n].className += ` ${ant2} animate__animated`;
             }
 
             await this.sleep(1000);
 
             for( let n = 0; n < k.length; n++) {
                 if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
-                    k[n].className = k[n].className.replace(" animate__bounce", "").replace(" animate__animated", "");
+                    k[n].className = k[n].className.replace(` ${ant1}`, "").replace(" animate__animated", "");
                 }
             }
             for( let n = 0; n < k.length; n++) {
                 if (typeof(u[n]) === "undefined") continue;
-                u[n].className = u[n].className.replace(" animate__shakeY", "").replace(" animate__animated", "");
+                u[n].className = u[n].className.replace(` ${ant2}`, "").replace(" animate__animated", "");
             }
 
             return; // end of epic last step
@@ -565,7 +582,7 @@ export default class App extends React.Component{
         stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
         await this.sleep(t)
         stepper.style.transition = t+"ms transform ease-out";
-        stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop + headerHeight}px) scale(1)`
+        stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
 
         if (index === steps - 1) {
@@ -583,7 +600,7 @@ export default class App extends React.Component{
             t = Math.pifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
             
             setTimeout(async () => {
-                this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
+                this.oneAnimatedStep(stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
             }, t*2);
         }
     }
@@ -596,21 +613,20 @@ export default class App extends React.Component{
         let possibility = cells[koordsfrom].possibilities[koordsto];
         
         let stepper = document.getElementById("stepper");
-        let headerHeight = document.querySelector(".uheader").offsetHeight;
         
         let checker = document.getElementById(cells[koordsfrom].checker);
         let lastStepColor = cells[koordsfrom].color;
         
         checker.style.opacity = 0;
         stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
-        stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop + headerHeight}px)`;
+        stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop}px)`;
         stepper.style.display = "block";
 
         let index = 1;
         let t = Math.pifagor(cells[koordsfrom], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
 
         setTimeout(async () => {
-            this.oneAnimatedStep(stepper, checker, possibility, index, t, headerHeight, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
+            this.oneAnimatedStep(stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
             index++;
         }, t*2);
     }
@@ -901,11 +917,12 @@ export default class App extends React.Component{
                 let {x,y,k,color,checker,possibilities,priority} = this.state.cells[koords];
                 let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && checkers);
                 let active = koords === this.state.selectedChecker;
-                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
+                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={priority} />);
             });
         }
 
-        let fieldClass = this.state.isLoading?"loading":"";
+        let fieldClass = this.state.isLoading ? "loading" : "";
+        if (this.state.playerInfo.color === "black") fieldClass += " forBlacks";
 
         return (
             <div className="ucon">
@@ -946,10 +963,12 @@ export default class App extends React.Component{
                         closer={this.hideModal} 
                         modal={this.state.modal}
                 />
-                <div className="uchecker black" id="stepper"><i className="fa fa-chess-queen"></i>&nbsp;</div>
                 <div className="umaincon animate__fadeInRight animate__animated">
-                    <div className={fieldClass} id="ufield" style={{backgroundImage: Board, transform: this.state.playerInfo.color === "white" ? "rotate(0deg)" : "rotate(180deg)"}}>
-                    {renderedField}
+                    <div className={fieldClass} id="ufield">
+                        <div className="ufcn">
+                        <div className="uchecker black" id="stepper">&nbsp;</div>
+                        {renderedField}
+                        </div>
                     </div>
                     <Console
                         text={this.state.consoleText} 
