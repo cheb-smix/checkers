@@ -1,4 +1,5 @@
 import React from 'react';
+import Lang from '../../Lang';
 import './console.css';
 
 export default class Console extends React.Component{
@@ -18,7 +19,7 @@ export default class Console extends React.Component{
         }
         let serverInfo = <span></span>;
         if(this.props.searching){
-            serverInfo = <span>Поиск противника {this.props.count}<br />Примерное время ожидания: {avgtime} сек.<br />Игроков на сервере: {this.props.serverInfo.playersstat.total}<br />Игроков в поиске: {this.props.serverInfo.playersstat.searching}</span>
+            serverInfo = <span>{Lang("searchingTheEnemy")} {this.props.count}<br />{Lang("approxWaitTime").replace("$", avgtime)}<br />{Lang("playersOnServers").replace("$", this.props.serverInfo.playersstat.total)}<br />{Lang("playersInSearch").replace("$", this.props.serverInfo.playersstat.searching)}</span>
         }
         let consoleText = this.props.rampageCode === "" ? this.props.text : "";
         let writeStepsBlock = "";

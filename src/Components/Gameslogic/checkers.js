@@ -334,7 +334,7 @@ export default class Checkers extends App{
     watchFutureRecoursive = (cells = this.state.cells, possibility, FE = 0, iteration = 0) => {
         if (iteration === this.state.usersettings.difficulty * 2) return 0;
         let kek = this.deepCopy(cells);
-        let watchEnemy = iteration % 2 == 0;
+        let watchEnemy = iteration % 2 === 0;
         kek[possibility.to].checker = kek[possibility.from].checker;
         kek[possibility.to].color = kek[possibility.from].color;
         kek[possibility.to].damka = kek[possibility.from].damka;

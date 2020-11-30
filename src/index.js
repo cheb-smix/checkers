@@ -8,6 +8,13 @@ import App from './App.js';
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 
+let device = {};
+document.addEventListener("deviceready", deviceReadyListener, false);
+function deviceReadyListener(){
+    alert(device.uuid);
+    console.log(device.uuid);
+}
+
 const history = window.cordova ? createHashHistory() : createBrowserHistory();
 
 Math.coefficient = (n1,n2,f=0) => {

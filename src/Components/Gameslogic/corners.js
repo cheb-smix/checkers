@@ -294,13 +294,13 @@ export default class Corners extends App{
         }
         ///////Third 3 in 1 algorithms using sorting
         let rndcomfunc = Math.floor(2+Math.random()*8);
-        let a = ["","h,lvl","h,rnd","lvl,h","s4","s5","|lvl|,|h|","s7","h==0,s8","s9"];
+        //let a = ["","h,lvl","h,rnd","lvl,h","s4","s5","|lvl|,|h|","s7","h==0,s8","s9"];
         if(this.state.playstage===3){
             rndcomfunc = 2;
         }else{
             rndcomfunc = 9;
         }
-        rndcomfunc = 1;
+        //rndcomfunc = 1;
         iicells.sort(this["compareFunc"+rndcomfunc]);
         /*
         if(this.state.playstage===3){
