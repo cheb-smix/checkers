@@ -10,6 +10,7 @@ import Rampage from '../Rampage';
 import Settings from '../../Funcs/settings';
 
 import './app.css';
+import Lang from '../../Lang';
 
 const server = window.location.hostname.length > 7 ? window.location.hostname : "smix-soft.ru";
 const wsport = "8080";
@@ -105,7 +106,6 @@ export default class App extends React.Component{
             this.initiation(state);
         });
 
-        //setTimeout(()=>this.consoleLog("Вы должны взять больше!"), 2000);
     }
 
     initiation = (state,data=false) => {
@@ -176,14 +176,14 @@ export default class App extends React.Component{
         if(response.response==="STARTGAME"){
             clearInterval(this.state.searchingOnlineOpponent);
             let playersStep = data.lastStep!==this.state.playerInfo.token;
-            let colorInfo = ". Вы играете "+(data.players[this.state.playerInfo.token].color==="white"?"белыми":"чёрными");
+            let colorInfo = Lang(`${data.players[this.state.playerInfo.token].color}IsYours`);
             let newStateObject = {
                 playersStep: playersStep,
                 lastStep: data.lastStep,
                 lastStepTime: data.lastStepTime,
                 opponentInfo: data.players[data.players[this.state.playerInfo.token].opponent],
                 playerInfo: data.players[this.state.playerInfo.token],
-                consoleText: (playersStep?"Ваш ход!":"Ожидание хода противника")+colorInfo,
+                consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+colorInfo,
                 isLoading: false,
                 online: true,
                 cells: this.dropCheckersToDefaults(),
@@ -193,14 +193,14 @@ export default class App extends React.Component{
                     if(this.state.online && this.state.playerInfo.status === "in_game" && this.state.lastStepTime>0){
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
                         if(r > this.state.serverInfo.steptimelimit * 2 / 3){
-                            this.consoleLog((this.state.playersStep?"Ваш ход! ":"Ожидание хода противника... ")+(this.state.serverInfo.steptimelimit - r));
+                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(this.state.serverInfo.steptimelimit - r));
                         }
                         if(r > this.state.serverInfo.steptimelimit){
                             if(!this.state.playersStep){
                                 this.socketSend({action:"TIMEOUTOPPO"});
-                                this.suggestNewOneGame("Противнику зачитано поражение за бездействие. ");
+                                this.suggestNewOneGame(Lang("enemyLostByTimeout"));
                             }
-                            this.consoleLog("Завершение игры по таймауту");
+                            this.consoleLog(Lang("gameOverByTimeout"));
                             clearInterval(this.state.timeoutCheckInterval);
                         }
                     }
@@ -252,7 +252,7 @@ export default class App extends React.Component{
                 this.setMazafuckinState({
                     timeoutCheckInterval: false,
                     online: false,
-                    consoleText: "Таймаут. Противник не отвечает."
+                    consoleText: Lang("enemyLostByTimeout")
                 });
             }
             if(response.data.reason === "TIMEOUT"){
@@ -260,7 +260,7 @@ export default class App extends React.Component{
                 this.setMazafuckinState({
                     timeoutCheckInterval: false,
                     online: false,
-                    consoleText: "Вам засчитано поражение за бездействие."
+                    consoleText: Lang("youveLostByTimeout")
                 });
             }
         }*/
@@ -381,8 +381,8 @@ export default class App extends React.Component{
         for (let d in doneStat[this.state.playerInfo.color]) playerInfo[d] = doneStat[this.state.playerInfo.color][d];
         for (let d in doneStat[this.state.opponentInfo.color]) opponentInfo[d] = doneStat[this.state.opponentInfo.color][d];
 
-        let consoleText = newPlayersStep?"Ваш ход!":"Ожидание хода противника";
-        if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = "Игра окончена";
+        let consoleText = newPlayersStep ? Lang("yourTurnText") : Lang("enemyTurnText");
+        if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = Lang("gameOverText");
 
         let playstage = 1;
         if(playerInfo.moves + opponentInfo.moves > 4){
@@ -608,7 +608,7 @@ export default class App extends React.Component{
     stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
         let {cells} = this.state;
         if (this.state.game === "corners" && cells[koordsfrom].possibilities[koordsto].path.length > 2) {
-            cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v,k) => k%2==0);
+            cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v,k) => k%2===0);
         }
         let possibility = cells[koordsfrom].possibilities[koordsto];
         
@@ -693,14 +693,14 @@ export default class App extends React.Component{
                             }
                             
                             if (needToEatMore) {
-                                if (needToEatMore.more) this.consoleLog("Вы должны взять больше!");
-                                else this.consoleLog("Вы должны есть!");
+                                if (needToEatMore.more) this.consoleLog( Lang("youHaveToTakeMore") );
+                                else this.consoleLog( Lang("youHaveToTake") );
                                 for (let k in needToEatMore.kills) {
                                     let ch = document.querySelector(`.ucell[koords='${needToEatMore.kills[k]}'] .uchecker`);
                                     ch.className = `${ch.className} deadly`;
                                 }
                             } else {
-                                this.consoleLog("Ход не возможен");
+                                this.consoleLog(Lang("stepIsImpossible"));
                             }
                             
                         }
@@ -731,22 +731,22 @@ export default class App extends React.Component{
         console.log(`Connecting socket ${url}`);
         this.socket = new WebSocket(url);
         this.socket.onopen = () => {
-            this.consoleLog("Подключен");
+            this.consoleLog(Lang("connected"));
             this.setMazafuckinState({socketOpened: true});
             this.startNewSearch(true);
         };
         this.socket.onclose = evt => { 
             if (evt.wasClean) {
-                this.consoleLog("Отключен");
+                this.consoleLog(Lang("disconnected"));
             } else {
-                this.consoleLog("Сервер не доступен");
+                this.consoleLog(Lang("serversUnavailable"));
             }
             this.setMazafuckinState({socketOpened: false});
-            console.log('Код: ' + evt.code + ' причина: ' + evt.reason);
+            console.log('Code: ' + evt.code + ' reason: ' + evt.reason);
         };
         this.socket.onerror = evt => { 
-            console.log('Ошибка подключения сокета', evt);
-            this.setMazafuckinState({socketOpened: false, consoleText: "Сервер не доступен"});
+            console.log('Socket connection failed', evt);
+            this.setMazafuckinState({socketOpened: false, consoleText: Lang("serversUnavailable")});
         };
         this.socket.onmessage = evt => { 
             this.socketReplyProcessing(evt);
@@ -776,13 +776,13 @@ export default class App extends React.Component{
             online: false,
             playerInfo: playerInfo,
             modal: {code: "", bg: true, panel: true, autoclose: false},
-            consoleText: "Отключен. Ваш ход."
+            consoleText: Lang("disconnected") + ". " + Lang("yourTurnText")
         });
     }
 
     continueWithSameOpponent = () => {
         if(this.state.socketOpened) this.socketSend({action:"REREGISTER"});
-        else this.consoleLog("Сервер не доступен");
+        else this.consoleLog(Lang("serversUnavailable"));
         this.clearPlayerInfoAfterGameOver();
     }
 
@@ -794,25 +794,25 @@ export default class App extends React.Component{
         };
         if(typeof(this.state.playerInfo.login)!=="undefined") regdata['login'] = this.state.playerInfo.login;
         if(socketOpened) this.socketSend(regdata);
-        else this.consoleLog("Сервер не доступен");
+        else this.consoleLog(Lang("serversUnavailable"));
         if(reset) this.clearPlayerInfoAfterGameOver();
     }
 
     suggestNewOneGame = (text="") => {
         this.showModal(
             <div>
-                <input type="button" value="Нет" onClick={this.clearPlayerInfoAfterGameOver} /> <input type="button" onClick={()=>{ this.searchNewOpponent() }} value="Да"/>
+                <input type="button" value={Lang("noText")} onClick={this.clearPlayerInfoAfterGameOver} /> <input type="button" onClick={()=>{ this.searchNewOpponent() }} value={Lang("yesText")}/>
             </div>,
-            text+"<br />Найти новую игру?"
+            text + "<br />" + Lang("findAnewGame")
         );
     }
 
     quit = (suggestNewOne=true,juststopsearching=true) =>{
         if(this.state.socketOpened) this.socketSend({action:"QUIT"});
-        else this.consoleLog("Сервер не доступен");
+        else this.consoleLog(Lang("serversUnavailable"));
         this.setMazafuckinState({
             online: false,
-            consoleText: "Отключен"
+            consoleText: Lang("disconnected")
         });
         if(suggestNewOne) this.suggestNewOneGame();
         else if(juststopsearching) this.clearPlayerInfoAfterGameOver();
@@ -821,7 +821,7 @@ export default class App extends React.Component{
     startNewSearch = (socketOpened=this.state.socketOpened) => {
         clearInterval(this.state.searchingOnlineOpponent);
         this.setMazafuckinState({
-            consoleText: "Поиск противника", 
+            consoleText: Lang("searchingTheEnemy"), 
             searchingOnlineCounter: 0,
             searchingOnlineOpponent: setInterval(()=>{
                 this.setMazafuckinState({searchingOnlineCounter: this.state.searchingOnlineCounter+1})
@@ -914,10 +914,10 @@ export default class App extends React.Component{
         let checkers = (this.state.game === "checkers" || this.state.game === "giveaway");
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
-                let {x,y,k,color,checker,possibilities,priority} = this.state.cells[koords];
+                let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
                 let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && checkers);
                 let active = koords === this.state.selectedChecker;
-                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={priority} />);
+                return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
         }
 
@@ -947,18 +947,6 @@ export default class App extends React.Component{
                         XMLHR={this.XMLHR}
                         quit={this.quit}
                 />
-                <Fanfara
-                        playerInfo={this.state.playerInfo} 
-                        opponentInfo={this.state.opponentInfo} 
-                        bestMove={this.state.bestMove}
-                        continueWithSameOpponent={this.continueWithSameOpponent}
-                        searchNewOpponent={this.searchNewOpponent}
-                        quit={this.quit}
-                        XMLHR={this.XMLHR}
-                        updatePI={this.updatePI}
-                        rampage={this.rampage}
-                        showBestMove={this.showBestMove}
-                />
                 <Modal
                         closer={this.hideModal} 
                         modal={this.state.modal}
@@ -969,6 +957,18 @@ export default class App extends React.Component{
                         <div className="uchecker black" id="stepper">&nbsp;</div>
                         {renderedField}
                         </div>
+                        <Fanfara
+                            playerInfo={this.state.playerInfo} 
+                            opponentInfo={this.state.opponentInfo} 
+                            bestMove={this.state.bestMove}
+                            continueWithSameOpponent={this.continueWithSameOpponent}
+                            searchNewOpponent={this.searchNewOpponent}
+                            quit={this.quit}
+                            XMLHR={this.XMLHR}
+                            updatePI={this.updatePI}
+                            rampage={this.rampage}
+                            showBestMove={this.showBestMove}
+                    />
                     </div>
                     <Console
                         text={this.state.consoleText} 

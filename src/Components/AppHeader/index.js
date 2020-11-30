@@ -5,6 +5,7 @@ import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Settings from '../../Funcs/settings';
 import Button from '../Button';
+import Lang from '../../Lang';
 
 export default class AppHeader extends React.Component{
 
@@ -17,8 +18,8 @@ export default class AppHeader extends React.Component{
 
     gameChoice = () => {
         let doptext = "";
-        if(this.props.playerStatus === "in_game" && this.props.online) doptext = <h5 className="warning">За выход из игры Вам будет засчитано поражение</h5>;
-        if(this.props.searching) doptext = <h5>За выход из игры Вам будет засчитано поражение</h5>;
+        if(this.props.playerStatus === "in_game" && this.props.online) doptext = <h5 className="warning">{Lang("gameCloseWarning")}</h5>;
+        if(this.props.searching) doptext = <h5>{Lang("gameCloseWarning")}</h5>;
 
         if (doptext) doptext = <div className="col-md-6 col-12">{doptext}</div>
 
@@ -29,17 +30,15 @@ export default class AppHeader extends React.Component{
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="game"
-                            items={{"checkers":"Шашки","giveaway":"Поддавки","corners":"Уголки","checkmates":"Шахматы"}}
+                            items={{"checkers":Lang("checkersGameName"),"giveaway":Lang("giveawayGameName"),"corners":Lang("cornersGameName"),"checkmates":Lang("chessGameName")}}
                             selected={this.props.gamename}
-                            placeholder="Игра &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp; "
+                            placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
                                 this.props.hideModal();
                                 document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
                                 document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
                                 setTimeout(() => {
                                     this.props.history.push("/" + v);
-                                    //document.querySelector(".umaincon").className = "umaincon animate__fadeInRight animate__animated";
-                                    //window.location.href = "/" + v;
                                 }, 1000);
                             }}
                         />
@@ -47,7 +46,7 @@ export default class AppHeader extends React.Component{
                     </div>
                 </div>
             </div>,
-            "Выберите игру"
+            Lang("chooseGameText")
         );
     }
 
@@ -62,14 +61,14 @@ export default class AppHeader extends React.Component{
                 <div className="container">
                     <div className="row">
                         <div className="col-12">
-                            <h5>Вы уверены в том, что хотите покинуть игру?</h5><h5 className="warning">Вам будет засчитано поражение!</h5>
+                        <h5>{Lang("sureYouWannaQuit")}</h5><h5 className="warning">{Lang("youllLooseIfYouQuit")}</h5>
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
                                 action={this.props.hideModal} 
                                 href="" 
                                 history="" 
-                                value="Отмена" 
+                                value={Lang("cancelText")} 
                                 theme="neon"
                                 strong="true"
                             />
@@ -79,19 +78,19 @@ export default class AppHeader extends React.Component{
                                 action={this.props.quit} 
                                 href="" 
                                 history="" 
-                                value="Выйти из игры" 
+                                value={Lang("quitTheGame")}
                                 theme="neon"
                                 strong="light"
                             />
                         </div>
                     </div>
                 </div>,
-                "Внимание!"
+                Lang("attention")
             )
         }
         if(this.props.searching){
-            let approxtext = <h5>Прекратить поиск? В ближайшие {this.props.serverInfo.avgwaittime.avg - this.props.count} сек. противник вероятнее всего найдется! (но это не точно)</h5>;
-            if(this.props.serverInfo.avgwaittime.cnt===0 || this.props.serverInfo.playersstat.total<5) approxtext = <h5>Прекратить поиск?</h5>;
+            let approxtext = <h5>{Lang("cancelSearchText").replace("$", this.props.serverInfo.avgwaittime.avg - this.props.count)}</h5>;
+            if(this.props.serverInfo.avgwaittime.cnt===0 || this.props.serverInfo.playersstat.total<5) approxtext = <h5>{Lang("cancelSearchConfirm")}?</h5>;
             this.props.showModal(
                 <div className="container">
                     <div className="row">
@@ -103,7 +102,7 @@ export default class AppHeader extends React.Component{
                                 action={this.props.hideModal} 
                                 href="" 
                                 history="" 
-                                value="Отмена" 
+                                value={Lang("cancelText")} 
                                 theme="neon"
                                 strong="true"
                             />
@@ -113,14 +112,14 @@ export default class AppHeader extends React.Component{
                                 action={this.stopSearchingOpponent} 
                                 href="" 
                                 history="" 
-                                value="Прекратить поиск" 
+                                value={Lang("cancelSearchConfirm")} 
                                 theme="light"
                                 strong="true"
                             />
                         </div>
                     </div>
                 </div>,
-                "Внимание!"
+                Lang("attention")
             )
         }else{
             this.props.startNewSearch();
@@ -146,25 +145,25 @@ export default class AppHeader extends React.Component{
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="animation"
-                            items={{"2":"Расширенная","1":"Упрощенная","0":"Без анимации"}}
+                            items={{"2":Lang("animationLevel2"),"1":Lang("animationLevel1"),"0":Lang("animationLevel0")}}
                             selected={this.props.usersettings.animation}
-                            placeholder="Анимация"
+                            placeholder={Lang("animationSetting")}
                             onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="difficulty"
-                            items={{"3":"Сложно","2":"Среднее","1":"Легко"}}
+                            items={{"3":Lang("difficultyLevel3"),"2":Lang("difficultyLevel2"),"1":Lang("difficultyLevel1")}}
                             selected={this.props.usersettings.difficulty}
-                            placeholder="Сложность бота"
+                            placeholder={Lang("difficultySetting")}
                             onSelect={this.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Slider
                             id="soundvolume"
-                            placeholder="Громкость звуков"
+                            placeholder={Lang("soundSetting")}
                             value={this.props.usersettings.soundvolume}
                             onSet={this.saveSetting}
                         />
@@ -172,7 +171,7 @@ export default class AppHeader extends React.Component{
                     <div className="col-md-6 col-12">
                         <Slider
                             id="musicvolume"
-                            placeholder="Громкость музыки"
+                            placeholder={Lang("musicSetting")}
                             value={this.props.usersettings.musicvolume}
                             onSet={this.saveSetting}
                         />
@@ -182,14 +181,14 @@ export default class AppHeader extends React.Component{
                             action={this.dropSettings} 
                             href="" 
                             history="" 
-                            value="По умолчанию" 
+                            value={Lang("returnDefaults")} 
                             theme="neon"
                             strong="true"
                         />
                     </div>
                 </div>
             </div>,
-            "Настройки"
+            Lang("settingsText")
         );
     }
     showAccStat = () => {
@@ -205,25 +204,25 @@ export default class AppHeader extends React.Component{
                 <div className="row">
                     <div className="col-12" id="message"></div>
                     <div className="col-12">
-                        <h4 style={{margin: "0", border: "0"}}>{s.lvl} уровень</h4>
+                        <h4 style={{margin: "0", border: "0"}}>{s.lvl} {Lang("levelText")}</h4>
                         <div className="exp">
                             <div className="progress" style={{width: progress, left: left+"%"}}>{s.exp}</div>
                             <table className="stable" style={{padding: "0px"}}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
                         </div>
                         <table className="stable">
                             <tbody>
-                                <tr><td>Опыта до следующего уровня</td><td>{endexp - s.exp}</td></tr>
-                                <tr><td>Всего игр</td><td>{s.games}</td></tr>
-                                <tr><td>Побед</td><td>{s.won} ({Math.percent(s.won,s.games,2)})</td></tr>
-                                <tr><td>Поражений</td><td>{s.lost} ({Math.percent(s.lost,s.games,2)})</td></tr>
-                                <tr><td>Ничьих</td><td>{s.games-s.won-s.lost} ({Math.percent(s.games-s.won-s.lost,s.games,2)})</td></tr>
-                                <tr><td>Побед/поражений</td><td>{Math.coefficient(s.won,s.lost,2)}</td></tr>
-                                <tr><td>Всего ходов</td><td>{s.moves}</td></tr>
-                                <tr><td>Всего хопов</td><td>{s.steps}</td></tr>
-                                <tr><td>Среднее время в игре</td><td>{Math.round(s.playeravgtime)} с. / {Math.round(s.totalavgtime)} с.</td></tr>
-                                <tr><td>Среднее кол-во ходов</td><td>{Math.round(s.playeravgmoves)} / {Math.round(s.totalavgmoves)}</td></tr>
-                                <tr><td>Среднее кол-во хопов</td><td>{Math.round(s.playeravgsteps)} / {Math.round(s.totalavgsteps)}</td></tr>
-                                <tr><td>Среднее хопов на ход</td><td>{Math.coefficient(s.playeravgsteps,s.playeravgmoves,2)} / {Math.coefficient(s.totalavgsteps,s.totalavgmoves,2)}</td></tr>
+                                <tr><td>{Lang("expNeededForNextLvl")}</td><td>{endexp - s.exp}</td></tr>
+                                <tr><td>{Lang("totalGames")}</td><td>{s.games}</td></tr>
+                                <tr><td>{Lang("totalWons")}</td><td>{s.won} ({Math.percent(s.won,s.games,2)})</td></tr>
+                                <tr><td>{Lang("totalLosts")}</td><td>{s.lost} ({Math.percent(s.lost,s.games,2)})</td></tr>
+                                <tr><td>{Lang("totalDraws")}</td><td>{s.games-s.won-s.lost} ({Math.percent(s.games-s.won-s.lost,s.games,2)})</td></tr>
+                                <tr><td>{Lang("totalWons")}/{Lang("totalLosts")}</td><td>{Math.coefficient(s.won,s.lost,2)}</td></tr>
+                                <tr><td>{Lang("totalMoves")}</td><td>{s.moves}</td></tr>
+                                <tr><td>{Lang("totalHops")}</td><td>{s.steps}</td></tr>
+                                <tr><td>{Lang("avgGameTime")}</td><td>{Math.round(s.playeravgtime)} {Lang("secondsText")} / {Math.round(s.totalavgtime)} {Lang("secondsText")}</td></tr>
+                                <tr><td>{Lang("avgGameMoves")}</td><td>{Math.round(s.playeravgmoves)} / {Math.round(s.totalavgmoves)}</td></tr>
+                                <tr><td>{Lang("avgGameHops")}</td><td>{Math.round(s.playeravgsteps)} / {Math.round(s.totalavgsteps)}</td></tr>
+                                <tr><td>{Lang("avgMoveHops")}</td><td>{Math.coefficient(s.playeravgsteps,s.playeravgmoves,2)} / {Math.coefficient(s.totalavgsteps,s.totalavgmoves,2)}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -238,30 +237,30 @@ export default class AppHeader extends React.Component{
                 <div className="row">
                     <div className="col-12" id="message"></div>
                     <div className="col-12">
-                        <input type="text" id="name" placeholder="Отображаемое имя" minLength="3" maxLength="40" />
+                        <input type="text" id="name" placeholder={Lang("displayName")} minLength="3" maxLength="40" />
                     </div>
                     <div className="col-12">
-                        <input type="text" id="login" placeholder="Логин" minLength="4" maxLength="30" />
+                        <input type="text" id="login" placeholder={Lang("loginText")} minLength="4" maxLength="30" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass" placeholder="Пароль" minLength="6" maxLength="60" />
+                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass2" placeholder="Повторите пароль" minLength="6" maxLength="60" />
+                        <input type="password" id="pass2" placeholder={Lang("passwordConfirm")} minLength="6" maxLength="60" />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
                             action={this.gogoRegister} 
                             href="" 
                             history="" 
-                            value="Зарегистрироваться" 
+                            value={Lang("signUpText")} 
                             theme="neon"
                             strong="true"
                         />
                     </div>
                 </div>
             </div>,
-            "Авторизация"
+            Lang("signUpText")
         );
     }
     gogoRegister = () => {
@@ -269,14 +268,14 @@ export default class AppHeader extends React.Component{
         m.className = "";
         if(document.getElementById("pass").value !== document.getElementById("pass2").value){
             m.className = "error";
-            m.innerHTML = "Пароли не совпадают";
+            m.innerHTML = Lang("passwordsNotMatch");
             return false;
         }
         let a = document.querySelectorAll("#modal .row input");
         for(let f=0;f<a.length;f++){
             if(a[f].value.length < a[f].minLength || a[f].value.length > a[f].maxLength){
                 m.className = "error";
-                m.innerHTML = "Поле «"+a[f].placeholder+"» должно быть в диапазоне от "+a[f].minLength+" до "+a[f].maxLength+" символов!";
+                m.innerHTML = Lang("fieldRuleText1").replace("$", a[f].placeholder) + Lang("fieldRuleText2").replace("$", a[f].minLength+"-"+a[f].maxLength);
                 return false;
             }
         }
@@ -293,24 +292,24 @@ export default class AppHeader extends React.Component{
                 <div className="row">
                     <div className="col-12" id="message"></div>
                     <div className="col-12">
-                        <input type="text" id="login" placeholder="Логин" maxLength="30" />
+                        <input type="text" id="login" placeholder={Lang("loginText")} maxLength="30" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass" placeholder="Пароль" />
+                        <input type="password" id="pass" placeholder={Lang("passwordText")} />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
                             action={this.gogoSign} 
                             href="" 
                             history="" 
-                            value="Войти" 
+                            value={Lang("signInText")} 
                             theme="neon"
                             strong="true"
                         />
                     </div>
                 </div>
             </div>,
-            "Авторизация"
+            Lang("authText")
         );
     }
     gogoSign = () => {
@@ -338,8 +337,9 @@ export default class AppHeader extends React.Component{
             this.props.history.push("/home");
         }, 1000);
     }
-    navigatorClick = () => {
-        this.setState({naviActive: !this.state.naviActive});
+    navigatorClick = (h = null) => {
+        if (h === null) this.setState({naviActive: !this.state.naviActive});
+        else this.setState({naviActive: h});
     }
     animationend = (event) => {
         event.target.className = "uhicon";
@@ -347,6 +347,7 @@ export default class AppHeader extends React.Component{
     }
     componentDidMount = () => {
         let title = document.getElementById('utitle');
+        document.getElementById("uhiconcontainer").style.top = `${title.offsetHeight}px`;
         title.className = "animate__backInLeft animate__animated fa-2x";
         title.addEventListener("animationend",(event) => {
             event.target.className = "fa-2x";
@@ -358,9 +359,9 @@ export default class AppHeader extends React.Component{
         if(this.props.status === "in_game" && this.props.online) gameclass = "fa fa-stop-circle";
         if(this.props.searching) gameclass = "fa fa-ellipsis-h fa-smx-spin";
 
-        let gametitle = "Найти противника";
-        if(this.props.status === "in_game" && this.props.online) gametitle = "Выйти из игры";
-        if(this.props.searching) gametitle = "Остановить поиск";
+        let gametitle = Lang("searchingTheEnemy");
+        if(this.props.status === "in_game" && this.props.online) gametitle = Lang("quitTheGame");
+        if(this.props.searching) gametitle = Lang("cancelSearchConfirm");
 
         let uhcclass = "fa-2x";
         uhcclass = this.state.naviActive ? "animate__fadeInLeft animate__animated fa-2x" : "animate__fadeOutLeft animate__animated fa-2x";
@@ -368,25 +369,26 @@ export default class AppHeader extends React.Component{
 
         let accDiv = <React.Fragment>
             <div className="uhicon" onClick={this.gameButClick} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
-            <div className="uhicon" onClick={this.settingsClick}><i className="fa fa-sliders-h"></i><span> Настройки</span></div>
+            <div className="uhicon" onClick={this.settingsClick}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 
         if(this.props.playerSigned){
             accDiv = <React.Fragment>
                         <div className="uhicon" onClick={this.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerName}</span></div>
                         {accDiv}
-                        <div className="uhicon" onClick={this.signOut}><i className="fa fa-times"></i><span> Выйти из аккаунта</span></div>
+                        <div className="uhicon" onClick={this.signOut}><i className="fa fa-times"></i><span> {Lang("signOutText")}</span></div>
                     </React.Fragment>;
         }else{
             accDiv = <React.Fragment>
-                        <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> Вход</span></div>
-                        <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> Регистрация</span></div>
+                        <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
+                        <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
                         {accDiv}
                     </React.Fragment>;
         }
 
         accDiv = <div id="uhiconcontainer" className={uhcclass}>
-                    <div className="uhicon" onClick={this.goHome}><i className="fa fa-home"></i><span> Главное меню</span></div>
+                    <div id="uhiconcontainershadow" onClick={() => this.navigatorClick(false)}></div>
+                    <div className="uhicon" onClick={this.goHome}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
                     {accDiv}
                 </div>;
 
@@ -394,7 +396,7 @@ export default class AppHeader extends React.Component{
             <div className="uheader">
                 <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerColor:"white"}}> </i> {this.props.gamename}</div>
                 {accDiv}
-                <div id="navibut" className="uhicon" onClick={this.navigatorClick}><i className="fa fa-bars fa-2x"></i></div>
+                <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)}><i className="fa fa-bars fa-2x"></i></div>
             </div>
         );
     };

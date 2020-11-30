@@ -1,4 +1,5 @@
 import React from 'react';
+import Lang from '../../Lang';
 import Button from '../Button';
 import "./fanfara.css";
 
@@ -23,7 +24,7 @@ export default class Fanfara extends React.Component{
                 let newEXP = data.data.exp;
                 let expDIF = newEXP - this.props.playerInfo.statistics.exp;
 
-                document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML+"<br>Вы "+(expDIF<0?"потеряли ":"получили ")+Math.abs(expDIF)+" опыта!";
+                document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML+"<br>"+(expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
                 if(lvlDIF>0){
                     let s = setInterval(()=>{
                         if(lvlDIF>0){
@@ -83,12 +84,7 @@ export default class Fanfara extends React.Component{
         let header = "";
         let text = <p></p>;
         let podtext = "";
-        /**/
-        //playerInfo.done = 12;
-        //playerInfo.status = "winner";
-        //opponentInfo.done = 3;
-        //opponentInfo.status = "looser";
-        /**/
+
         let playersCheckersUnDone = 12 - playerInfo.done;
         let opponentCheckersUnDone = 12 - opponentInfo.done;
         let ppercent = Math.round(playersCheckersUnDone*100/12);
@@ -102,7 +98,7 @@ export default class Fanfara extends React.Component{
                             action={()=>{this.props.quit(false)}} 
                             href="" 
                             history="" 
-                            value="Закрыть" 
+                            value={Lang("closeText")} 
                             theme="grey"
                             strong="true"
                         />
@@ -112,7 +108,7 @@ export default class Fanfara extends React.Component{
                             action={this.props.continueWithSameOpponent} 
                             href="" 
                             history="" 
-                            value={"Продолжить с "+opponentInfo.name} 
+                            value={Lang("continueWith").replace("$", opponentInfo.name)} 
                             theme="neon"
                             strong="true"
                         />
@@ -122,7 +118,7 @@ export default class Fanfara extends React.Component{
                             action={this.props.searchNewOpponent} 
                             href="" 
                             history="" 
-                            value="Найти другого противника" 
+                            value={Lang("searchAnotherEnemy")} 
                             theme="neon"
                             strong="true"
                         />
@@ -135,41 +131,41 @@ export default class Fanfara extends React.Component{
         if(playerInfo.status!=="winner" && playerInfo.status!=="looser" && playerInfo.status!=="done") playerInfo.status = "in_game";
 
         if(playerInfo.status==="winner"){
-            header = "Поздравляем!";
+            header = Lang("congratulations");
             let diff = opponentCheckersUnDone;
             if (playerInfo.done === 12) {
-                podtext = "Вы отмудохали противника с отрывом";
+                podtext = Lang("youCrashedOpponent");
             } else {
-                podtext = "Вы зажали противника в угол с отрывом";
+                podtext = Lang("youCorneredEnemy");
                 diff = opponentCheckersUnDone - playersCheckersUnDone;
             }
-            if(diff===1) podtext += " всего на одну шашку";
-            if(diff>1 && diff<5) podtext += " в "+diff+" шашки";
-            if(diff>4) podtext += " аж на "+diff+" шашек";
+            if(diff===1) podtext += Lang("onlyOneChecker");
+            if(diff>1 && diff<5) podtext += Lang("onlyOneChecker").replace("$", diff);
+            if(diff>4) podtext += Lang("won2to4checkers").replace("$", diff);
             podtext += " ("+opercent+"%)!";
             gonnashow = true;
         }
         if(playerInfo.status==="looser"){
-            header = "Сожалеем";
+            header = Lang("regrets");
             if (opponentInfo.done === 12) {
-                podtext = "Вы проиграли в этой партии, отстав";
-                if(playersCheckersUnDone===1) podtext += " всего на одну шашку";
-                if(playersCheckersUnDone>1 && playersCheckersUnDone<5) podtext += " на "+playersCheckersUnDone+" шашки";
-                if(playersCheckersUnDone>4) podtext += " на целых "+playersCheckersUnDone+" шашек";
+                podtext = Lang("youLooseThisOne");
+                if(playersCheckersUnDone===1) podtext += Lang("onlyOneChecker");
+                if(playersCheckersUnDone>1 && playersCheckersUnDone<5) podtext += Lang("lost2to4checkers").replace("$", playersCheckersUnDone);
+                if(playersCheckersUnDone>4) podtext += Lang("lost5andMoreCheckers").replace("$", playersCheckersUnDone);
                 podtext += " ("+ppercent+"%)!";
             } else {
-                podtext = "Вы проиграли в этой партии, оставшись без ходов";
+                podtext = Lang("youveBeenCornered");
             }
             gonnashow = true;
         }
         if(playerInfo.status==="done" && opponentInfo.status==="done" /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
-            header = "Неплохо!";
-            podtext = "Ничья лучше проигрыша!";
+            header = Lang("noBadText");
+            podtext = Lang("betterThanNothing");
             gonnashow = true;
         }
         if(playerInfo.status==="done" && opponentInfo.status!=="done" && playerInfo.done === 12){
-            header = "Поздравляем!";
-            text = <p>Вы почти выиграли! Ожидаем решающий ход противника.</p>
+            header = Lang("congratulations");
+            text = <p>{Lang("lastEnemyStep")}</p>
         }else{
             text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
         }
