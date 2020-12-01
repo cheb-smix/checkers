@@ -3,9 +3,9 @@ import "./appheader.css";
 import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
-import Settings from '../../Funcs/settings';
 import Button from '../Button';
 import Lang from '../../Lang';
+import { Settings } from '../Setting';
 
 export default class AppHeader extends React.Component{
 
@@ -34,7 +34,7 @@ export default class AppHeader extends React.Component{
                             selected={this.props.gamename}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
-                                this.props.hideModal();
+                                this.props.showModal(false);
                                 document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
                                 document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
                                 setTimeout(() => {
@@ -52,7 +52,7 @@ export default class AppHeader extends React.Component{
 
     stopSearchingOpponent = () => {
         this.props.stopTheSearch();
-        this.props.hideModal();
+        this.props.showModal(false);
     }
 
     gameButClick = () => {
@@ -65,7 +65,7 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={this.props.hideModal} 
+                                action={() => this.props.showModal(false)} 
                                 href="" 
                                 history="" 
                                 value={Lang("cancelText")} 
@@ -99,7 +99,7 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={this.props.hideModal} 
+                                action={() => this.props.showModal(false)} 
                                 href="" 
                                 history="" 
                                 value={Lang("cancelText")} 
@@ -129,7 +129,7 @@ export default class AppHeader extends React.Component{
     dropSettings = () => {
         let us = this.state.settings.dropSettings();
         for (let k in us) this.props.updateSetting(k, us[k]);
-        this.props.hideModal();
+        this.props.showModal(false);
     }
 
     saveSetting = (key, val) => {

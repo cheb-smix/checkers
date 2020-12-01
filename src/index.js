@@ -21,10 +21,12 @@ Math.coefficient = (n1,n2,f=0) => {
   n2 = n2>0?n2:1;
   return (n1 / n2).toFixed(f);
 }
+
 Math.percent = (n1,n2,f=0) => {
   n2 = n2>0?n2:1;
   return (n1 * 100 / n2).toFixed(f)+"%";
 }
+
 Math.diagonalEffectivity = (c1,c2,color="any",playstage = 1) => {
   let diagonalCorrection = 1;
   let dia1 = c1.x-c1.y;
@@ -36,12 +38,13 @@ Math.diagonalEffectivity = (c1,c2,color="any",playstage = 1) => {
   lessPriorityCellsCorrection = 1;
   let hypotenuse = Math.pifagor(c1,c2);
   let p = (hypotenuse * lessPriorityCellsCorrection + dd) * diagonalCorrection;
-  //console.log("c1",c1.x,c1.y,"c2",c2,"dia",dia1,dia2,dd,diagonalCorrection,"pif",p);
   return {effectivity: p,dia1,dia2,dd,diagonalCorrection,lessPriorityCellsCorrection,hypotenuse};
 }
+
 Math.pifagor = (c1,c2) => {
   return Math.sqrt(Math.pow(c1.x - c2.x,2)+Math.pow(c1.y - c2.y,2));
 }
+
 Math.pifagorColored = (c1,c2,color="any") => {
   let dx = 0, dy = 0, directionCorrection = 1;
   if(color==="black"){
@@ -56,6 +59,7 @@ Math.pifagorColored = (c1,c2,color="any") => {
   }
   return Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2)) * directionCorrection;
 }
+
 
 ReactDOM.render(
   <Router history={history}>

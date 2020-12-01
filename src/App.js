@@ -10,10 +10,10 @@ import {
 import Home from "./Components/Home";
 import Corners from "./Components/Gameslogic/corners";
 import Checkers from "./Components/Gameslogic/checkers";
-import Setting from './Components/Setting';
-import Settings from './Funcs/settings';
+import Setting, { Settings } from './Components/Setting';
 
 import './Funcs/fps';
+import Modal from './Components/Modal';
 
 class App extends Component{
 
@@ -21,7 +21,26 @@ class App extends Component{
         settings: new Settings(),
         playlist: [
             "/music/sadness_and_hate.mp3",
-        ]
+        ],
+        modal: {
+            code: "", header: "", bg: true, panel: true, autoclose: false
+        },
+    }
+
+    hideModal = () => {
+        let a = document.querySelectorAll(".show");
+        for(let i=0;i<a.length;i++) a[i].className = a[i].className.replace("show","");
+        setTimeout(()=>{
+            this.setState({modal: {code: "", header: "", bg: true, panel: true, autoclose: false}});
+        },300);
+    }
+
+    showModal = (code = "", header = "", bg = true, panel = true, autoclose = false) => {
+        if (code === false) {
+            this.hideModal();
+            return;
+        }
+        this.setState({modal: {code: code, header: header, bg: bg, panel: panel, autoclose: autoclose}});
     }
 
     setNewTrack = () => {
@@ -54,13 +73,18 @@ class App extends Component{
         const { history } = this.props
   
         return (
+            <React.Fragment>
             <Switch>
-                <Route history={history} path='/home' component={Home} />
-                <Route history={history} path='/checkers' component={Checkers} />
-                <Route history={history} path='/corners' component={Corners} />
-                <Route history={history} path='/settings' component={Setting} />
+                <Route history={history} path='/home' 
+                render={(props) => <Home {...props} showModal={this.showModal} showModal={this.showModal}/>} 
+                />
+                <Route history={history} path='/checkers' render={(props) => <Checkers {...props} showModal={this.showModal}/>} />
+                <Route history={history} path='/corners' render={(props) => <Corners {...props} showModal={this.showModal}/>} />
+                <Route history={history} path='/settings' render={(props) => <Setting {...props} showModal={this.showModal}/>} />
                 <Redirect from='/' to='/home'/>
             </Switch>
+            <Modal closer={this.hideModal} modal={this.state.modal}/>
+            </React.Fragment>
         );
     }
 

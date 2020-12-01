@@ -4,13 +4,12 @@ import AppHeader from '../AppHeader/';
 import Cell from '../Cell/';
 import Console from '../Console/';
 import Fanfara from '../Fanfaras';
-import Modal from '../Modal';
 import Rampage from '../Rampage';
-//import Board from './wood_texture.jpg';
-import Settings from '../../Funcs/settings';
+import Lang from '../../Lang';
+import Button from '../Button';
+import { Settings } from '../Setting';
 
 import './app.css';
-import Lang from '../../Lang';
 
 const server = window.location.hostname.length > 7 ? window.location.hostname : "smix-soft.ru";
 const wsport = "8080";
@@ -63,16 +62,12 @@ export default class App extends React.Component{
         epicstepnum: 2,
         playstage: 1,
         consoleText: "",
-        modal: {
-            code: "", header: "", bg: true, panel: true, autoclose: false
-        },
         gameTotalStat: {
             TWD: 0, TBD: 0, TC: 24, MC: 0
         },
         rampageCode: "",
         rampageTO: null,
         targetCells: {}, 
-        /*stepperproperties: {color:"white",koords:"0:0",scale:1},*/
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
@@ -281,18 +276,6 @@ export default class App extends React.Component{
 
     sleep = (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    hideModal = () => {
-        let a = document.querySelectorAll(".show");
-        for(let i=0;i<a.length;i++) a[i].className = a[i].className.replace("show","");
-        setTimeout(()=>{
-            this.setMazafuckinState({modal: {code: "", header: "", bg: true, panel: true, autoclose: false}});
-        },300);
-    }
-
-    showModal = (code,header="",bg=true,panel=true,autoclose=false) => {
-        this.setMazafuckinState({modal: {code: code, header: header, bg: bg, panel: panel, autoclose: autoclose}});
     }
 
     XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
@@ -799,7 +782,7 @@ export default class App extends React.Component{
     }
 
     suggestNewOneGame = (text="") => {
-        this.showModal(
+        this.props.showModal(
             <div>
                 <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" history="" value={Lang("noText")} />
                 <Button action={()=>this.searchNewOpponent()} href="" history="" value={Lang("yesText")} />
@@ -939,18 +922,13 @@ export default class App extends React.Component{
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
                         serverInfo={this.state.serverInfo}
-                        hideModal={this.hideModal}
-                        showModal={this.showModal}
+                        showModal={this.props.showModal}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
                         usersettings={this.state.usersettings}
                         XMLHR={this.XMLHR}
                         quit={this.quit}
-                />
-                <Modal
-                        closer={this.hideModal} 
-                        modal={this.state.modal}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield">

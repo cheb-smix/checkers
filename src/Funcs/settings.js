@@ -1,4 +1,4 @@
-export default class Settings{
+/*export default class Settings{
     
     constructor() {
         this.usersettings = {
@@ -61,4 +61,4 @@ export default class Settings{
         if (key) return this.usersettings[key];
         return this.usersettings;
     }
-}
+}*/
