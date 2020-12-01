@@ -801,7 +801,8 @@ export default class App extends React.Component{
     suggestNewOneGame = (text="") => {
         this.showModal(
             <div>
-                <input type="button" value={Lang("noText")} onClick={this.clearPlayerInfoAfterGameOver} /> <input type="button" onClick={()=>{ this.searchNewOpponent() }} value={Lang("yesText")}/>
+                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" history="" value={Lang("noText")} />
+                <Button action={()=>this.searchNewOpponent()} href="" history="" value={Lang("yesText")} />
             </div>,
             text + "<br />" + Lang("findAnewGame")
         );
