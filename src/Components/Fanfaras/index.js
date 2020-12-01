@@ -139,9 +139,9 @@ export default class Fanfara extends React.Component{
                 podtext = Lang("youCorneredEnemy");
                 diff = opponentCheckersUnDone - playersCheckersUnDone;
             }
-            if(diff===1) podtext += Lang("onlyOneChecker");
-            if(diff>1 && diff<5) podtext += Lang("onlyOneChecker").replace("$", diff);
-            if(diff>4) podtext += Lang("won2to4checkers").replace("$", diff);
+            if(diff===1) podtext += Lang("wonOnlyOneChecker");
+            if(diff>1 && diff<5) podtext += Lang("won2to4checkers").replace("$", diff);
+            if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
             podtext += " ("+opercent+"%)!";
             gonnashow = true;
         }
@@ -149,7 +149,7 @@ export default class Fanfara extends React.Component{
             header = Lang("regrets");
             if (opponentInfo.done === 12) {
                 podtext = Lang("youLooseThisOne");
-                if(playersCheckersUnDone===1) podtext += Lang("onlyOneChecker");
+                if(playersCheckersUnDone===1) podtext += Lang("lostOnlyOneChecker");
                 if(playersCheckersUnDone>1 && playersCheckersUnDone<5) podtext += Lang("lost2to4checkers").replace("$", playersCheckersUnDone);
                 if(playersCheckersUnDone>4) podtext += Lang("lost5andMoreCheckers").replace("$", playersCheckersUnDone);
                 podtext += " ("+ppercent+"%)!";
