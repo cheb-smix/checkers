@@ -21,6 +21,9 @@ class App extends Component{
         settings: new Settings(),
         playlist: [
             "/music/sadness_and_hate.mp3",
+            "/music/hidden_inside.mp3",
+            "/music/liricue.mp3",
+            "/music/road_begins.mp3",
         ],
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
