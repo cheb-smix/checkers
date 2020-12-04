@@ -91,7 +91,7 @@ export default class App extends React.Component{
         let state = {};
         state.usersettings = this.state.settings.getSettings();
         let param = {action:"checkcheck"};
-        if(state.usersettings.atoken!==""){
+        if(state.usersettings.atoken !== ""){
             param = {action:"auth",token:state.usersettings.atoken};
         }
         
