@@ -1,4 +1,5 @@
 import React from 'react';
+import ajax from '../../Funcs/ajax';
 import Lang from '../../Lang';
 import Button from '../Button';
 import "./fanfara.css";
@@ -12,62 +13,67 @@ export default class Fanfara extends React.Component{
     animate = () => {
         if(typeof(this.props.playerInfo.login)==="undefined" || this.props.playerInfo.status==="in_game" || this.state.animated) return;
 
-        this.props.XMLHR({action:"getPlayerStat",login:this.props.playerInfo.login},(data)=>{
-            this.setState({animated:true});
-            if(data.success){
-                //data.data.lvl++;
-                //data.data.exp = parseInt(data.data.exp,10)+1850;
-                let pdiv = document.querySelector(".progress");
-                let newLVL = data.data.lvl;
-                let curLVL = this.props.playerInfo.statistics.lvl;
-                let lvlDIF = newLVL - curLVL;
-                let newEXP = data.data.exp;
-                let expDIF = newEXP - this.props.playerInfo.statistics.exp;
+        ajax({
+            url: this.props.apiserver,
+            params: {action:"getPlayerStat",login:this.props.playerInfo.login},
+            device: this.props.device,
+            success: (data)=>{
+                this.setState({animated:true});
+                if(data.success){
+                    //data.data.lvl++;
+                    //data.data.exp = parseInt(data.data.exp,10)+1850;
+                    let pdiv = document.querySelector(".progress");
+                    let newLVL = data.data.lvl;
+                    let curLVL = this.props.playerInfo.statistics.lvl;
+                    let lvlDIF = newLVL - curLVL;
+                    let newEXP = data.data.exp;
+                    let expDIF = newEXP - this.props.playerInfo.statistics.exp;
 
-                document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML+"<br>"+(expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
-                if(lvlDIF>0){
-                    let s = setInterval(()=>{
-                        if(lvlDIF>0){
-                            pdiv.style.transition = "all 0.5s ease";
-                            pdiv.style.width = "100%";
-                            pdiv.style.left = "0%";
-                            lvlDIF--;
-                            curLVL++;
-                            setTimeout(()=>{
-                                let startexp = (curLVL > 1) ? (50*(Math.pow(2,curLVL-1))) : 0;
-                                let endexp = 50*(Math.pow(2,curLVL));
-                                document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
-                                document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
-                                document.querySelector(".exp").className = 'exp tada animated';
-                                pdiv.style.transition = "none";
-                                pdiv.style.width = "0%";
-                                pdiv.style.left = "50%";
+                    document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML+"<br>"+(expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
+                    if(lvlDIF>0){
+                        let s = setInterval(()=>{
+                            if(lvlDIF>0){
+                                pdiv.style.transition = "all 0.5s ease";
+                                pdiv.style.width = "100%";
+                                pdiv.style.left = "0%";
+                                lvlDIF--;
+                                curLVL++;
                                 setTimeout(()=>{
-                                    pdiv.style.transition = "all 0.5s ease";
-                                },30);
-                            },500);
-                        }else{
-                            let startexp = (newLVL > 1) ? (50*(Math.pow(2,newLVL-1))) : 0;
-                            let endexp = 50*(Math.pow(2,newLVL));
-                            let progress = Math.percent(newEXP - startexp,endexp - startexp);
-                            pdiv.style.width = progress;
-                            pdiv.style.left = (50 - parseInt(progress,10)/2)+"%";
-                            this.props.rampage(0,"NEW LEVEL "+newLVL+"!");
-                            pdiv.innerHTML = newEXP;
-                            clearInterval(s);
-                            this.props.updatePI(data.data);
-                        }
-                    },600)
-                }else{
-                    let startexp = (curLVL > 1) ? (50*(Math.pow(2,curLVL-1))) : 0;
-                    let endexp = 50*(Math.pow(2,curLVL));
-                    let progress = Math.percent(newEXP - startexp,endexp - startexp);
-                    pdiv.style.width = progress;
-                    pdiv.style.left = (50 - parseInt(progress,10)/2)+"%";
-                    pdiv.innerHTML = newEXP;
-                    this.props.updatePI(data.data);
+                                    let startexp = (curLVL > 1) ? (50*(Math.pow(2,curLVL-1))) : 0;
+                                    let endexp = 50*(Math.pow(2,curLVL));
+                                    document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
+                                    document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
+                                    document.querySelector(".exp").className = 'exp tada animated';
+                                    pdiv.style.transition = "none";
+                                    pdiv.style.width = "0%";
+                                    pdiv.style.left = "50%";
+                                    setTimeout(()=>{
+                                        pdiv.style.transition = "all 0.5s ease";
+                                    },30);
+                                },500);
+                            }else{
+                                let startexp = (newLVL > 1) ? (50*(Math.pow(2,newLVL-1))) : 0;
+                                let endexp = 50*(Math.pow(2,newLVL));
+                                let progress = Math.percent(newEXP - startexp,endexp - startexp);
+                                pdiv.style.width = progress;
+                                pdiv.style.left = (50 - parseInt(progress,10)/2)+"%";
+                                this.props.rampage(0,"NEW LEVEL "+newLVL+"!");
+                                pdiv.innerHTML = newEXP;
+                                clearInterval(s);
+                                this.props.updatePI(data.data);
+                            }
+                        },600)
+                    }else{
+                        let startexp = (curLVL > 1) ? (50*(Math.pow(2,curLVL-1))) : 0;
+                        let endexp = 50*(Math.pow(2,curLVL));
+                        let progress = Math.percent(newEXP - startexp,endexp - startexp);
+                        pdiv.style.width = progress;
+                        pdiv.style.left = (50 - parseInt(progress,10)/2)+"%";
+                        pdiv.innerHTML = newEXP;
+                        this.props.updatePI(data.data);
+                    }
+                    this.props.showBestMove();
                 }
-                this.props.showBestMove();
             }
         });
     }

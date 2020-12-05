@@ -37,6 +37,7 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "2")) {
     foreach ($files as $i => $file) {
         $content = file_get_contents($file);
         $content = str_replace("/static/", "static/", $content);
+        $content = str_replace('id="cordova">', 'id="cordova" src="cordova.js">', $content);
         file_put_contents($file, $content);
     }
 }

@@ -8,16 +8,34 @@ import App from './App.js';
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 
+
 let device = {};
 document.addEventListener("deviceready", onDeviceReady, false);
-function onDeviceReady(){
-    alert(device.uuid);
+function onDeviceReady()
+{
+    document.addEventListener("pause", onPause, false);
+    document.addEventListener("resume", onResume, false);
 }
-if (window.cordova) {
-  document.getElementById("cordova").src = "cordova.js";
+
+function onPause() 
+{
+    document.querySelector("#musicplayer").pause();
+}
+function onResume() 
+{
+    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").pause();
 }
 
 const history = window.cordova ? createHashHistory() : createBrowserHistory();
+
+
+let wsserver = `ws://ws.smix-soft.ru:8080`;
+let apiserver = `//smix-soft.ru/api/v2/game/`;
+
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    wsserver = "ws://localhost:7777";
+    apiserver = "//localhost:3333/game/";
+}
 
 Math.coefficient = (n1,n2,f=0) => {
     n2 = n2>0?n2:1;
@@ -65,7 +83,7 @@ Math.pifagorColored = (c1,c2,color="any") => {
 
 ReactDOM.render(
     <Router history={history}>
-      <App/>
+      <App device={device} wsserver={wsserver} apiserver={apiserver}/>
     </Router>
     ,
     document.getElementById('root')

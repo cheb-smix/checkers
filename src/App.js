@@ -28,6 +28,7 @@ class App extends Component{
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
         },
+        device: this.props.device
     }
 
     hideModal = () => {
@@ -78,12 +79,10 @@ class App extends Component{
         return (
             <React.Fragment>
             <Switch>
-                <Route history={history} path='/home' 
-                render={(props) => <Home {...props} showModal={this.showModal} showModal={this.showModal}/>} 
-                />
-                <Route history={history} path='/checkers' render={(props) => <Checkers {...props} showModal={this.showModal}/>} />
-                <Route history={history} path='/corners' render={(props) => <Corners {...props} showModal={this.showModal}/>} />
-                <Route history={history} path='/settings' render={(props) => <Setting {...props} showModal={this.showModal}/>} />
+                <Route history={history} path='/home' render={(props) => <Home {...props} {...this.props} showModal={this.showModal}/>} />
+                <Route history={history} path='/checkers' render={(props) => <Checkers {...props} {...this.props} showModal={this.showModal}/>} />
+                <Route history={history} path='/corners' render={(props) => <Corners {...props} {...this.props} showModal={this.showModal}/>} />
+                <Route history={history} path='/settings' render={(props) => <Setting {...props} {...this.props} showModal={this.showModal}/>} />
                 <Redirect from='/' to='/home'/>
             </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>

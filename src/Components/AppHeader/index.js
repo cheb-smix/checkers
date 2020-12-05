@@ -6,6 +6,7 @@ import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Lang';
 import { Settings } from '../Setting';
+import ajax from '../../Funcs/ajax';
 
 export default class AppHeader extends React.Component{
 
@@ -243,10 +244,10 @@ export default class AppHeader extends React.Component{
                         <input type="text" id="login" placeholder={Lang("loginText")} minLength="4" maxLength="30" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
+                        <input type="text" id="email" placeholder={Lang("emailText")} minLength="4" maxLength="70" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass2" placeholder={Lang("passwordConfirm")} minLength="6" maxLength="60" />
+                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
@@ -279,11 +280,21 @@ export default class AppHeader extends React.Component{
                 return false;
             }
         }
-        this.props.XMLHR({action:"register",name:document.getElementById("name").value,login:document.getElementById("login").value,pass:sha1(document.getElementById("pass").value)},(d)=>{
-            m.className = d.success?"success":"error";
-            m.innerHTML = d.response;
-            this.saveSetting("atoken",d.data.token);
-            if(d.success) window.location.reload();
+        ajax({
+            url: this.props.apiserver + "sign-up",
+            params: {
+                display_name:   document.getElementById("name").value,
+                username:       document.getElementById("login").value,
+                password:       sha1(document.getElementById("pass").value),
+                email:          document.getElementById("email").value,
+            },
+            device: this.props.device,
+            success: (d)=>{
+                m.className = d.success?"success":"error";
+                m.innerHTML = d.errors[Object.keys(d.errors).shift()];
+                /*this.saveSetting("atoken",d.data.token);
+                if(d.success) window.location.reload();*/
+            }
         });
     }
     signIn = () => {
@@ -313,15 +324,23 @@ export default class AppHeader extends React.Component{
         );
     }
     gogoSign = () => {
-        this.props.XMLHR({action:"auth",login:document.querySelector("#login").value,pass:sha1(document.querySelector("#pass").value)},(d)=>{
-            let m = document.querySelector("#message");
-            m.innerHTML = d.response;
-            if(d.success){
-                m.className = "success";
-                this.saveSetting("atoken",d.data.token);
-                window.location.reload();
-            }else{
-                m.className = "error";
+        ajax({
+            url: this.props.apiserver + "sign-in",
+            params: {
+                username:  document.querySelector("#login").value,
+                password:   document.querySelector("#pass").value
+            },
+            device: this.props.device,
+            success: (d)=>{
+                let m = document.querySelector("#message");
+                if(d.success){
+                    m.className = "success";
+                    /*this.saveSetting("atoken",d.data.token);
+                    window.location.reload();*/
+                }else{
+                    m.className = "error";
+                    m.innerHTML = d.errors[Object.keys(d.errors).shift()]
+                }
             }
         });
     }

@@ -10,9 +10,7 @@ import Button from '../Button';
 import { Settings } from '../Setting';
 
 import './app.css';
-
-const server = window.location.hostname.length > 7 ? window.location.hostname : "smix-soft.ru";
-const wsport = "8080";
+import ajax from '../../Funcs/ajax';
 
 
 export default class App extends React.Component{
@@ -71,7 +69,7 @@ export default class App extends React.Component{
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
-        XMLHRAvailable: false,
+        AjaxAvailable: false,
         serverInfo: {
             avgwaittime: {cnt: 0, ttl: 0, avg: 0},
             playersstat: {total: 0, searching: 0, in_game: 0},
@@ -95,15 +93,20 @@ export default class App extends React.Component{
             param = {action:"auth",token:state.usersettings.atoken};
         }
         
-        this.XMLHR(param,(data)=>{
-            this.initiation(state,data);
-        },()=>{
-            this.initiation(state);
+        ajax({
+            url: this.props.apiserver + "config",
+            param: param,
+            device: this.props.device,
+            success: (data)=>{
+                this.initiation(state, data);
+            },
+            error: ()=>{
+                this.initiation(state);
+            }
         });
-
     }
 
-    initiation = (state,data=false) => {
+    initiation = (state, data = false) => {
         let {playerInfo, opponentInfo} = this.state;
         if(state.usersettings.atoken!=="" && data){
             if(data.success){
@@ -120,7 +123,7 @@ export default class App extends React.Component{
             state.writesteps = data.WriteSteps;
             state.writestats = data.WriteStats;
             state.debug = data.Debug;
-            state.XMLHRAvailable = true;
+            state.AjaxAvailable = true;
         }
         if(this.state.autochess){
             playerInfo.name = "bot"+Math.round(Math.random()*1000 + 1000);
@@ -278,7 +281,7 @@ export default class App extends React.Component{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
+    /*XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -303,7 +306,7 @@ export default class App extends React.Component{
         if(typeof(params) === "object") params = this.object2string(params);
         console.log(params);
         xhr.send(params);
-    }
+    }*/
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
@@ -430,7 +433,7 @@ export default class App extends React.Component{
     }
 
     saveStepResults = (koordsto,koordsfrom,pflag) => {
-        if(this.state.online || !this.state.XMLHRAvailable) return;
+        if(this.state.online || !this.state.AjaxAvailable) return;
         let {cells} = this.state;
         let postdata = {
             action: 'saveStep',
@@ -443,14 +446,19 @@ export default class App extends React.Component{
             game_id: this.state.game_id,
             gtoken: this.state.gtoken,
         };
-        this.XMLHR(postdata,(data)=>{
-            if(data.success){
-                if(this.state.game_id===0){
-                    if(data.data.game_id){
-                        this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
-                    }else{
-                        this.setMazafuckinState({XMLHRAvailable: false});
-                    } 
+        ajax({
+            url: this.props.apiserver,
+            param: postdata,
+            device: this.props.device,
+            success: (data)=>{
+                if(data.success){
+                    if(this.state.game_id===0){
+                        if(data.data.game_id){
+                            this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
+                        }else{
+                            this.setMazafuckinState({AjaxAvailable: false});
+                        } 
+                    }
                 }
             }
         });
@@ -463,14 +471,19 @@ export default class App extends React.Component{
             mask: this.getDeskMask(),
             color: color[0]
         };
-        this.XMLHR(postdata,(data)=>{
-            if(!data.success){
-                this.iiStep(color);
-            }else{
-                if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
-                    this.doStep(data.data.to, data.data.from, true, null);
-                }else{
+        ajax({
+            url: this.props.apiserver,
+            param: postdata,
+            device: this.props.device,
+            success: (data)=>{
+                if(!data.success){
                     this.iiStep(color);
+                }else{
+                    if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
+                        this.doStep(data.data.to, data.data.from, true, null);
+                    }else{
+                        this.iiStep(color);
+                    }
                 }
             }
         });
@@ -484,7 +497,7 @@ export default class App extends React.Component{
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && this.state.usersettings.mode === "bot"){
             setTimeout(()=>{
 
-                if(this.state.XMLHRAvailable && !this.state.autochess){
+                if(this.state.AjaxAvailable && !this.state.autochess){
                     this.getBotStep(color);
                 }else{
                     this.iiStep(color);
@@ -710,9 +723,8 @@ export default class App extends React.Component{
     }
 
     connectSocket = () => {
-        let url = `wss://${server}:${wsport}`;
-        console.log(`Connecting socket ${url}`);
-        this.socket = new WebSocket(url);
+        console.log(`Connecting socket ${this.props.wsserver}`);
+        this.socket = new WebSocket(this.props.wsserver);
         this.socket.onopen = () => {
             this.consoleLog(Lang("connected"));
             this.setMazafuckinState({socketOpened: true});
@@ -927,7 +939,8 @@ export default class App extends React.Component{
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
                         usersettings={this.state.usersettings}
-                        XMLHR={this.XMLHR}
+                        device={this.props.device}
+                        apiserver={this.props.apiserver}
                         quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
@@ -943,9 +956,10 @@ export default class App extends React.Component{
                             continueWithSameOpponent={this.continueWithSameOpponent}
                             searchNewOpponent={this.searchNewOpponent}
                             quit={this.quit}
-                            XMLHR={this.XMLHR}
                             updatePI={this.updatePI}
                             rampage={this.rampage}
+                            device={this.props.device}
+                            apiserver={this.props.apiserver}
                             showBestMove={this.showBestMove}
                     />
                     </div>
