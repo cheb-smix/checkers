@@ -8,9 +8,9 @@ import Rampage from '../Rampage';
 import Lang from '../../Lang';
 import Button from '../Button';
 import { Settings } from '../Setting';
+import ajax from '../../Funcs/ajax';
 
 import './app.css';
-import ajax from '../../Funcs/ajax';
 
 
 export default class App extends React.Component{
@@ -98,6 +98,7 @@ export default class App extends React.Component{
             param: param,
             device: this.props.device,
             success: (data)=>{
+                alert(JSON.stringify(data));
                 this.initiation(state, data);
             },
             error: ()=>{

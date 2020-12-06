@@ -38,6 +38,8 @@ php build.php (workfolder=...) (steps=1234567)
 
 
 # Баги
+- Ajax не работает в cordova - https://www.npmjs.com/package/cordova-plugin-advanced-http
+- Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket
 - Проблемы авторизации
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 

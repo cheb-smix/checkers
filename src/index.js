@@ -29,13 +29,15 @@ function onResume()
 const history = window.cordova ? createHashHistory() : createBrowserHistory();
 
 
-let wsserver = `ws://ws.smix-soft.ru:8080`;
-let apiserver = `//smix-soft.ru/api/v2/game/`;
+let wsserver = `wss://ws.smix-soft.ru:8080`;
+let apiserver = `https://smix-soft.ru/api/v2/game/`;
 
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    wsserver = "ws://localhost:7777";
-    apiserver = "//localhost:3333/game/";
+if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
+    wsserver = "ws://192.168.31.168:7777";
+    apiserver = "http://192.168.31.168:3333/game/";
 }
+
+//alert(JSON.stringify([apiserver, window.location.hostname]));
 
 Math.coefficient = (n1,n2,f=0) => {
     n2 = n2>0?n2:1;

@@ -290,8 +290,15 @@ export default class AppHeader extends React.Component{
             },
             device: this.props.device,
             success: (d)=>{
-                m.className = d.success?"success":"error";
-                m.innerHTML = d.errors[Object.keys(d.errors).shift()];
+                if (d.success) {
+                    m.className = "success";
+                    m.innerHTML = Lang("success");
+                } else {
+                    m.className = "error";
+                    m.innerHTML = d.errors ? d.errors[Object.keys(d.errors).shift()] : Lang("failed");
+                }
+                
+                
                 /*this.saveSetting("atoken",d.data.token);
                 if(d.success) window.location.reload();*/
             }
@@ -335,6 +342,7 @@ export default class AppHeader extends React.Component{
                 let m = document.querySelector("#message");
                 if(d.success){
                     m.className = "success";
+                    m.innerHTML = Lang("success");
                     /*this.saveSetting("atoken",d.data.token);
                     window.location.reload();*/
                 }else{

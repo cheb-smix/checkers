@@ -21,6 +21,8 @@ let strings = new LocalizedStrings({
         secondsText:        "sec.",
         noText:             "No",
         yesText:            "Yes",
+        success:            "Success!",
+        failed:             "Failed!",
         // Home
         playWithBot:        "Versus Bot",
         playByBlueTooth:    "BlueTooth Game",
@@ -127,6 +129,8 @@ let strings = new LocalizedStrings({
         secondsText:        "сек.",
         noText:             "Нет",
         yesText:            "Да",
+        success:            "Успешно!",
+        failed:             "Ошибка!",
         // Home
         playWithBot:        "Против бота",
         playByBlueTooth:    "По BlueTooth",
