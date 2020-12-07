@@ -3,9 +3,13 @@ import "./appheader.css";
 import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
-import Settings from '../../Funcs/settings';
 import Button from '../Button';
-import Lang from '../../Lang';
+import Lang from '../../Funcs/Lang';
+import { Settings } from '../Setting';
+import postData from '../../Funcs/PostDataFuncs';
+import Cookie from '../../Funcs/Cookie';
+import Routing from '../../Funcs/Routing';
+import Noise from '../../Funcs/Noise';
 
 export default class AppHeader extends React.Component{
 
@@ -34,12 +38,8 @@ export default class AppHeader extends React.Component{
                             selected={this.props.gamename}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
-                                this.props.hideModal();
-                                document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
-                                document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
-                                setTimeout(() => {
-                                    this.props.history.push("/" + v);
-                                }, 1000);
+                                this.props.showModal(false);
+                                Routing("/" + v, this.props.history);
                             }}
                         />
                         <i className="fa fa-play fa-2x"></i>
@@ -52,7 +52,7 @@ export default class AppHeader extends React.Component{
 
     stopSearchingOpponent = () => {
         this.props.stopTheSearch();
-        this.props.hideModal();
+        this.props.showModal(false);
     }
 
     gameButClick = () => {
@@ -65,7 +65,7 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={this.props.hideModal} 
+                                action={() => this.props.showModal(false)} 
                                 href="" 
                                 history="" 
                                 value={Lang("cancelText")} 
@@ -99,7 +99,7 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={this.props.hideModal} 
+                                action={() => this.props.showModal(false)} 
                                 href="" 
                                 history="" 
                                 value={Lang("cancelText")} 
@@ -129,7 +129,7 @@ export default class AppHeader extends React.Component{
     dropSettings = () => {
         let us = this.state.settings.dropSettings();
         for (let k in us) this.props.updateSetting(k, us[k]);
-        this.props.hideModal();
+        this.props.showModal(false);
     }
 
     saveSetting = (key, val) => {
@@ -243,10 +243,10 @@ export default class AppHeader extends React.Component{
                         <input type="text" id="login" placeholder={Lang("loginText")} minLength="4" maxLength="30" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
+                        <input type="text" id="email" placeholder={Lang("emailText")} minLength="4" maxLength="70" />
                     </div>
                     <div className="col-12">
-                        <input type="password" id="pass2" placeholder={Lang("passwordConfirm")} minLength="6" maxLength="60" />
+                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
@@ -279,11 +279,28 @@ export default class AppHeader extends React.Component{
                 return false;
             }
         }
-        this.props.XMLHR({action:"register",name:document.getElementById("name").value,login:document.getElementById("login").value,pass:sha1(document.getElementById("pass").value)},(d)=>{
-            m.className = d.success?"success":"error";
-            m.innerHTML = d.response;
-            this.saveSetting("atoken",d.data.token);
-            if(d.success) window.location.reload();
+        postData({
+            url: this.props.apiserver + "sign-up",
+            params: {
+                display_name:   document.getElementById("name").value,
+                username:       document.getElementById("login").value,
+                password:       sha1(document.getElementById("pass").value),
+                email:          document.getElementById("email").value,
+            },
+            device: this.props.device,
+            success: (d)=>{
+                if (d.success) {
+                    m.className = "success";
+                    m.innerHTML = Lang("success");
+                } else {
+                    m.className = "error";
+                    m.innerHTML = d.errors ? d.errors[Object.keys(d.errors).shift()] : Lang("failed");
+                }
+                
+                
+                /*this.saveSetting("atoken",d.data.token);
+                if(d.success) window.location.reload();*/
+            }
         });
     }
     signIn = () => {
@@ -313,15 +330,25 @@ export default class AppHeader extends React.Component{
         );
     }
     gogoSign = () => {
-        this.props.XMLHR({action:"auth",login:document.querySelector("#login").value,pass:sha1(document.querySelector("#pass").value)},(d)=>{
-            let m = document.querySelector("#message");
-            m.innerHTML = d.response;
-            if(d.success){
-                m.className = "success";
-                this.saveSetting("atoken",d.data.token);
-                window.location.reload();
-            }else{
-                m.className = "error";
+        postData({
+            url: this.props.apiserver + "sign-in",
+            params: {
+                username:  document.querySelector("#login").value,
+                password:   document.querySelector("#pass").value
+            },
+            device: this.props.device,
+            success: (d)=>{
+                let m = document.querySelector("#message");
+                if(d.success){
+                    m.className = "success";
+                    m.innerHTML = Lang("success");
+                    Cookie.set("_identity-frontend", d.atoken);
+                    /*this.saveSetting("atoken",d.data.token);
+                    window.location.reload();*/
+                }else{
+                    m.className = "error";
+                    m.innerHTML = d.errors[Object.keys(d.errors).shift()]
+                }
             }
         });
     }
@@ -329,14 +356,9 @@ export default class AppHeader extends React.Component{
         this.saveSetting("atoken","");
         window.location.reload();
     }
-    goHome = () => {
-        document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
-        document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
-        this.setState({naviActive: false});
-        setTimeout(() => {
-            this.props.history.push("/home");
-        }, 1000);
-    }
+
+    goHome = () => Routing("/home", this.props.history);
+
     navigatorClick = (h = null) => {
         if (h === null) this.setState({naviActive: !this.state.naviActive});
         else this.setState({naviActive: h});
@@ -368,8 +390,8 @@ export default class AppHeader extends React.Component{
         if (this.state.naviActive === null) uhcclass = "hidden fa-2x";
 
         let accDiv = <React.Fragment>
-            <div className="uhicon" onClick={this.gameButClick} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
-            <div className="uhicon" onClick={this.settingsClick}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
+            <div className="uhicon" onClick={this.gameButClick} onMouseDown={() => Noise("menu-click")} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
+            <div className="uhicon" onClick={this.settingsClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 
         if(this.props.playerSigned){
@@ -380,23 +402,23 @@ export default class AppHeader extends React.Component{
                     </React.Fragment>;
         }else{
             accDiv = <React.Fragment>
-                        <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
-                        <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
+                        <div className="uhicon" onClick={this.signIn} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
+                        <div className="uhicon" onClick={this.newRegistration} onMouseDown={() => Noise("menu-click")}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
                         {accDiv}
                     </React.Fragment>;
         }
 
         accDiv = <div id="uhiconcontainer" className={uhcclass}>
                     <div id="uhiconcontainershadow" onClick={() => this.navigatorClick(false)}></div>
-                    <div className="uhicon" onClick={this.goHome}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
+                    <div className="uhicon" onClick={this.goHome} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
                     {accDiv}
                 </div>;
 
         return (
             <div className="uheader">
-                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerColor:"white"}}> </i> {this.props.gamename}</div>
+                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice} onMouseDown={() => Noise("menu-click")}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerColor:"white"}}> </i> {this.props.gamename}</div>
                 {accDiv}
-                <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)}><i className="fa fa-bars fa-2x"></i></div>
+                <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)} onMouseDown={() => Noise("menu-click")}><i className="fa fa-bars fa-2x"></i></div>
             </div>
         );
     };

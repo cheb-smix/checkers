@@ -4,16 +4,14 @@ import AppHeader from '../AppHeader/';
 import Cell from '../Cell/';
 import Console from '../Console/';
 import Fanfara from '../Fanfaras';
-import Modal from '../Modal';
 import Rampage from '../Rampage';
-//import Board from './wood_texture.jpg';
-import Settings from '../../Funcs/settings';
+import Lang from '../../Funcs/Lang';
+import Button from '../Button';
+import { Settings } from '../Setting';
+import postData from '../../Funcs/PostDataFuncs';
 
 import './app.css';
-import Lang from '../../Lang';
-
-const server = window.location.hostname.length > 7 ? window.location.hostname : "smix-soft.ru";
-const wsport = "8080";
+import Noise from '../../Funcs/Noise';
 
 
 export default class App extends React.Component{
@@ -63,20 +61,16 @@ export default class App extends React.Component{
         epicstepnum: 2,
         playstage: 1,
         consoleText: "",
-        modal: {
-            code: "", header: "", bg: true, panel: true, autoclose: false
-        },
         gameTotalStat: {
             TWD: 0, TBD: 0, TC: 24, MC: 0
         },
         rampageCode: "",
         rampageTO: null,
         targetCells: {}, 
-        /*stepperproperties: {color:"white",koords:"0:0",scale:1},*/
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
-        XMLHRAvailable: false,
+        AjaxAvailable: false,
         serverInfo: {
             avgwaittime: {cnt: 0, ttl: 0, avg: 0},
             playersstat: {total: 0, searching: 0, in_game: 0},
@@ -96,19 +90,25 @@ export default class App extends React.Component{
         let state = {};
         state.usersettings = this.state.settings.getSettings();
         let param = {action:"checkcheck"};
-        if(state.usersettings.atoken!==""){
+        if(state.usersettings.atoken !== ""){
             param = {action:"auth",token:state.usersettings.atoken};
         }
         
-        this.XMLHR(param,(data)=>{
-            this.initiation(state,data);
-        },()=>{
-            this.initiation(state);
+        postData({
+            url: this.props.apiserver + "config",
+            param: param,
+            device: this.props.device,
+            success: (data)=>{
+                alert(JSON.stringify(data));
+                this.initiation(state, data);
+            },
+            error: ()=>{
+                this.initiation(state);
+            }
         });
-
     }
 
-    initiation = (state,data=false) => {
+    initiation = (state, data = false) => {
         let {playerInfo, opponentInfo} = this.state;
         if(state.usersettings.atoken!=="" && data){
             if(data.success){
@@ -125,7 +125,7 @@ export default class App extends React.Component{
             state.writesteps = data.WriteSteps;
             state.writestats = data.WriteStats;
             state.debug = data.Debug;
-            state.XMLHRAvailable = true;
+            state.AjaxAvailable = true;
         }
         if(this.state.autochess){
             playerInfo.name = "bot"+Math.round(Math.random()*1000 + 1000);
@@ -283,19 +283,7 @@ export default class App extends React.Component{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    hideModal = () => {
-        let a = document.querySelectorAll(".show");
-        for(let i=0;i<a.length;i++) a[i].className = a[i].className.replace("show","");
-        setTimeout(()=>{
-            this.setMazafuckinState({modal: {code: "", header: "", bg: true, panel: true, autoclose: false}});
-        },300);
-    }
-
-    showModal = (code,header="",bg=true,panel=true,autoclose=false) => {
-        this.setMazafuckinState({modal: {code: code, header: header, bg: bg, panel: panel, autoclose: autoclose}});
-    }
-
-    XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
+    /*XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, url, true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -320,7 +308,7 @@ export default class App extends React.Component{
         if(typeof(params) === "object") params = this.object2string(params);
         console.log(params);
         xhr.send(params);
-    }
+    }*/
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
@@ -447,7 +435,7 @@ export default class App extends React.Component{
     }
 
     saveStepResults = (koordsto,koordsfrom,pflag) => {
-        if(this.state.online || !this.state.XMLHRAvailable) return;
+        if(this.state.online || !this.state.AjaxAvailable) return;
         let {cells} = this.state;
         let postdata = {
             action: 'saveStep',
@@ -460,14 +448,19 @@ export default class App extends React.Component{
             game_id: this.state.game_id,
             gtoken: this.state.gtoken,
         };
-        this.XMLHR(postdata,(data)=>{
-            if(data.success){
-                if(this.state.game_id===0){
-                    if(data.data.game_id){
-                        this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
-                    }else{
-                        this.setMazafuckinState({XMLHRAvailable: false});
-                    } 
+        postData({
+            url: this.props.apiserver + "set-step",
+            param: postdata,
+            device: this.props.device,
+            success: (data)=>{
+                if(data.success){
+                    if(this.state.game_id===0){
+                        if(data.data.game_id){
+                            this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
+                        }else{
+                            this.setMazafuckinState({AjaxAvailable: false});
+                        } 
+                    }
                 }
             }
         });
@@ -480,14 +473,19 @@ export default class App extends React.Component{
             mask: this.getDeskMask(),
             color: color[0]
         };
-        this.XMLHR(postdata,(data)=>{
-            if(!data.success){
-                this.iiStep(color);
-            }else{
-                if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
-                    this.doStep(data.data.to, data.data.from, true, null);
-                }else{
+        postData({
+            url: this.props.apiserver + "get-bot-step",
+            param: postdata,
+            device: this.props.device,
+            success: (data)=>{
+                if(!data.success){
                     this.iiStep(color);
+                }else{
+                    if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
+                        this.doStep(data.data.to, data.data.from, true, null);
+                    }else{
+                        this.iiStep(color);
+                    }
                 }
             }
         });
@@ -501,7 +499,7 @@ export default class App extends React.Component{
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && this.state.usersettings.mode === "bot"){
             setTimeout(()=>{
 
-                if(this.state.XMLHRAvailable && !this.state.autochess){
+                if(this.state.AjaxAvailable && !this.state.autochess){
                     this.getBotStep(color);
                 }else{
                     this.iiStep(color);
@@ -584,13 +582,14 @@ export default class App extends React.Component{
         stepper.style.transition = t+"ms transform ease-out";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
+        Noise("soft");
 
         if (index === steps - 1) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-
+            Noise(steps);
             return; // end of default last step
         } 
 
@@ -644,6 +643,7 @@ export default class App extends React.Component{
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
                         newselectedChecker = koords;
                     }
+                    Noise("soft");
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
                 }else{
                     //Trying to do a step
@@ -668,9 +668,9 @@ export default class App extends React.Component{
                         }else{
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;
+                            
                             let needToEatMore = false;
                             if (this.state.game === "checkers" || this.state.game === "giveaway") {
-                                console.log(cells[this.state.selectedChecker].possibilities);
                                 for (let p in cells[this.state.selectedChecker].possibilities) {
                                     let pos = cells[this.state.selectedChecker].possibilities[p];
                                     if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
@@ -693,6 +693,7 @@ export default class App extends React.Component{
                             }
                             
                             if (needToEatMore) {
+                                Noise("warning");
                                 if (needToEatMore.more) this.consoleLog( Lang("youHaveToTakeMore") );
                                 else this.consoleLog( Lang("youHaveToTake") );
                                 for (let k in needToEatMore.kills) {
@@ -727,9 +728,8 @@ export default class App extends React.Component{
     }
 
     connectSocket = () => {
-        let url = `wss://${server}:${wsport}`;
-        console.log(`Connecting socket ${url}`);
-        this.socket = new WebSocket(url);
+        console.log(`Connecting socket ${this.props.wsserver}`);
+        this.socket = new WebSocket(this.props.wsserver);
         this.socket.onopen = () => {
             this.consoleLog(Lang("connected"));
             this.setMazafuckinState({socketOpened: true});
@@ -799,9 +799,10 @@ export default class App extends React.Component{
     }
 
     suggestNewOneGame = (text="") => {
-        this.showModal(
+        this.props.showModal(
             <div>
-                <input type="button" value={Lang("noText")} onClick={this.clearPlayerInfoAfterGameOver} /> <input type="button" onClick={()=>{ this.searchNewOpponent() }} value={Lang("yesText")}/>
+                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" history="" value={Lang("noText")} />
+                <Button action={()=>this.searchNewOpponent()} href="" history="" value={Lang("yesText")} />
             </div>,
             text + "<br />" + Lang("findAnewGame")
         );
@@ -938,18 +939,14 @@ export default class App extends React.Component{
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
                         serverInfo={this.state.serverInfo}
-                        hideModal={this.hideModal}
-                        showModal={this.showModal}
+                        showModal={this.props.showModal}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
                         usersettings={this.state.usersettings}
-                        XMLHR={this.XMLHR}
+                        device={this.props.device}
+                        apiserver={this.props.apiserver}
                         quit={this.quit}
-                />
-                <Modal
-                        closer={this.hideModal} 
-                        modal={this.state.modal}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield">
@@ -964,9 +961,10 @@ export default class App extends React.Component{
                             continueWithSameOpponent={this.continueWithSameOpponent}
                             searchNewOpponent={this.searchNewOpponent}
                             quit={this.quit}
-                            XMLHR={this.XMLHR}
                             updatePI={this.updatePI}
                             rampage={this.rampage}
+                            device={this.props.device}
+                            apiserver={this.props.apiserver}
                             showBestMove={this.showBestMove}
                     />
                     </div>

@@ -1,37 +1,48 @@
 # Installations
 - Install ReactJS
+- Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
+- Install cordova-plugin-device and cordova-plugin-whitelist
+- Configure config.xml
 - Add platforms (android, ios)
 
 # Порядок билда
-
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
 4. build/static/js/main.*.chunk.js* > "/music/" to "music/"
-5. copy build folder to cordova/www
-6. cordova build
+5. remove folders in cordova/www/ (music, static, sound)
+6. copy build folder to cordova/www
+7. cordova build
+
+# Запуск автобилдера (При первом запуске запросит рабочую папку cordova)
+php build.php (workfolder=...) (steps=1234567)
 
 # TODO
-2. Звуки
+0. Нужны звуки: EpicMove (rotation, hit and checkers jumping), Rampage, Victory, Fail, Draw.
+0. Новое API на Yii2, новая логика бэкенда, реализация WS и API в одном проекте, WS на consik/yii2-websocket
+1. Вынести авторизацию / регистрацию / вход / аккаунт в отдельный компонент ? Чтобы не дублировать ? Или не стоит?
+3. Локализация API (либо заблаговременно подготовленные здесь ответы API)
 4. Вывести опыт в видное место
 5. Внутриигровая валюта?
 5. Скины ?) Лол
-6. Открыть апи хотя бы для AJAX, хотя бы чтоб регистрироваться и логиниться
-6. Автологин?
-7. Стоит вынести Modal
 8. Придумать реализацию режима bluetooth вместо local
 9. Реклама
 -  Реализация в уголках схожей логики анализа будущих ходов как и в шашках.
--  В App заменить инпуты на компоненты
+-  Правила игры с локализацией
+-  Испанский язык? Португальский? Немецкий? Французский? Китайский? Итальянский?
+-  cordova-plugin-vibration?
+-  https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-network-information/index.html
+-  Оптимизация RAMPAGE 
 
 # Баги
+- Ajax не работает в cordova 
+- Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket
+- Проблемы авторизации
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 
 # Баги/Фичи на проверке
-- Проблема анимации сокрушительного хода бота
-- Оптимизация RAMPAGE 
-- Внедрение авторизации по uuid
+-
 
 # Выполнено / исправлено
 + Заставка
@@ -70,3 +81,20 @@
 + Приоритет угловых ячеек
 + Реализована локализация и возможность добавления других языков
 + Правки в отображении Fanfaras и AppHeader
++ Замена инпутов на компонент button
++ Добавление английского языка
++ Modal вынесен в главный App, где может быть передан и использован во всех роутах
++ Выбор игры в главном меню
++ Сохранение выбора игры в localStorage
++ API v2 на Yii2 
++ Реструктуризация бэкенда
++ Автобилдер приложения
++ Device Info теперь приходит
++ Внедрение авторизации по uuid
++ В свёрнутом состоянии воспроизведение музыки теперь приостанавливается
++ Проблема анимации сокрушительного хода бота решена
++ Ajax вынесен в отдельный инструмент
++ Роутинг вынесен в отдельный функционал
++ Кнопка назад на главной странице теперь закрывает приложение
++ Modal теперь закрывается при переходах
++ Звуки добавлены в геймплей

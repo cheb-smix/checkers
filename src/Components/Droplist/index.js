@@ -1,4 +1,5 @@
 import React from 'react';
+import Noise from '../../Funcs/Noise';
 import "./droplist.css";
 import Listitem from './Listitem';
 
@@ -9,6 +10,7 @@ export default class Droplist extends React.Component{
         selectedText: this.props.items[this.props.selected]
     }
     toggleDroplist = () => {
+        Noise("menu-click");
         let a = document.querySelectorAll(".droplist.opened");
         for(let i=0;i<a.length;i++){
             a[i].className = "droplist";
