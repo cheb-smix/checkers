@@ -4,7 +4,7 @@ import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
-import Lang from '../../Lang';
+import Lang from '../../Funcs/lang';
 import { Settings } from '../Setting';
 import postData from '../../Funcs/postDataFuncs';
 import Cookie from '../../Funcs/cookie';

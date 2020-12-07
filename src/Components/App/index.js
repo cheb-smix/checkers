@@ -5,7 +5,7 @@ import Cell from '../Cell/';
 import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
-import Lang from '../../Lang';
+import Lang from '../../Funcs/lang';
 import Button from '../Button';
 import { Settings } from '../Setting';
 import postData from '../../Funcs/postDataFuncs';

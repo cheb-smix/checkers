@@ -3,7 +3,7 @@ import React from 'react';
 import Button from '../Button';
 import Droplist from '../Droplist';
 import Slider from '../Slider';
-import Lang from '../../Lang';
+import Lang from '../../Funcs/lang';
 
 export class Settings{
     
