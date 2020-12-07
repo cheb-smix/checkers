@@ -8,7 +8,7 @@ import Rampage from '../Rampage';
 import Lang from '../../Lang';
 import Button from '../Button';
 import { Settings } from '../Setting';
-import ajax from '../../Funcs/ajax';
+import postData from '../../Funcs/postDataFuncs';
 
 import './app.css';
 
@@ -93,7 +93,7 @@ export default class App extends React.Component{
             param = {action:"auth",token:state.usersettings.atoken};
         }
         
-        ajax({
+        postData({
             url: this.props.apiserver + "config",
             param: param,
             device: this.props.device,
@@ -447,8 +447,8 @@ export default class App extends React.Component{
             game_id: this.state.game_id,
             gtoken: this.state.gtoken,
         };
-        ajax({
-            url: this.props.apiserver,
+        postData({
+            url: this.props.apiserver + "set-step",
             param: postdata,
             device: this.props.device,
             success: (data)=>{
@@ -472,8 +472,8 @@ export default class App extends React.Component{
             mask: this.getDeskMask(),
             color: color[0]
         };
-        ajax({
-            url: this.props.apiserver,
+        postData({
+            url: this.props.apiserver + "get-bot-step",
             param: postdata,
             device: this.props.device,
             success: (data)=>{

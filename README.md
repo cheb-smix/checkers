@@ -1,11 +1,12 @@
 # Installations
 - Install ReactJS
+- Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
+- Install cordova-plugin-device and cordova-plugin-whitelist
+- Configure config.xml
 - Add platforms (android, ios)
 
-
 # Порядок билда
-
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
@@ -14,14 +15,11 @@
 6. copy build folder to cordova/www
 7. cordova build
 
-
 # Запуск автобилдера (При первом запуске запросит рабочую папку cordova)
 php build.php (workfolder=...) (steps=1234567)
 
-
 # TODO
 0. Новое API на Yii2, новая логика бэкенда, реализация WS и API в одном проекте, WS на consik/yii2-websocket
-
 1. Вынести авторизацию / регистрацию / вход / аккаунт в отдельный компонент ? Чтобы не дублировать ? Или не стоит?
 2. Звуки
 3. Локализация API (либо заблаговременно подготовленные здесь ответы API)
@@ -35,18 +33,17 @@ php build.php (workfolder=...) (steps=1234567)
 -  Испанский язык? Португальский? Немецкий? Французский? Китайский? Итальянский?
 -  cordova-plugin-vibration?
 -  https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-network-information/index.html
-
+-  Оптимизация RAMPAGE 
 
 # Баги
-- Ajax не работает в cordova - https://www.npmjs.com/package/cordova-plugin-advanced-http
+- Ajax не работает в cordova 
+- Modal не закрывается при переходах
 - Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket
 - Проблемы авторизации
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 
-
 # Баги/Фичи на проверке
-- Оптимизация RAMPAGE 
-
+-
 
 # Выполнено / исправлено
 + Заставка
@@ -98,3 +95,4 @@ php build.php (workfolder=...) (steps=1234567)
 + В свёрнутом состоянии воспроизведение музыки теперь приостанавливается
 + Проблема анимации сокрушительного хода бота решена
 + Ajax вынесен в отдельный инструмент
++ Роутинг вынесен в отдельный функционал

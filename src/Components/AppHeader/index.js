@@ -6,7 +6,9 @@ import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Lang';
 import { Settings } from '../Setting';
-import ajax from '../../Funcs/ajax';
+import postData from '../../Funcs/postDataFuncs';
+import Cookie from '../../Funcs/cookie';
+import Routing from '../../Funcs/routing';
 
 export default class AppHeader extends React.Component{
 
@@ -36,11 +38,7 @@ export default class AppHeader extends React.Component{
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
                                 this.props.showModal(false);
-                                document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
-                                document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
-                                setTimeout(() => {
-                                    this.props.history.push("/" + v);
-                                }, 1000);
+                                Routing("/" + v, this.props.history);
                             }}
                         />
                         <i className="fa fa-play fa-2x"></i>
@@ -280,7 +278,7 @@ export default class AppHeader extends React.Component{
                 return false;
             }
         }
-        ajax({
+        postData({
             url: this.props.apiserver + "sign-up",
             params: {
                 display_name:   document.getElementById("name").value,
@@ -331,7 +329,7 @@ export default class AppHeader extends React.Component{
         );
     }
     gogoSign = () => {
-        ajax({
+        postData({
             url: this.props.apiserver + "sign-in",
             params: {
                 username:  document.querySelector("#login").value,
@@ -343,6 +341,7 @@ export default class AppHeader extends React.Component{
                 if(d.success){
                     m.className = "success";
                     m.innerHTML = Lang("success");
+                    Cookie.set("_identity-frontend", d.atoken);
                     /*this.saveSetting("atoken",d.data.token);
                     window.location.reload();*/
                 }else{
@@ -356,14 +355,9 @@ export default class AppHeader extends React.Component{
         this.saveSetting("atoken","");
         window.location.reload();
     }
-    goHome = () => {
-        document.querySelector("#utitle").className = "animate__backOutLeft animate__animated fa-2x";
-        document.querySelector(".umaincon").className = "umaincon animate__fadeOutLeft animate__animated";
-        this.setState({naviActive: false});
-        setTimeout(() => {
-            this.props.history.push("/home");
-        }, 1000);
-    }
+
+    goHome = () => Routing("/home", this.props.history);
+
     navigatorClick = (h = null) => {
         if (h === null) this.setState({naviActive: !this.state.naviActive});
         else this.setState({naviActive: h});

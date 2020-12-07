@@ -1,4 +1,5 @@
 import React from 'react';
+import Routing from '../../Funcs/routing';
 
 import "./button.css";
 
@@ -8,21 +9,7 @@ export default class Button extends React.Component{
         if (this.props.action !== "") {
             this.props.action();
         }
-        if (this.props.href !== "") {
-                
-            let a = document.querySelector("#utitle");
-            if (a) a.className  = "animate__rotateOutUpLeft animate__animated fa-2x";
-
-            a = document.querySelector(".umaincon");
-            if (a) a.className = "umaincon animate__fadeOutLeft animate__animated";
-
-            a = document.querySelector("#btnContainer");
-            if (a) a.className = "animate__fadeOut animate__animated";
-
-            setTimeout(() => {
-                if (this.props.history) this.props.history.push(this.props.href);
-            }, 1000);
-        }
+        if (this.props.href !== "") Routing(this.props.href, this.props.history);
     }
 
     render(){

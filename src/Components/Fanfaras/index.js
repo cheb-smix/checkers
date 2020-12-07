@@ -1,5 +1,5 @@
 import React from 'react';
-import ajax from '../../Funcs/ajax';
+import postData from '../../Funcs/postDataFuncs';
 import Lang from '../../Lang';
 import Button from '../Button';
 import "./fanfara.css";
@@ -13,9 +13,9 @@ export default class Fanfara extends React.Component{
     animate = () => {
         if(typeof(this.props.playerInfo.login)==="undefined" || this.props.playerInfo.status==="in_game" || this.state.animated) return;
 
-        ajax({
-            url: this.props.apiserver,
-            params: {action:"getPlayerStat",login:this.props.playerInfo.login},
+        postData({
+            url: this.props.apiserver + "get-stat",
+            params: { username: this.props.playerInfo.login },
             device: this.props.device,
             success: (data)=>{
                 this.setState({animated:true});
