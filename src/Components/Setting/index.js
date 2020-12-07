@@ -52,6 +52,7 @@ export class Settings{
     
     saveSetting = (key,value="") => {
         this.usersettings[key] = value;
+        window.loft.usersettings[key] = value;
         if(value==="") localStorage.removeItem(key);
         else localStorage.setItem(key,value);
 
@@ -74,8 +75,6 @@ export class Settings{
 
 export default class Setting extends React.Component{
     render(){
-        let settings = new Settings();
-        let usersettings = settings.getSettings();
         return (
             <div className="container" id="btnContainer">
                 <h5 className="neon">{Lang("settingsText")}</h5>
@@ -84,41 +83,40 @@ export default class Setting extends React.Component{
                         <Droplist
                             id="animation"
                             items={{"2":Lang("animationLevel2"),"1":Lang("animationLevel1"),"0":Lang("animationLevel0")}}
-                            selected={usersettings.animation}
+                            selected={window.loft.usersettings.animation}
                             placeholder={Lang("animationSetting")}
-                            onSelect={settings.saveSetting}
+                            onSelect={window.loft.settings.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="difficulty"
                             items={{"3":Lang("difficultyLevel3"),"2":Lang("difficultyLevel2"),"1":Lang("difficultyLevel1")}}
-                            selected={usersettings.difficulty}
+                            selected={window.loft.usersettings.difficulty}
                             placeholder={Lang("difficultySetting")}
-                            onSelect={settings.saveSetting}
+                            onSelect={window.loft.settings.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Slider
                             id="soundvolume"
                             placeholder={Lang("soundSetting")}
-                            value={usersettings.soundvolume}
-                            onSet={settings.saveSetting}
+                            value={window.loft.usersettings.soundvolume}
+                            onSet={window.loft.settings.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Slider
                             id="musicvolume"
                             placeholder={Lang("musicSetting")}
-                            value={usersettings.musicvolume}
-                            onSet={settings.saveSetting}
+                            value={window.loft.usersettings.musicvolume}
+                            onSet={window.loft.settings.saveSetting}
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
                             action={this.dropSettings} 
                             href="/home" 
-                            history={this.props.history} 
                             value={Lang("returnDefaults")} 
                             theme="neon"
                             strong="true"
@@ -128,7 +126,6 @@ export default class Setting extends React.Component{
                         <Button
                             action="" 
                             href="/home" 
-                            history={this.props.history} 
                             value={Lang("goBackText")}  
                             theme="grey"
                             strong="true"

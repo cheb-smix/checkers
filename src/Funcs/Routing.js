@@ -5,7 +5,7 @@ let components = {
     "#btnContainer": "animate__fadeOut animate__animated",
 };
 
-export default function Routing(route = "/home", hi = [], addonAction = () => {}, timeout = 700)
+export default function Routing(route = "/home", addonAction = () => {}, timeout = 700)
 {
     for (let s in components) {
         let a = document.querySelectorAll(s);
@@ -16,5 +16,5 @@ export default function Routing(route = "/home", hi = [], addonAction = () => {}
 
     addonAction();
 
-    setTimeout(() => hi.push(route), timeout);
+    setTimeout(() => window.loft.history.push(route), timeout);
 }

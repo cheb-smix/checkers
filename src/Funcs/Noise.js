@@ -22,7 +22,9 @@ export default function Noise(type = "soft", volume = false) {
     }
     src = "sound/" + src;
 
-    let a = new Audio(src);
-    a.volume = volume;
-    a.play();
+    if (typeof(window.loft.sounds[src]) === "undefined") { // lazy loading =)
+        window.loft.sounds[src] = new Audio(src);
+    }
+    window.loft.sounds[src].volume = volume;
+    window.loft.sounds[src].play();
 }

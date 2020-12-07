@@ -5,7 +5,6 @@ import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Funcs/Lang';
-import { Settings } from '../Setting';
 import postData from '../../Funcs/PostDataFuncs';
 import Cookie from '../../Funcs/Cookie';
 import Routing from '../../Funcs/Routing';
@@ -14,8 +13,7 @@ import Noise from '../../Funcs/Noise';
 export default class AppHeader extends React.Component{
 
     state = {
-        naviActive: null,
-        settings: new Settings()
+        naviActive: null
     }
 
     
@@ -27,7 +25,7 @@ export default class AppHeader extends React.Component{
 
         if (doptext) doptext = <div className="col-md-6 col-12">{doptext}</div>
 
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     {doptext}
@@ -38,8 +36,8 @@ export default class AppHeader extends React.Component{
                             selected={this.props.gamename}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
-                                this.props.showModal(false);
-                                Routing("/" + v, this.props.history);
+                                window.loft.showModal(false);
+                                Routing("/" + v);
                             }}
                         />
                         <i className="fa fa-play fa-2x"></i>
@@ -52,12 +50,12 @@ export default class AppHeader extends React.Component{
 
     stopSearchingOpponent = () => {
         this.props.stopTheSearch();
-        this.props.showModal(false);
+        window.loft.showModal(false);
     }
 
     gameButClick = () => {
         if(this.props.playerStatus === "in_game" && this.props.online){
-            this.props.showModal(
+            window.loft.showModal(
                 <div className="container">
                     <div className="row">
                         <div className="col-12">
@@ -65,9 +63,8 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={() => this.props.showModal(false)} 
+                                action={() => window.loft.showModal(false)} 
                                 href="" 
-                                history="" 
                                 value={Lang("cancelText")} 
                                 theme="neon"
                                 strong="true"
@@ -77,7 +74,6 @@ export default class AppHeader extends React.Component{
                             <Button
                                 action={this.props.quit} 
                                 href="" 
-                                history="" 
                                 value={Lang("quitTheGame")}
                                 theme="neon"
                                 strong="light"
@@ -91,7 +87,7 @@ export default class AppHeader extends React.Component{
         if(this.props.searching){
             let approxtext = <h5>{Lang("cancelSearchText").replace("$", this.props.serverInfo.avgwaittime.avg - this.props.count)}</h5>;
             if(this.props.serverInfo.avgwaittime.cnt===0 || this.props.serverInfo.playersstat.total<5) approxtext = <h5>{Lang("cancelSearchConfirm")}?</h5>;
-            this.props.showModal(
+            window.loft.showModal(
                 <div className="container">
                     <div className="row">
                         <div className="col-12">
@@ -99,9 +95,8 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={() => this.props.showModal(false)} 
+                                action={() => window.loft.showModal(false)} 
                                 href="" 
-                                history="" 
                                 value={Lang("cancelText")} 
                                 theme="neon"
                                 strong="true"
@@ -111,7 +106,6 @@ export default class AppHeader extends React.Component{
                             <Button
                                 action={this.stopSearchingOpponent} 
                                 href="" 
-                                history="" 
                                 value={Lang("cancelSearchConfirm")} 
                                 theme="light"
                                 strong="true"
@@ -127,26 +121,26 @@ export default class AppHeader extends React.Component{
     }
 
     dropSettings = () => {
-        let us = this.state.settings.dropSettings();
-        for (let k in us) this.props.updateSetting(k, us[k]);
-        this.props.showModal(false);
+        window.loft.settings.dropSettings();
+        //for (let k in us) this.props.updateSetting(k, us[k]);
+        window.loft.showModal(false);
     }
 
     saveSetting = (key, val) => {
-        this.state.settings.saveSetting(key, val);
-        this.props.updateSetting(key, val);
+        window.loft.settings.saveSetting(key, val);
+        //this.props.updateSetting(key, val);
     }
 
 
     settingsClick = () => {
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="animation"
                             items={{"2":Lang("animationLevel2"),"1":Lang("animationLevel1"),"0":Lang("animationLevel0")}}
-                            selected={this.props.usersettings.animation}
+                            selected={window.loft.usersettings.animation}
                             placeholder={Lang("animationSetting")}
                             onSelect={this.saveSetting}
                         />
@@ -155,7 +149,7 @@ export default class AppHeader extends React.Component{
                         <Droplist
                             id="difficulty"
                             items={{"3":Lang("difficultyLevel3"),"2":Lang("difficultyLevel2"),"1":Lang("difficultyLevel1")}}
-                            selected={this.props.usersettings.difficulty}
+                            selected={window.loft.usersettings.difficulty}
                             placeholder={Lang("difficultySetting")}
                             onSelect={this.saveSetting}
                         />
@@ -164,7 +158,7 @@ export default class AppHeader extends React.Component{
                         <Slider
                             id="soundvolume"
                             placeholder={Lang("soundSetting")}
-                            value={this.props.usersettings.soundvolume}
+                            value={window.loft.usersettings.soundvolume}
                             onSet={this.saveSetting}
                         />
                     </div>
@@ -172,7 +166,7 @@ export default class AppHeader extends React.Component{
                         <Slider
                             id="musicvolume"
                             placeholder={Lang("musicSetting")}
-                            value={this.props.usersettings.musicvolume}
+                            value={window.loft.usersettings.musicvolume}
                             onSet={this.saveSetting}
                         />
                     </div>
@@ -180,7 +174,6 @@ export default class AppHeader extends React.Component{
                         <Button
                             action={this.dropSettings} 
                             href="" 
-                            history="" 
                             value={Lang("returnDefaults")} 
                             theme="neon"
                             strong="true"
@@ -199,7 +192,7 @@ export default class AppHeader extends React.Component{
         let progress = Math.percent(s.exp - startexp,endexp - startexp);
         let left = 50 - parseInt(progress,10)/2;
 
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-12" id="message"></div>
@@ -232,7 +225,7 @@ export default class AppHeader extends React.Component{
         );
     }
     newRegistration = () => {
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-12" id="message"></div>
@@ -252,7 +245,6 @@ export default class AppHeader extends React.Component{
                         <Button
                             action={this.gogoRegister} 
                             href="" 
-                            history="" 
                             value={Lang("signUpText")} 
                             theme="neon"
                             strong="true"
@@ -280,14 +272,14 @@ export default class AppHeader extends React.Component{
             }
         }
         postData({
-            url: this.props.apiserver + "sign-up",
+            url: window.loft.apiserver + "sign-up",
             params: {
                 display_name:   document.getElementById("name").value,
                 username:       document.getElementById("login").value,
                 password:       sha1(document.getElementById("pass").value),
                 email:          document.getElementById("email").value,
             },
-            device: this.props.device,
+            device: window.loft.device,
             success: (d)=>{
                 if (d.success) {
                     m.className = "success";
@@ -304,7 +296,7 @@ export default class AppHeader extends React.Component{
         });
     }
     signIn = () => {
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-12" id="message"></div>
@@ -318,7 +310,6 @@ export default class AppHeader extends React.Component{
                         <Button
                             action={this.gogoSign} 
                             href="" 
-                            history="" 
                             value={Lang("signInText")} 
                             theme="neon"
                             strong="true"
@@ -331,12 +322,12 @@ export default class AppHeader extends React.Component{
     }
     gogoSign = () => {
         postData({
-            url: this.props.apiserver + "sign-in",
+            url: window.loft.apiserver + "sign-in",
             params: {
                 username:  document.querySelector("#login").value,
                 password:   document.querySelector("#pass").value
             },
-            device: this.props.device,
+            device: window.loft.device,
             success: (d)=>{
                 let m = document.querySelector("#message");
                 if(d.success){
@@ -357,7 +348,7 @@ export default class AppHeader extends React.Component{
         window.location.reload();
     }
 
-    goHome = () => Routing("/home", this.props.history);
+    goHome = () => Routing("/home");
 
     navigatorClick = (h = null) => {
         if (h === null) this.setState({naviActive: !this.state.naviActive});

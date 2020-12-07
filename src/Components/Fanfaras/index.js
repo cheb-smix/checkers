@@ -103,7 +103,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={()=>{this.props.quit(false)}} 
                             href="" 
-                            history="" 
                             value={Lang("closeText")} 
                             theme="grey"
                             strong="true"
@@ -113,7 +112,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.continueWithSameOpponent} 
                             href="" 
-                            history="" 
                             value={Lang("continueWith").replace("$", opponentInfo.name)} 
                             theme="neon"
                             strong="true"
@@ -123,7 +121,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.searchNewOpponent} 
                             href="" 
-                            history="" 
                             value={Lang("searchAnotherEnemy")} 
                             theme="neon"
                             strong="true"

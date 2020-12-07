@@ -7,7 +7,6 @@ import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
 import Lang from '../../Funcs/Lang';
 import Button from '../Button';
-import { Settings } from '../Setting';
 import postData from '../../Funcs/PostDataFuncs';
 
 import './app.css';
@@ -45,9 +44,6 @@ export default class App extends React.Component{
             possibilities: 10,
         },
         game: window.location.href.split("/").pop(),
-        /* USER PREFERENCES */
-        settings: new Settings(),
-        usersettings: {},
         /* TECH INFO */
         selectedChecker: false,
         playersStep: true,
@@ -88,16 +84,14 @@ export default class App extends React.Component{
 
     componentDidMount() {
         let state = {};
-        state.usersettings = this.state.settings.getSettings();
         let param = {action:"checkcheck"};
-        if(state.usersettings.atoken !== ""){
-            param = {action:"auth",token:state.usersettings.atoken};
+        if(window.loft.usersettings.atoken !== ""){
+            param = {action:"auth", token: window.loft.usersettings.atoken};
         }
         
         postData({
-            url: this.props.apiserver + "config",
+            url: window.loft.apiserver + "config",
             param: param,
-            device: this.props.device,
             success: (data)=>{
                 alert(JSON.stringify(data));
                 this.initiation(state, data);
@@ -110,7 +104,7 @@ export default class App extends React.Component{
 
     initiation = (state, data = false) => {
         let {playerInfo, opponentInfo} = this.state;
-        if(state.usersettings.atoken!=="" && data){
+        if(window.loft.usersettings.atoken!=="" && data){
             if(data.success){
                 playerInfo.signed = true;
                 playerInfo.name = data.data.name;
@@ -120,7 +114,7 @@ export default class App extends React.Component{
                 this.saveSettingsOption("atoken");
             }
         }
-        if(state.usersettings.mode === "online") this.connectSocket();
+        if(window.loft.usersettings.mode === "online") this.connectSocket();
         if(data){
             state.writesteps = data.WriteSteps;
             state.writestats = data.WriteStats;
@@ -133,7 +127,7 @@ export default class App extends React.Component{
 
         state.playerInfo = playerInfo;
 
-        if (state.usersettings.mode === "bot") {
+        if (window.loft.usersettings.mode === "bot") {
             if (Math.random() > 0.5) {
                 state.playerInfo.color = "white";
                 opponentInfo.color = "black";
@@ -313,7 +307,7 @@ export default class App extends React.Component{
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
         
-        if(this.state.usersettings.animation==='0'){
+        if(window.loft.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
         }else{
             this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
@@ -449,9 +443,8 @@ export default class App extends React.Component{
             gtoken: this.state.gtoken,
         };
         postData({
-            url: this.props.apiserver + "set-step",
+            url: window.loft.apiserver + "set-step",
             param: postdata,
-            device: this.props.device,
             success: (data)=>{
                 if(data.success){
                     if(this.state.game_id===0){
@@ -474,9 +467,8 @@ export default class App extends React.Component{
             color: color[0]
         };
         postData({
-            url: this.props.apiserver + "get-bot-step",
+            url: window.loft.apiserver + "get-bot-step",
             param: postdata,
-            device: this.props.device,
             success: (data)=>{
                 if(!data.success){
                     this.iiStep(color);
@@ -496,7 +488,7 @@ export default class App extends React.Component{
 
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === "in_game") || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === "in_game"));
         
-        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && this.state.usersettings.mode === "bot"){
+        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
             setTimeout(()=>{
 
                 if(this.state.AjaxAvailable && !this.state.autochess){
@@ -582,7 +574,6 @@ export default class App extends React.Component{
         stepper.style.transition = t+"ms transform ease-out";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
-        Noise("soft");
 
         if (index === steps - 1) {
             stepper.style.display = "none";
@@ -592,6 +583,8 @@ export default class App extends React.Component{
             Noise(steps);
             return; // end of default last step
         } 
+
+        Noise("soft");
 
         index++;
 
@@ -714,22 +707,22 @@ export default class App extends React.Component{
     consoleLog = (text) => {
         this.setMazafuckinState({consoleText: text});
     }
-
+/*
     updateSetting = (key, val) => {
         console.log("state updated");
         let {usersettings} = this.state;
         usersettings[key] = val;
         this.setState({usersettings: usersettings});
     }
-
+*/
     socketSend = (param) => {
         console.log(param);
         this.socket.send(JSON.stringify(param));
     }
 
     connectSocket = () => {
-        console.log(`Connecting socket ${this.props.wsserver}`);
-        this.socket = new WebSocket(this.props.wsserver);
+        console.log(`Connecting socket ${window.loft.wsserver}`);
+        this.socket = new WebSocket(window.loft.wsserver);
         this.socket.onopen = () => {
             this.consoleLog(Lang("connected"));
             this.setMazafuckinState({socketOpened: true});
@@ -799,10 +792,10 @@ export default class App extends React.Component{
     }
 
     suggestNewOneGame = (text="") => {
-        this.props.showModal(
+        window.loft.showModal(
             <div>
-                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" history="" value={Lang("noText")} />
-                <Button action={()=>this.searchNewOpponent()} href="" history="" value={Lang("yesText")} />
+                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
+                <Button action={()=>this.searchNewOpponent()} href="" value={Lang("yesText")} />
             </div>,
             text + "<br />" + Lang("findAnewGame")
         );
@@ -928,7 +921,6 @@ export default class App extends React.Component{
         return (
             <div className="ucon">
                 <AppHeader 
-                        history={this.props.history} 
                         gamename={this.state.game} 
                         playerName={this.state.playerInfo.name}
                         playerColor={this.state.playerInfo.color}
@@ -939,13 +931,9 @@ export default class App extends React.Component{
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
                         serverInfo={this.state.serverInfo}
-                        showModal={this.props.showModal}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
-                        usersettings={this.state.usersettings}
-                        device={this.props.device}
-                        apiserver={this.props.apiserver}
                         quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
@@ -963,8 +951,6 @@ export default class App extends React.Component{
                             quit={this.quit}
                             updatePI={this.updatePI}
                             rampage={this.rampage}
-                            device={this.props.device}
-                            apiserver={this.props.apiserver}
                             showBestMove={this.showBestMove}
                     />
                     </div>

@@ -48,23 +48,20 @@ export default class Home extends React.Component{
                 <Button 
                     action={()=>this.state.settings.saveSetting("mode", "bot")} 
                     href={this.getGameRoute()} 
-                    history={this.props.history} 
                     value={Lang("playWithBot")} 
                 />
                 <Button 
                     action={()=>this.state.settings.saveSetting("mode", "local")} 
                     href={this.getGameRoute()} 
-                    history={this.props.history} 
                     value={Lang("playByBlueTooth")} 
                 />
                 <Button 
                     action={()=>this.state.settings.saveSetting("mode", "online")} 
                     href={this.getGameRoute()} 
-                    history={this.props.history} 
                     value={Lang("playOnlineGame")} 
                 />
-                <Button action="" href="" history={this.props.history} value={Lang("signInText")} />
-                <Button action="" href="/settings" history={this.props.history} value={Lang("settingsText")} />
+                <Button action="" href="" value={Lang("signInText")} />
+                <Button action="" href="/settings" value={Lang("settingsText")} />
             </div>
         );
     };
