@@ -71,6 +71,14 @@ class App extends Component{
         this.setNewTrack();
         document.querySelector("#musicplayer").addEventListener("ended", this.setNewTrack);
         document.querySelector(".App-logo").style.top = "15vh";
+
+        if (window.cordova) {
+            document.addEventListener("backbutton", () => {
+                this.hideModal();
+                if (document.location.href.indexOf('/home') > 0) navigator.app.exitApp();
+                else navigator.app.backHistory();
+            }, false);
+        }
     }
 
     render() {

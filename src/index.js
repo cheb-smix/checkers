@@ -15,12 +15,6 @@ function onDeviceReady()
 {
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
-    document.addEventListener("backbutton", onBackBtn, false);
-}
-function onBackBtn() 
-{
-    if (document.location.href.indexOf('/home') > 0) navigator.app.exitApp();
-    else navigator.app.backHistory();
 }
 function onPause() 
 {
