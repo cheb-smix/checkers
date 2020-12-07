@@ -35,6 +35,7 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
     wsserver = "ws://192.168.31.168:7777";
     apiserver = "http://192.168.31.168:3333/game/";
 }
+apiserver = "http://localhost:3333/";
 
 //alert(JSON.stringify([apiserver, window.location.hostname]));
 

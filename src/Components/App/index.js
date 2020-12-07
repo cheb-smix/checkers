@@ -5,12 +5,13 @@ import Cell from '../Cell/';
 import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
-import Lang from '../../Funcs/lang';
+import Lang from '../../Funcs/Lang';
 import Button from '../Button';
 import { Settings } from '../Setting';
-import postData from '../../Funcs/postDataFuncs';
+import postData from '../../Funcs/PostDataFuncs';
 
 import './app.css';
+import Noise from '../../Funcs/Noise';
 
 
 export default class App extends React.Component{
@@ -581,13 +582,14 @@ export default class App extends React.Component{
         stepper.style.transition = t+"ms transform ease-out";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
+        Noise("soft");
 
         if (index === steps - 1) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-
+            Noise(steps);
             return; // end of default last step
         } 
 
@@ -641,6 +643,7 @@ export default class App extends React.Component{
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
                         newselectedChecker = koords;
                     }
+                    Noise("soft");
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
                 }else{
                     //Trying to do a step
@@ -665,9 +668,9 @@ export default class App extends React.Component{
                         }else{
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;
+                            
                             let needToEatMore = false;
                             if (this.state.game === "checkers" || this.state.game === "giveaway") {
-                                console.log(cells[this.state.selectedChecker].possibilities);
                                 for (let p in cells[this.state.selectedChecker].possibilities) {
                                     let pos = cells[this.state.selectedChecker].possibilities[p];
                                     if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
@@ -690,6 +693,7 @@ export default class App extends React.Component{
                             }
                             
                             if (needToEatMore) {
+                                Noise("warning");
                                 if (needToEatMore.more) this.consoleLog( Lang("youHaveToTakeMore") );
                                 else this.consoleLog( Lang("youHaveToTake") );
                                 for (let k in needToEatMore.kills) {

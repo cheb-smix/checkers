@@ -1,6 +1,6 @@
 import React from 'react';
-import postData from '../../Funcs/postDataFuncs';
-import Lang from '../../Funcs/lang';
+import postData from '../../Funcs/PostDataFuncs';
+import Lang from '../../Funcs/Lang';
 import Button from '../Button';
 import "./fanfara.css";
 

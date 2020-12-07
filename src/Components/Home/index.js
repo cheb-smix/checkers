@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../Button';
-import Lang from '../../Funcs/lang';
+import Lang from '../../Funcs/Lang';
 import Droplist from '../Droplist';
 import { Settings } from '../Setting';
 

@@ -14,16 +14,17 @@ import Setting, { Settings } from './Components/Setting';
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
+import Noise from './Funcs/Noise';
 
 class App extends Component{
 
     state = {
         settings: new Settings(),
         playlist: [
-            "/music/sadness_and_hate.mp3",
-            "/music/hidden_inside.mp3",
-            "/music/liricue.mp3",
-            "/music/road_begins.mp3",
+            "music/sadness_and_hate.mp3",
+            "music/hidden_inside.mp3",
+            "music/liricue.mp3",
+            "music/road_begins.mp3",
         ],
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
@@ -32,6 +33,7 @@ class App extends Component{
     }
 
     hideModal = () => {
+        Noise("menu-click");
         let a = document.querySelectorAll(".show");
         for(let i=0;i<a.length;i++) a[i].className = a[i].className.replace("show","");
         setTimeout(()=>{

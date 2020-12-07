@@ -1,11 +1,13 @@
 import React from 'react';
-import Routing from '../../Funcs/routing';
+import Noise from '../../Funcs/Noise';
+import Routing from '../../Funcs/Routing';
 
 import "./button.css";
 
 export default class Button extends React.Component{
 
     buttonAction = () => {
+        Noise("menu-click");
         if (this.props.action !== "") {
             this.props.action();
         }

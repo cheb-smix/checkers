@@ -1,4 +1,5 @@
 import React from 'react';
+import Noise from '../../Funcs/Noise';
 import './slider.css';
 
 export default class Slider extends React.Component{
@@ -14,6 +15,7 @@ export default class Slider extends React.Component{
         if (offsetX < 5) offsetX = 0;
         this.setState({value: offsetX});
         this.props.onSet(this.props.id, offsetX);
+        Noise("menu-click");
     }
     render(){
         return (

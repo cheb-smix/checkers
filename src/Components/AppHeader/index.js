@@ -4,11 +4,12 @@ import Droplist from "../Droplist";
 import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
-import Lang from '../../Funcs/lang';
+import Lang from '../../Funcs/Lang';
 import { Settings } from '../Setting';
-import postData from '../../Funcs/postDataFuncs';
-import Cookie from '../../Funcs/cookie';
-import Routing from '../../Funcs/routing';
+import postData from '../../Funcs/PostDataFuncs';
+import Cookie from '../../Funcs/Cookie';
+import Routing from '../../Funcs/Routing';
+import Noise from '../../Funcs/Noise';
 
 export default class AppHeader extends React.Component{
 
@@ -389,8 +390,8 @@ export default class AppHeader extends React.Component{
         if (this.state.naviActive === null) uhcclass = "hidden fa-2x";
 
         let accDiv = <React.Fragment>
-            <div className="uhicon" onClick={this.gameButClick} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
-            <div className="uhicon" onClick={this.settingsClick}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
+            <div className="uhicon" onClick={this.gameButClick} onMouseDown={() => Noise("menu-click")} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching?<i style={{width: "35px"}}> {this.props.count}</i>:""}</div>
+            <div className="uhicon" onClick={this.settingsClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 
         if(this.props.playerSigned){
@@ -401,23 +402,23 @@ export default class AppHeader extends React.Component{
                     </React.Fragment>;
         }else{
             accDiv = <React.Fragment>
-                        <div className="uhicon" onClick={this.signIn}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
-                        <div className="uhicon" onClick={this.newRegistration}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
+                        <div className="uhicon" onClick={this.signIn} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
+                        <div className="uhicon" onClick={this.newRegistration} onMouseDown={() => Noise("menu-click")}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
                         {accDiv}
                     </React.Fragment>;
         }
 
         accDiv = <div id="uhiconcontainer" className={uhcclass}>
                     <div id="uhiconcontainershadow" onClick={() => this.navigatorClick(false)}></div>
-                    <div className="uhicon" onClick={this.goHome}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
+                    <div className="uhicon" onClick={this.goHome} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
                     {accDiv}
                 </div>;
 
         return (
             <div className="uheader">
-                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerColor:"white"}}> </i> {this.props.gamename}</div>
+                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice} onMouseDown={() => Noise("menu-click")}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerColor:"white"}}> </i> {this.props.gamename}</div>
                 {accDiv}
-                <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)}><i className="fa fa-bars fa-2x"></i></div>
+                <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)} onMouseDown={() => Noise("menu-click")}><i className="fa fa-bars fa-2x"></i></div>
             </div>
         );
     };
