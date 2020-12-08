@@ -16,7 +16,7 @@ export default class Fanfara extends React.Component{
 
         postData({
             url: this.props.apiserver + "get-stat",
-            params: { username: this.props.playerInfo.login },
+            data: { username: this.props.playerInfo.login },
             device: this.props.device,
             success: (data)=>{
                 this.setState({animated:true});

@@ -222,7 +222,7 @@ export default class AppHeader extends React.Component{
         }
         postData({
             url: window.loft.apiserver + "sign-up",
-            params: {
+            data: {
                 display_name:   document.getElementById("name").value,
                 username:       document.getElementById("login").value,
                 password:       sha1(document.getElementById("pass").value),
@@ -272,7 +272,7 @@ export default class AppHeader extends React.Component{
     gogoSign = () => {
         postData({
             url: window.loft.apiserver + "sign-in",
-            params: {
+            data: {
                 username:  document.querySelector("#login").value,
                 password:   document.querySelector("#pass").value
             },

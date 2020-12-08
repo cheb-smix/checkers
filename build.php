@@ -55,18 +55,7 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "3")) {
 
 
 if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "4")) {
-    echo "4. Rebuilding build/static/js/main.*.chunk.js*\n";
-    $files = getFolderFilesByMask("./build/static/js/", "main.*.chunk.js*");
-    foreach ($files as $i => $file) {
-        $content = file_get_contents($file);
-        $content = str_replace('"/music/', '"music/', $content);
-        file_put_contents($file, $content);
-    }
-}
-
-
-if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "5")) {
-    echo "5. Removing subfolder of cordova/www/\n";
+    echo "4. Removing subfolder of cordova/www/\n";
     $files = scandir("{$cordova_workfolder}www");
     foreach ($files as $i => $file) {
         if ($file != "." && $file != ".." && is_dir("{$cordova_workfolder}www" . DIRECTORY_SEPARATOR .$file) && !is_link("{$cordova_workfolder}www/$file"))
@@ -75,16 +64,16 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "5")) {
 }
 
 
-if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "6")) {
-    echo "6. Copy build folder to cordova/www\n";
+if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "5")) {
+    echo "5. Copy build folder to cordova/www\n";
     echo `mv ./build ./www`;
     echo `cp -r ./www {$cordova_workfolder}`;
     echo `mv ./www ./build`;
 }
 
 
-if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "7")) {
-    echo "7. Cordova build\n";
+if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "6")) {
+    echo "6. Cordova build\n";
     $res = `cd {$cordova_workfolder}
     cordova build`;
 

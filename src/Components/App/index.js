@@ -84,19 +84,18 @@ export default class App extends React.Component{
 
     componentDidMount() {
         let state = {};
-        let param = {action:"checkcheck"};
-        if(window.loft.usersettings.atoken !== ""){
-            param = {action:"auth", token: window.loft.usersettings.atoken};
-        }
+        let data = {};
+        if (window.loft.usersettings.atoken !== "") data = { token: window.loft.usersettings.atoken };
         
         postData({
             url: window.loft.apiserver + "config",
-            param: param,
-            success: (data)=>{
-                alert(JSON.stringify(data));
-                this.initiation(state, data);
+            data: data,
+            success: (res)=>{
+                alert(JSON.stringify(res));
+                this.initiation(state, res);
             },
-            error: ()=>{
+            error: (res)=>{
+                alert(JSON.stringify(res));
                 this.initiation(state);
             }
         });
@@ -277,33 +276,6 @@ export default class App extends React.Component{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /*XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState !== 4) return false;
-            if (xhr.status !== 200) {
-                console.log(xhr.status + ': ' + xhr.statusText);
-                onerror();
-            } else {
-                let data = xhr.responseText;
-                if(responseType==="json"){
-                    try {
-                        data = JSON.parse(data);
-                        console.log(data);
-                    } catch(e) {
-                        console.log(e,data);
-                    }
-                }
-                onsuccess(data);
-            }
-        }
-        if(typeof(params) === "object") params = this.object2string(params);
-        console.log(params);
-        xhr.send(params);
-    }*/
-
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
         
@@ -445,12 +417,12 @@ export default class App extends React.Component{
         };
         postData({
             url: window.loft.apiserver + "set-step",
-            param: postdata,
-            success: (data)=>{
-                if(data.success){
+            data: postdata,
+            success: (res)=>{
+                if(res.success){
                     if(this.state.game_id===0){
-                        if(data.data.game_id){
-                            this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
+                        if(res.data.game_id){
+                            this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
                         }else{
                             this.setMazafuckinState({AjaxAvailable: false});
                         } 
@@ -469,13 +441,13 @@ export default class App extends React.Component{
         };
         postData({
             url: window.loft.apiserver + "get-bot-step",
-            param: postdata,
-            success: (data)=>{
-                if(!data.success){
+            data: postdata,
+            success: (res)=>{
+                if(!res.success){
                     this.iiStep(color);
                 }else{
-                    if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
-                        this.doStep(data.data.to, data.data.from, true, null);
+                    if(this.state.cells[res.data.from].color===color && typeof(this.state.cells[res.data.from].possibilities[res.data.to])!=="undefined"){
+                        this.doStep(res.data.to, res.data.from, true, null);
                     }else{
                         this.iiStep(color);
                     }
