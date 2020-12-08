@@ -37,6 +37,7 @@ let strings = new LocalizedStrings({
         difficultyLevel2:   "Medium",
         difficultyLevel3:   "Hard",
         soundSetting:       "Sounds volume",
+        fanfarasSetting:    "Fanfare volume",
         musicSetting:       "Music volume",
         // Fanfaras
         congratulations:    "Congratulations!",
@@ -145,6 +146,7 @@ let strings = new LocalizedStrings({
         difficultyLevel2:   "Средне",
         difficultyLevel3:   "Сложно",
         soundSetting:       "Громкость звуков",
+        fanfarasSetting:    "Громкость фанфар",
         musicSetting:       "Громкость музыки",
         // Fanfaras
         congratulations:    "Поздравляем!",

@@ -2,35 +2,41 @@ let type = "xhr";
 
 export default function postData(obj = {})
 {
+    let o = {url: "", data: {}, success: () => {}, error: () => {}, dataType: "json", method: "POST", headers: {}};
+    for (let k in obj) o[k] = obj[k];
+    
+    o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
+    if (Object.keys(window.loft.device) > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    
+    console.log("using", type, o);
+
     if (type === "fetch") {
-        return fatch(obj); // Fetch is not supported on cordova
+        return fatch(o); // Fetch is not supported on cordova
     } else if (type === "xhr") {
-        return xhr(obj);
+        return xhr(o);
     }
 }
 
-function xhr(obj = {})
+function xhr(o = {})
 {
-    let o = {url: "", params: "", success: () => {}, error: () => {}, responseType: "json", method: "POST", device: {}};
-    for (let k in obj) o[k] = obj[k];
-
-    //console.log(o);
-
-    const xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
     xhr.open(o.method, o.url, true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    if (Object.keys(o.device) > 0) xhr.setRequestHeader('App-User-Agent', JSON.stringify(o.device));
+
+    for (let h in o.headers) xhr.setRequestHeader(h, o.headers[h]);
 
     xhr.onreadystatechange = () => {
         if (xhr.readyState !== 4) return false;
-        console.log(xhr.getAllResponseHeaders());
-        if (xhr.status !== 200) {
+        
+        if (xhr.status !== 200 && xhr.status !== 0) {
+
             console.log(xhr.status + ': ' + xhr.statusText);
             alert(o.url + '. ' + xhr.status + ': ' + xhr.statusText);
             o.error();
+
         } else {
+            
             let data = xhr.responseText;
-            if(o.responseType==="json"){
+            if(o.dataType==="json"){
                 try {
                     data = JSON.parse(data);
                     //console.log(data);
@@ -39,32 +45,25 @@ function xhr(obj = {})
                 }
             }
             o.success(data);
+
         }
     }
-    if(typeof(o.params) === "object") o.params = object2string(o.params);
-    //console.log(params);
-    xhr.send(o.params);
+    if(typeof(o.data) === "object") o.data = object2string(o.data);
+    //console.log(data);
+    xhr.send(o.data);
 }
 
-async function fatch(obj = {})
+async function fatch(o = {})
 {
-    let o = {url: "", params: "", success: () => {}, error: () => {}, responseType: "json", method: "POST", device: {}, headers: {}};
-    for (let k in obj) o[k] = obj[k];
-
-    console.log(o);
-
-    o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
-    if (Object.keys(o.device) > 0) o.headers["App-User-Agent"] = JSON.stringify(o.device);
-
     let response = await fetch(o.url, {
         method: o.method,
         headers: o.headers,
-        body: object2string(o.params),
+        body: object2string(o.data),
     });
 
     if (response.ok) {
         let res = "";
-        if (o.responseType==="json") {
+        if (o.dataType==="json") {
             try {
                 res = await response.json();
             } catch(e) {

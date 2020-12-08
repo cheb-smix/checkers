@@ -11,7 +11,7 @@ export default class Button extends React.Component{
         if (this.props.action !== "") {
             this.props.action();
         }
-        if (this.props.href !== "") Routing(this.props.href, this.props.history);
+        if (this.props.href !== "") Routing(this.props.href);
     }
 
     render(){

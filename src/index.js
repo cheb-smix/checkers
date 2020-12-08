@@ -7,6 +7,7 @@ import App from './App.js';
 
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
+import { Settings } from './Components/Setting/index.js';
 
 
 let device = {};
@@ -25,17 +26,21 @@ function onResume()
     if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").pause();
 }
 
-const history = window.cordova ? createHashHistory() : createBrowserHistory();
+window.loft = {
+    wsserver: "wss://ws.smix-soft.ru:8080",
+    apiserver: "https://smix-soft.ru/api/v2/game/",
+    device: device,
+    settings: new Settings(),
+    history: window.cordova ? createHashHistory() : createBrowserHistory(),
+    sounds: {},
+};
 
-
-let wsserver = `wss://ws.smix-soft.ru:8080`;
-let apiserver = `https://smix-soft.ru/api/v2/game/`;
+window.loft.usersettings = window.loft.settings.getSettings();
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
-    wsserver = "ws://192.168.31.168:7777";
-    apiserver = "http://192.168.31.168:3333/game/";
+    window.loft.wsserver = "ws://192.168.31.168:7777";
+    window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
-apiserver = "http://localhost:3333/";
 
 //alert(JSON.stringify([apiserver, window.location.hostname]));
 
@@ -84,8 +89,8 @@ Math.pifagorColored = (c1,c2,color="any") => {
 
 
 ReactDOM.render(
-    <Router history={history}>
-      <App device={device} wsserver={wsserver} apiserver={apiserver}/>
+    <Router history={window.loft.history}>
+      <App/>
     </Router>
     ,
     document.getElementById('root')

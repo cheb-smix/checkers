@@ -3,10 +3,14 @@ let noiseTypes = {
     medium: 3,
     hard: 1,
 };
+let fanfaras = ["draw", "victory", "fail", "epic", "epic-rock"];
 
-export default function Noise(type = "soft", volume = false) {
+export default function Noise(type = "soft") {
 
-    volume = volume === false ? document.querySelector("#soundplayer").volume : volume;
+    let volume = window.loft.usersettings.soundvolume / 100;
+    if (fanfaras.indexOf(type) >= 0) {
+        volume = window.loft.usersettings.fanfaravolume / 100;
+    }
     if (volume === 0) return;
 
     volume /= 2;
@@ -22,7 +26,9 @@ export default function Noise(type = "soft", volume = false) {
     }
     src = "sound/" + src;
 
-    let a = new Audio(src);
-    a.volume = volume;
-    a.play();
+    if (typeof(window.loft.sounds[src]) === "undefined") { // lazy loading =)
+        window.loft.sounds[src] = new Audio(src);
+    }
+    window.loft.sounds[src].volume = volume;
+    window.loft.sounds[src].play();
 }

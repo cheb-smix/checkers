@@ -7,7 +7,6 @@ import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
 import Lang from '../../Funcs/Lang';
 import Button from '../Button';
-import { Settings } from '../Setting';
 import postData from '../../Funcs/PostDataFuncs';
 
 import './app.css';
@@ -45,9 +44,6 @@ export default class App extends React.Component{
             possibilities: 10,
         },
         game: window.location.href.split("/").pop(),
-        /* USER PREFERENCES */
-        settings: new Settings(),
-        usersettings: {},
         /* TECH INFO */
         selectedChecker: false,
         playersStep: true,
@@ -88,21 +84,18 @@ export default class App extends React.Component{
 
     componentDidMount() {
         let state = {};
-        state.usersettings = this.state.settings.getSettings();
-        let param = {action:"checkcheck"};
-        if(state.usersettings.atoken !== ""){
-            param = {action:"auth",token:state.usersettings.atoken};
-        }
+        let data = {};
+        if (window.loft.usersettings.atoken !== "") data = { token: window.loft.usersettings.atoken };
         
         postData({
-            url: this.props.apiserver + "config",
-            param: param,
-            device: this.props.device,
-            success: (data)=>{
-                alert(JSON.stringify(data));
-                this.initiation(state, data);
+            url: window.loft.apiserver + "config",
+            data: data,
+            success: (res)=>{
+                alert(JSON.stringify(res));
+                this.initiation(state, res);
             },
-            error: ()=>{
+            error: (res)=>{
+                alert(JSON.stringify(res));
                 this.initiation(state);
             }
         });
@@ -110,7 +103,7 @@ export default class App extends React.Component{
 
     initiation = (state, data = false) => {
         let {playerInfo, opponentInfo} = this.state;
-        if(state.usersettings.atoken!=="" && data){
+        if(window.loft.usersettings.atoken!=="" && data){
             if(data.success){
                 playerInfo.signed = true;
                 playerInfo.name = data.data.name;
@@ -120,7 +113,7 @@ export default class App extends React.Component{
                 this.saveSettingsOption("atoken");
             }
         }
-        if(state.usersettings.mode === "online") this.connectSocket();
+        if(window.loft.usersettings.mode === "online") this.connectSocket();
         if(data){
             state.writesteps = data.WriteSteps;
             state.writestats = data.WriteStats;
@@ -133,7 +126,7 @@ export default class App extends React.Component{
 
         state.playerInfo = playerInfo;
 
-        if (state.usersettings.mode === "bot") {
+        if (window.loft.usersettings.mode === "bot") {
             if (Math.random() > 0.5) {
                 state.playerInfo.color = "white";
                 opponentInfo.color = "black";
@@ -283,37 +276,10 @@ export default class App extends React.Component{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    /*XMLHR = (params="",onsuccess=()=>{},onerror=()=>{},responseType="json",method="POST",url=`//${server}/api/r.php`) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState !== 4) return false;
-            if (xhr.status !== 200) {
-                console.log(xhr.status + ': ' + xhr.statusText);
-                onerror();
-            } else {
-                let data = xhr.responseText;
-                if(responseType==="json"){
-                    try {
-                        data = JSON.parse(data);
-                        console.log(data);
-                    } catch(e) {
-                        console.log(e,data);
-                    }
-                }
-                onsuccess(data);
-            }
-        }
-        if(typeof(params) === "object") params = this.object2string(params);
-        console.log(params);
-        xhr.send(params);
-    }*/
-
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
         if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
         
-        if(this.state.usersettings.animation==='0'){
+        if(window.loft.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
         }else{
             this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
@@ -406,6 +372,7 @@ export default class App extends React.Component{
         }
         let newstate = {}
         if(steps>2) newstate = this.rampage(steps, "", true);
+        Noise(steps);
 
         newstate.playerInfo = playerInfo;
         newstate.opponentInfo = opponentInfo;
@@ -449,14 +416,13 @@ export default class App extends React.Component{
             gtoken: this.state.gtoken,
         };
         postData({
-            url: this.props.apiserver + "set-step",
-            param: postdata,
-            device: this.props.device,
-            success: (data)=>{
-                if(data.success){
+            url: window.loft.apiserver + "set-step",
+            data: postdata,
+            success: (res)=>{
+                if(res.success){
                     if(this.state.game_id===0){
-                        if(data.data.game_id){
-                            this.setMazafuckinState({game_id: data.data.game_id, gtoken: data.data.gtoken});
+                        if(res.data.game_id){
+                            this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
                         }else{
                             this.setMazafuckinState({AjaxAvailable: false});
                         } 
@@ -474,15 +440,14 @@ export default class App extends React.Component{
             color: color[0]
         };
         postData({
-            url: this.props.apiserver + "get-bot-step",
-            param: postdata,
-            device: this.props.device,
-            success: (data)=>{
-                if(!data.success){
+            url: window.loft.apiserver + "get-bot-step",
+            data: postdata,
+            success: (res)=>{
+                if(!res.success){
                     this.iiStep(color);
                 }else{
-                    if(this.state.cells[data.data.from].color===color && typeof(this.state.cells[data.data.from].possibilities[data.data.to])!=="undefined"){
-                        this.doStep(data.data.to, data.data.from, true, null);
+                    if(this.state.cells[res.data.from].color===color && typeof(this.state.cells[res.data.from].possibilities[res.data.to])!=="undefined"){
+                        this.doStep(res.data.to, res.data.from, true, null);
                     }else{
                         this.iiStep(color);
                     }
@@ -496,7 +461,7 @@ export default class App extends React.Component{
 
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === "in_game") || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === "in_game"));
         
-        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && this.state.usersettings.mode === "bot"){
+        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
             setTimeout(()=>{
 
                 if(this.state.AjaxAvailable && !this.state.autochess){
@@ -531,11 +496,16 @@ export default class App extends React.Component{
         let dy = y1 - (y1 - y2) / 2;
 
         if (index === steps - 1 && steps > this.state.epicstepnum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
-
+            
+            if (steps > this.state.epicstepnum + 2 || Math.random() > 0.5) {
+                Noise("epic-rock");
+            } else {
+                Noise("epic");
+            }
             stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1.5)`;
             stepper.className = stepper.className.replace(" animated", "") + " animated";
 
-            await this.sleep(1000);
+            await this.sleep(1200);
 
             stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`;
             stepper.className = stepper.className.replace(" animated", "");
@@ -582,16 +552,16 @@ export default class App extends React.Component{
         stepper.style.transition = t+"ms transform ease-out";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
-        Noise("soft");
 
         if (index === steps - 1) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-            Noise(steps);
             return; // end of default last step
         } 
+
+        Noise("soft");
 
         index++;
 
@@ -643,7 +613,7 @@ export default class App extends React.Component{
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
                         newselectedChecker = koords;
                     }
-                    Noise("soft");
+                    Noise("checker-take");
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
                 }else{
                     //Trying to do a step
@@ -714,22 +684,22 @@ export default class App extends React.Component{
     consoleLog = (text) => {
         this.setMazafuckinState({consoleText: text});
     }
-
+/*
     updateSetting = (key, val) => {
         console.log("state updated");
         let {usersettings} = this.state;
         usersettings[key] = val;
         this.setState({usersettings: usersettings});
     }
-
+*/
     socketSend = (param) => {
         console.log(param);
         this.socket.send(JSON.stringify(param));
     }
 
     connectSocket = () => {
-        console.log(`Connecting socket ${this.props.wsserver}`);
-        this.socket = new WebSocket(this.props.wsserver);
+        console.log(`Connecting socket ${window.loft.wsserver}`);
+        this.socket = new WebSocket(window.loft.wsserver);
         this.socket.onopen = () => {
             this.consoleLog(Lang("connected"));
             this.setMazafuckinState({socketOpened: true});
@@ -799,10 +769,10 @@ export default class App extends React.Component{
     }
 
     suggestNewOneGame = (text="") => {
-        this.props.showModal(
+        window.loft.showModal(
             <div>
-                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" history="" value={Lang("noText")} />
-                <Button action={()=>this.searchNewOpponent()} href="" history="" value={Lang("yesText")} />
+                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
+                <Button action={()=>this.searchNewOpponent()} href="" value={Lang("yesText")} />
             </div>,
             text + "<br />" + Lang("findAnewGame")
         );
@@ -928,7 +898,6 @@ export default class App extends React.Component{
         return (
             <div className="ucon">
                 <AppHeader 
-                        history={this.props.history} 
                         gamename={this.state.game} 
                         playerName={this.state.playerInfo.name}
                         playerColor={this.state.playerInfo.color}
@@ -939,13 +908,9 @@ export default class App extends React.Component{
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
                         serverInfo={this.state.serverInfo}
-                        showModal={this.props.showModal}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
-                        usersettings={this.state.usersettings}
-                        device={this.props.device}
-                        apiserver={this.props.apiserver}
                         quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
@@ -963,8 +928,6 @@ export default class App extends React.Component{
                             quit={this.quit}
                             updatePI={this.updatePI}
                             rampage={this.rampage}
-                            device={this.props.device}
-                            apiserver={this.props.apiserver}
                             showBestMove={this.showBestMove}
                     />
                     </div>

@@ -10,7 +10,7 @@ import {
 import Home from "./Components/Home";
 import Corners from "./Components/Gameslogic/corners";
 import Checkers from "./Components/Gameslogic/checkers";
-import Setting, { Settings } from './Components/Setting';
+import Setting from './Components/Setting';
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
@@ -19,7 +19,6 @@ import Noise from './Funcs/Noise';
 class App extends Component{
 
     state = {
-        settings: new Settings(),
         playlist: [
             "music/sadness_and_hate.mp3",
             "music/hidden_inside.mp3",
@@ -28,8 +27,7 @@ class App extends Component{
         ],
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
-        },
-        device: this.props.device
+        }
     }
 
     hideModal = () => {
@@ -67,9 +65,7 @@ class App extends Component{
     }
 
     componentDidMount = () => {
-        let usersettings = this.state.settings.getSettings();
-        document.querySelector("#musicplayer").volume = usersettings.musicvolume / 100;
-        document.querySelector("#soundplayer").volume = usersettings.soundvolume / 100;
+        document.querySelector("#musicplayer").volume = window.loft.usersettings.musicvolume / 100;
         this.setNewTrack();
         document.querySelector("#musicplayer").addEventListener("ended", this.setNewTrack);
         document.querySelector(".App-logo").style.top = "15vh";
@@ -81,18 +77,18 @@ class App extends Component{
                 else navigator.app.backHistory();
             }, false);
         }
+        window.loft.showModal = this.showModal;
+        window.loft.nextTrack = this.setNewTrack;
     }
 
-    render() {
-        const { history } = this.props
-  
+    render() {  
         return (
             <React.Fragment>
             <Switch>
-                <Route history={history} path='/home' render={(props) => <Home {...props} {...this.props} showModal={this.showModal}/>} />
-                <Route history={history} path='/checkers' render={(props) => <Checkers {...props} {...this.props} showModal={this.showModal}/>} />
-                <Route history={history} path='/corners' render={(props) => <Corners {...props} {...this.props} showModal={this.showModal}/>} />
-                <Route history={history} path='/settings' render={(props) => <Setting {...props} {...this.props} showModal={this.showModal}/>} />
+                <Route path='/home' render={(props) => <Home {...props} />} />
+                <Route path='/checkers' render={(props) => <Checkers {...props} />} />
+                <Route path='/corners' render={(props) => <Corners {...props} />} />
+                <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
                 <Redirect from='/' to='/home'/>
             </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>

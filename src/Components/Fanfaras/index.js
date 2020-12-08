@@ -3,6 +3,7 @@ import postData from '../../Funcs/PostDataFuncs';
 import Lang from '../../Funcs/Lang';
 import Button from '../Button';
 import "./fanfara.css";
+import Noise from '../../Funcs/Noise';
 
 export default class Fanfara extends React.Component{
 
@@ -15,7 +16,7 @@ export default class Fanfara extends React.Component{
 
         postData({
             url: this.props.apiserver + "get-stat",
-            params: { username: this.props.playerInfo.login },
+            data: { username: this.props.playerInfo.login },
             device: this.props.device,
             success: (data)=>{
                 this.setState({animated:true});
@@ -103,7 +104,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={()=>{this.props.quit(false)}} 
                             href="" 
-                            history="" 
                             value={Lang("closeText")} 
                             theme="grey"
                             strong="true"
@@ -113,7 +113,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.continueWithSameOpponent} 
                             href="" 
-                            history="" 
                             value={Lang("continueWith").replace("$", opponentInfo.name)} 
                             theme="neon"
                             strong="true"
@@ -123,7 +122,6 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.searchNewOpponent} 
                             href="" 
-                            history="" 
                             value={Lang("searchAnotherEnemy")} 
                             theme="neon"
                             strong="true"
@@ -150,6 +148,8 @@ export default class Fanfara extends React.Component{
             if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
             podtext += " ("+opercent+"%)!";
             gonnashow = true;
+
+            Noise("victory");
         }
         if(playerInfo.status==="looser"){
             header = Lang("regrets");
@@ -163,15 +163,19 @@ export default class Fanfara extends React.Component{
                 podtext = Lang("youveBeenCornered");
             }
             gonnashow = true;
+
+            Noise("fail");
         }
         if(playerInfo.status==="done" && opponentInfo.status==="done" /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
             header = Lang("noBadText");
             podtext = Lang("betterThanNothing");
             gonnashow = true;
+            Noise("draw");
         }
         if(playerInfo.status==="done" && opponentInfo.status!=="done" && playerInfo.done === 12){
             header = Lang("congratulations");
             text = <p>{Lang("lastEnemyStep")}</p>
+            Noise("warning");
         }else{
             text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
         }

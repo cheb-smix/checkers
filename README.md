@@ -3,6 +3,7 @@
 - Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
 - Install cordova-plugin-device and cordova-plugin-whitelist
+- Set android:usesCleartextTraffic="true" at android manifest
 - Configure config.xml
 - Add platforms (android, ios)
 
@@ -10,39 +11,40 @@
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
-4. build/static/js/main.*.chunk.js* > "/music/" to "music/"
-5. remove folders in cordova/www/ (music, static, sound)
-6. copy build folder to cordova/www
-7. cordova build
+4. remove folders in cordova/www/ (music, static, sound)
+5. copy build folder to cordova/www
+6. cordova build
 
 # Запуск автобилдера (При первом запуске запросит рабочую папку cordova)
 php build.php (workfolder=...) (steps=1234567)
 
 # TODO
-0. Нужны звуки: EpicMove (rotation, hit and checkers jumping), Rampage, Victory, Fail, Draw.
-0. Новое API на Yii2, новая логика бэкенда, реализация WS и API в одном проекте, WS на consik/yii2-websocket
+0. Нужны звуки: Rampage.
+0. Реализация WS на consik/yii2-websocket в одном проекте вместе с API
 1. Вынести авторизацию / регистрацию / вход / аккаунт в отдельный компонент ? Чтобы не дублировать ? Или не стоит?
+2. Вынести сокет в глобаль?
 3. Локализация API (либо заблаговременно подготовленные здесь ответы API)
 4. Вывести опыт в видное место
-5. Внутриигровая валюта?
-5. Скины ?) Лол
-8. Придумать реализацию режима bluetooth вместо local
-9. Реклама
+5. Придумать реализацию режима bluetooth вместо local
+
+-  Отрендерить нормальную иконку!
+-  Реклама
 -  Реализация в уголках схожей логики анализа будущих ходов как и в шашках.
 -  Правила игры с локализацией
 -  Испанский язык? Португальский? Немецкий? Французский? Китайский? Итальянский?
 -  cordova-plugin-vibration?
 -  https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-network-information/index.html
 -  Оптимизация RAMPAGE 
+-  Внутриигровая валюта?
+-  Скины ?) Лол
 
 # Баги
-- Ajax не работает в cordova 
 - Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket
-- Проблемы авторизации
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 
 # Баги/Фичи на проверке
--
+- Ajax теперь проходит в cordova!
+- Авторизация и сохранение куки осуществляется!
 
 # Выполнено / исправлено
 + Заставка
@@ -98,3 +100,55 @@ php build.php (workfolder=...) (steps=1234567)
 + Кнопка назад на главной странице теперь закрывает приложение
 + Modal теперь закрывается при переходах
 + Звуки добавлены в геймплей
++ Некоторые переменные вынесены в глобаль для упрощения зависимостей и уменьшения количества вызовов одного и того же
++ Звуки добавлены в глобаль для предотвращения повторных загрузок
++ Для звуков реализована ленивая загрузка
++ Добавлены звуки эпик-хода и фанфар
++ Небольшая реструктуризация настроек
+
+
+
+
+
+
+
+
+
+
+# Cordova config
+
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="ru.smixsoft.checkers" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Checkers</name>
+    <description>
+        Checkers Giveaway Corners Checkmates 4 in 1
+    </description>
+    <author email="admin@smix-soft.ru" href="https://smix-soft.ru">
+        SmixSoft
+    </author>
+    <content src="index.html" />
+    <!--access origin="http://192.168.31.168/*"/>
+    <access origin="http://192.168.31.168:3333/*"/>
+    <access origin="http://smix-soft.ru/*"/>
+    <access origin="https://smix-soft.ru/*"/-->
+    <access origin="" />
+    <!--allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" /-->
+    <allow-navigation href="http://*/*" />
+    <allow-navigation href="https://*/*" />
+    <allow-navigation href="data:*" />
+    <plugin name="cordova-plugin-device" spec="^2.0.3" />
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.4" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+    <icon src="checker.png" />
+</widget>
