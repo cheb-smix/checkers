@@ -66,7 +66,6 @@ class App extends Component{
 
     componentDidMount = () => {
         document.querySelector("#musicplayer").volume = window.loft.usersettings.musicvolume / 100;
-        document.querySelector("#soundplayer").volume = window.loft.usersettings.soundvolume / 100;
         this.setNewTrack();
         document.querySelector("#musicplayer").addEventListener("ended", this.setNewTrack);
         document.querySelector(".App-logo").style.top = "15vh";
@@ -79,6 +78,7 @@ class App extends Component{
             }, false);
         }
         window.loft.showModal = this.showModal;
+        window.loft.nextTrack = this.setNewTrack;
     }
 
     render() {  
@@ -88,7 +88,7 @@ class App extends Component{
                 <Route path='/home' render={(props) => <Home {...props} />} />
                 <Route path='/checkers' render={(props) => <Checkers {...props} />} />
                 <Route path='/corners' render={(props) => <Corners {...props} />} />
-                <Route path='/settings' render={(props) => <Setting {...props} />} />
+                <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
                 <Redirect from='/' to='/home'/>
             </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>

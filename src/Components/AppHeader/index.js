@@ -1,7 +1,6 @@
 import React from 'react';
 import "./appheader.css";
 import Droplist from "../Droplist";
-import Slider from "../Slider";
 import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Funcs/Lang';
@@ -9,14 +8,13 @@ import postData from '../../Funcs/PostDataFuncs';
 import Cookie from '../../Funcs/Cookie';
 import Routing from '../../Funcs/Routing';
 import Noise from '../../Funcs/Noise';
+import Setting from '../Setting';
 
 export default class AppHeader extends React.Component{
 
     state = {
         naviActive: null
     }
-
-    
 
     gameChoice = () => {
         let doptext = "";
@@ -133,56 +131,7 @@ export default class AppHeader extends React.Component{
 
 
     settingsClick = () => {
-        window.loft.showModal(
-            <div className="container">
-                <div className="row">
-                    <div className="col-md-6 col-12">
-                        <Droplist
-                            id="animation"
-                            items={{"2":Lang("animationLevel2"),"1":Lang("animationLevel1"),"0":Lang("animationLevel0")}}
-                            selected={window.loft.usersettings.animation}
-                            placeholder={Lang("animationSetting")}
-                            onSelect={this.saveSetting}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Droplist
-                            id="difficulty"
-                            items={{"3":Lang("difficultyLevel3"),"2":Lang("difficultyLevel2"),"1":Lang("difficultyLevel1")}}
-                            selected={window.loft.usersettings.difficulty}
-                            placeholder={Lang("difficultySetting")}
-                            onSelect={this.saveSetting}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Slider
-                            id="soundvolume"
-                            placeholder={Lang("soundSetting")}
-                            value={window.loft.usersettings.soundvolume}
-                            onSet={this.saveSetting}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Slider
-                            id="musicvolume"
-                            placeholder={Lang("musicSetting")}
-                            value={window.loft.usersettings.musicvolume}
-                            onSet={this.saveSetting}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Button
-                            action={this.dropSettings} 
-                            href="" 
-                            value={Lang("returnDefaults")} 
-                            theme="neon"
-                            strong="true"
-                        />
-                    </div>
-                </div>
-            </div>,
-            Lang("settingsText")
-        );
+        window.loft.showModal(<Setting modal="true" />, Lang("settingsText"));
     }
     showAccStat = () => {
         let s = this.props.playerStat;

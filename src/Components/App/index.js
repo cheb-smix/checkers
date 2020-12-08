@@ -400,6 +400,7 @@ export default class App extends React.Component{
         }
         let newstate = {}
         if(steps>2) newstate = this.rampage(steps, "", true);
+        Noise(steps);
 
         newstate.playerInfo = playerInfo;
         newstate.opponentInfo = opponentInfo;
@@ -523,11 +524,16 @@ export default class App extends React.Component{
         let dy = y1 - (y1 - y2) / 2;
 
         if (index === steps - 1 && steps > this.state.epicstepnum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
-
+            
+            if (steps > this.state.epicstepnum + 2 || Math.random() > 0.5) {
+                Noise("epic-rock");
+            } else {
+                Noise("epic");
+            }
             stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1.5)`;
             stepper.className = stepper.className.replace(" animated", "") + " animated";
 
-            await this.sleep(1000);
+            await this.sleep(1200);
 
             stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`;
             stepper.className = stepper.className.replace(" animated", "");
@@ -580,7 +586,6 @@ export default class App extends React.Component{
             stepper.style.transition = "none";
             checker.style.opacity = 1;
             this.theStep(koordsto,koordsfrom,newPlayersStep);
-            Noise(steps);
             return; // end of default last step
         } 
 
@@ -636,7 +641,7 @@ export default class App extends React.Component{
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
                         newselectedChecker = koords;
                     }
-                    Noise("soft");
+                    Noise("checker-take");
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
                 }else{
                     //Trying to do a step

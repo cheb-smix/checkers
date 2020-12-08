@@ -3,10 +3,14 @@ let noiseTypes = {
     medium: 3,
     hard: 1,
 };
+let fanfaras = ["draw", "victory", "fail", "epic", "epic-rock"];
 
-export default function Noise(type = "soft", volume = false) {
+export default function Noise(type = "soft") {
 
-    volume = volume === false ? document.querySelector("#soundplayer").volume : volume;
+    let volume = window.loft.usersettings.soundvolume / 100;
+    if (fanfaras.indexOf(type) >= 0) {
+        volume = window.loft.usersettings.fanfaravolume / 100;
+    }
     if (volume === 0) return;
 
     volume /= 2;

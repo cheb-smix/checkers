@@ -11,6 +11,7 @@ export class Settings{
         this.usersettings = {
             animation: 1,
             difficulty: 1,
+            fanfaravolume: 70,
             soundvolume: 70,
             musicvolume: 70,
             mode: "bot",
@@ -21,6 +22,7 @@ export class Settings{
         this.defaultusersettings = {
             animation: 1,
             difficulty: 1,
+            fanfaravolume: 70,
             soundvolume: 70,
             musicvolume: 70,
             mode: "bot",
@@ -35,7 +37,6 @@ export class Settings{
             this.saveSetting(i, this.defaultusersettings[i]);
         }
         document.querySelector("#musicplayer").volume = this.defaultusersettings.musicvolume / 100;
-        document.querySelector("#soundplayer").volume = this.defaultusersettings.soundvolume / 100;
         return this.defaultusersettings;
     }
 
@@ -59,11 +60,13 @@ export class Settings{
         if (key === "musicvolume") {
             let musicplayer = document.querySelector("#musicplayer");
             musicplayer.volume = value / 100;
-            if (value > 0 && musicplayer.paused) musicplayer.play();
+            if (value > 0 && musicplayer.paused) {
+                if (!musicplayer.src) window.loft.nextTrack();
+                musicplayer.play();
+            }
             if (value === 0 && !musicplayer.paused) musicplayer.pause();
             
         }
-        if (key === "soundvolume") document.querySelector("#soundplayer").volume = value / 100;
     }
 
     getSettings = (key = false) => {
@@ -74,10 +77,13 @@ export class Settings{
 }
 
 export default class Setting extends React.Component{
+    state = {
+        modal: (typeof(this.props.modal) === "undefined" || this.props.modal !== false)
+    }
     render(){
         return (
-            <div className="container" id="btnContainer">
-                <h5 className="neon">{Lang("settingsText")}</h5>
+            <div className="container" id={this.state.modal === false ? 'btnContainer' : 'modalSettingsContainer'} >
+                {this.state.modal === false ? <h5 className="neon">{Lang("settingsText")}</h5> : ""}
                 <div className="row">
                     <div className="col-md-6 col-12">
                         <Droplist
@@ -107,6 +113,14 @@ export default class Setting extends React.Component{
                     </div>
                     <div className="col-md-6 col-12">
                         <Slider
+                            id="fanfaravolume"
+                            placeholder={Lang("fanfarasSetting")}
+                            value={window.loft.usersettings.fanfaravolume}
+                            onSet={window.loft.settings.saveSetting}
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Slider
                             id="musicvolume"
                             placeholder={Lang("musicSetting")}
                             value={window.loft.usersettings.musicvolume}
@@ -115,14 +129,14 @@ export default class Setting extends React.Component{
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
-                            action={this.dropSettings} 
+                            action={window.loft.settings.dropSettings} 
                             href="/home" 
                             value={Lang("returnDefaults")} 
                             theme="neon"
                             strong="true"
                         />
                     </div>
-                    <div className="col-md-6 col-12">
+                    {this.state.modal === false ? <div className="col-md-6 col-12">
                         <Button
                             action="" 
                             href="/home" 
@@ -130,7 +144,7 @@ export default class Setting extends React.Component{
                             theme="grey"
                             strong="true"
                         />
-                    </div>
+                    </div> : ""}
                 </div>
             </div>
         );
