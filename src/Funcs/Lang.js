@@ -223,5 +223,5 @@ let strings = new LocalizedStrings({
 
 export default function Lang(key)
 {
-    return strings[key];
+    return strings[key] ?? key;
 }
