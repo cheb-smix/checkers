@@ -3,6 +3,7 @@ import Button from '../Button';
 import Lang from '../../Funcs/Lang';
 import Droplist from '../Droplist';
 import { Settings } from '../Setting';
+import Acc from '../../Funcs/Acc';
 
 export default class Home extends React.Component{
 
@@ -42,6 +43,7 @@ export default class Home extends React.Component{
     }
 
     render(){
+        let acc = new Acc(this.props.setAppState);
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated">
                 <h5 onClick={this.gameChoice}>{Lang(this.getGame() + "GameName")}</h5>
@@ -60,7 +62,16 @@ export default class Home extends React.Component{
                     href={this.getGameRoute()} 
                     value={Lang("playOnlineGame")} 
                 />
-                <Button action="" href="" value={Lang("signInText")} />
+                {
+                    this.props.isGuest 
+                    ? 
+                    <Button action={acc.signIn} href="" value={Lang("signInText")} /> 
+                    : 
+                    <React.Fragment>
+                        <Button action={acc.showAccStat} href="" value={window.loft.user_info.display_name} /> 
+                        <Button action={acc.signOut} href="" value={Lang("signOutText")} /> 
+                    </React.Fragment>
+                } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
             </div>
         );

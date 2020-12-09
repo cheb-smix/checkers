@@ -74,55 +74,29 @@ export default class App extends React.Component{
         },
         
         /* DEV FIELDS */
-        debug: false,
+        debug: window.loft.config.Debug,
         autochess: false,
-        writesteps: false,
-        writestats: false,
+        writesteps: window.loft.config.WriteSteps,
+        writestats: window.loft.config.WriteStats,
         game_id: 0,
         gtoken: "",
     };
 
     componentDidMount() {
-        let state = {};
-        let data = {};
-        if (window.loft.usersettings.atoken !== "") data = { token: window.loft.usersettings.atoken };
-        
-        postData({
-            url: window.loft.apiserver + "config",
-            data: data,
-            success: (res)=>{
-                alert(JSON.stringify(res));
-                this.initiation(state, res);
-            },
-            error: (res)=>{
-                alert(JSON.stringify(res));
-                this.initiation(state);
-            }
-        });
+        console.log(window.loft);
+        this.initiation({});
     }
 
-    initiation = (state, data = false) => {
+    initiation = (state) => {
         let {playerInfo, opponentInfo} = this.state;
-        if(window.loft.usersettings.atoken!=="" && data){
-            if(data.success){
-                playerInfo.signed = true;
-                playerInfo.name = data.data.name;
-                playerInfo.login = data.data.login;
-                playerInfo.statistics = data.data;
-            }else{
-                this.saveSettingsOption("atoken");
-            }
+        if(!window.loft.isGuest){
+            playerInfo.signed = true;
+            playerInfo.name = window.loft.user_info.display_name;
+            playerInfo.login = window.loft.user_info.username;
+            playerInfo.statistics = window.loft.user_info.stat;
         }
-        if(window.loft.usersettings.mode === "online") this.connectSocket();
-        if(data){
-            state.writesteps = data.WriteSteps;
-            state.writestats = data.WriteStats;
-            state.debug = data.Debug;
-            state.AjaxAvailable = true;
-        }
-        if(this.state.autochess){
-            playerInfo.name = "bot"+Math.round(Math.random()*1000 + 1000);
-        }
+        //if(window.loft.usersettings.mode === "online") this.connectSocket();
+        if(this.state.autochess) playerInfo.name = "bot"+Math.round(Math.random()*1000 + 1000);
 
         state.playerInfo = playerInfo;
 
@@ -402,7 +376,7 @@ export default class App extends React.Component{
     }
 
     saveStepResults = (koordsto,koordsfrom,pflag) => {
-        if(this.state.online || !this.state.AjaxAvailable) return;
+        if(this.state.online || !window.loft.AjaxAvailable) return;
         let {cells} = this.state;
         let postdata = {
             action: 'saveStep',
@@ -424,7 +398,7 @@ export default class App extends React.Component{
                         if(res.data.game_id){
                             this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
                         }else{
-                            this.setMazafuckinState({AjaxAvailable: false});
+                            window.loft.AjaxAvailable = false;
                         } 
                     }
                 }
@@ -464,7 +438,7 @@ export default class App extends React.Component{
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
             setTimeout(()=>{
 
-                if(this.state.AjaxAvailable && !this.state.autochess){
+                if(window.loft.AjaxAvailable && !this.state.autochess){
                     this.getBotStep(color);
                 }else{
                     this.iiStep(color);
@@ -902,7 +876,6 @@ export default class App extends React.Component{
                         playerName={this.state.playerInfo.name}
                         playerColor={this.state.playerInfo.color}
                         playerStatus={this.state.playerInfo.status}
-                        playerSigned={this.state.playerInfo.signed}
                         playerStat={this.state.playerInfo.signed ? this.state.playerInfo.statistics : {}}
                         searching={this.state.searchingOnlineOpponent} 
                         count={this.state.searchingOnlineCounter} 
@@ -911,6 +884,8 @@ export default class App extends React.Component{
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
+                        setAppState={this.props.setAppState}
+                        isGuest={this.props.isGuest}
                         quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">

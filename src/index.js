@@ -8,8 +8,7 @@ import App from './App.js';
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 import { Settings } from './Components/Setting/index.js';
-
-//let device = {};
+import postData from './Funcs/PostDataFuncs';
 
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
@@ -18,34 +17,84 @@ window.loft = {
     device: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
+    config: { WriteSteps: false, WriteStats: false, Debug: false },
+    user_info: {},
+    isGuest: true,
+    AjaxAvailable: false,
 };
-
-window.loft.usersettings = window.loft.settings.getSettings();
-
-document.addEventListener("deviceready", onDeviceReady, false);
-
-function onDeviceReady()
-{
-    document.addEventListener("pause", onPause, false);
-    document.addEventListener("resume", onResume, false);
-    window.loft.device = {};
-    console.log(window.loft.device);
-}
-function onPause() 
-{
-    document.querySelector("#musicplayer").pause();
-}
-function onResume() 
-{
-    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").play();
-}
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
     window.loft.wsserver = "ws://192.168.31.168:7777";
     window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
 
-//alert(JSON.stringify([apiserver, window.location.hostname]));
+window.loft.usersettings = window.loft.settings.getSettings();
+
+if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
+else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+
+function DOMLoaded()
+{
+    checkConnection();
+
+    ReactDOM.render(
+        <Router history={window.loft.history}>
+          <App/>
+        </Router>
+        ,
+        document.getElementById('root')
+    );
+}
+
+function onDeviceReady()
+{
+    document.addEventListener("pause", onPause, false);
+    document.addEventListener("resume", onResume, false);
+    document.addEventListener("online", onOnline, false);
+    document.addEventListener("offline", onOffline, false);
+    window.loft.device = {};
+    console.log(window.loft);
+    DOMLoaded();
+}
+
+function checkConnection()
+{
+    window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
+    postData({
+        url: window.loft.apiserver + "config",
+        success: (res)=>{
+            window.loft.config = res.config;
+            window.loft.user_info = res.user_info;
+            window.loft.isGuest = res.isGuest;
+            window.loft.AjaxAvailable = true;
+        },
+        error: (res)=>{
+            console.log(res);
+        }
+    });
+}
+
+function onOnline()
+{
+    checkConnection();
+    alert("Connection restored!");
+}
+
+function onOffline()
+{
+    window.loft.AjaxAvailable = false;
+    alert("Connection lost!");
+}
+
+function onPause() 
+{
+    document.querySelector("#musicplayer").pause();
+}
+
+function onResume() 
+{
+    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").play();
+}
 
 Math.coefficient = (n1,n2,f=0) => {
     n2 = n2>0?n2:1;
@@ -90,10 +139,4 @@ Math.pifagorColored = (c1,c2,color="any") => {
     return Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2)) * directionCorrection;
 }
 
-ReactDOM.render(
-    <Router history={window.loft.history}>
-      <App/>
-    </Router>
-    ,
-    document.getElementById('root')
-);
+

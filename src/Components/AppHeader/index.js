@@ -8,6 +8,7 @@ import postData from '../../Funcs/PostDataFuncs';
 import Routing from '../../Funcs/Routing';
 import Noise from '../../Funcs/Noise';
 import Setting from '../Setting';
+import Acc from '../../Funcs/Acc';
 
 export default class AppHeader extends React.Component{
 
@@ -117,193 +118,20 @@ export default class AppHeader extends React.Component{
         }
     }
 
-    dropSettings = () => {
-        window.loft.settings.dropSettings();
-        //for (let k in us) this.props.updateSetting(k, us[k]);
-        window.loft.showModal(false);
-    }
-
-    saveSetting = (key, val) => {
-        window.loft.settings.saveSetting(key, val);
-        //this.props.updateSetting(key, val);
-    }
-
-
     settingsClick = () => {
         window.loft.showModal(<Setting modal="true" />, Lang("settingsText"));
     }
-    showAccStat = () => {
-        let s = this.props.playerStat;
-        let startexp = 0;
-        if(s.lvl > 1) startexp = 50*(Math.pow(2,s.lvl-1));
-        let endexp = 50*(Math.pow(2,s.lvl));
-        let progress = Math.percent(s.exp - startexp,endexp - startexp);
-        let left = 50 - parseInt(progress,10)/2;
-
-        window.loft.showModal(
-            <div className="container">
-                <div className="row">
-                    <div className="col-12" id="message"></div>
-                    <div className="col-12">
-                        <h4 style={{margin: "0", border: "0"}}>{s.lvl} {Lang("levelText")}</h4>
-                        <div className="exp">
-                            <div className="progress" style={{width: progress, left: left+"%"}}>{s.exp}</div>
-                            <table className="stable" style={{padding: "0px"}}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
-                        </div>
-                        <table className="stable">
-                            <tbody>
-                                <tr><td>{Lang("expNeededForNextLvl")}</td><td>{endexp - s.exp}</td></tr>
-                                <tr><td>{Lang("totalGames")}</td><td>{s.games}</td></tr>
-                                <tr><td>{Lang("totalWons")}</td><td>{s.won} ({Math.percent(s.won,s.games,2)})</td></tr>
-                                <tr><td>{Lang("totalLosts")}</td><td>{s.lost} ({Math.percent(s.lost,s.games,2)})</td></tr>
-                                <tr><td>{Lang("totalDraws")}</td><td>{s.games-s.won-s.lost} ({Math.percent(s.games-s.won-s.lost,s.games,2)})</td></tr>
-                                <tr><td>{Lang("totalWons")}/{Lang("totalLosts")}</td><td>{Math.coefficient(s.won,s.lost,2)}</td></tr>
-                                <tr><td>{Lang("totalMoves")}</td><td>{s.moves}</td></tr>
-                                <tr><td>{Lang("totalHops")}</td><td>{s.steps}</td></tr>
-                                <tr><td>{Lang("avgGameTime")}</td><td>{Math.round(s.playeravgtime)} {Lang("secondsText")} / {Math.round(s.totalavgtime)} {Lang("secondsText")}</td></tr>
-                                <tr><td>{Lang("avgGameMoves")}</td><td>{Math.round(s.playeravgmoves)} / {Math.round(s.totalavgmoves)}</td></tr>
-                                <tr><td>{Lang("avgGameHops")}</td><td>{Math.round(s.playeravgsteps)} / {Math.round(s.totalavgsteps)}</td></tr>
-                                <tr><td>{Lang("avgMoveHops")}</td><td>{Math.coefficient(s.playeravgsteps,s.playeravgmoves,2)} / {Math.coefficient(s.totalavgsteps,s.totalavgmoves,2)}</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>,
-            this.props.playerName
-        );
-    }
-    newRegistration = () => {
-        window.loft.showModal(
-            <div className="container">
-                <div className="row">
-                    <div className="col-12" id="message"></div>
-                    <div className="col-12">
-                        <input type="text" id="name" placeholder={Lang("displayName")} minLength="3" maxLength="40" />
-                    </div>
-                    <div className="col-12">
-                        <input type="text" id="login" placeholder={Lang("loginText")} minLength="4" maxLength="30" />
-                    </div>
-                    <div className="col-12">
-                        <input type="text" id="email" placeholder={Lang("emailText")} minLength="4" maxLength="70" />
-                    </div>
-                    <div className="col-12">
-                        <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Button
-                            action={this.gogoRegister} 
-                            href="" 
-                            value={Lang("signUpText")} 
-                            theme="neon"
-                            strong="true"
-                        />
-                    </div>
-                </div>
-            </div>,
-            Lang("signUpText")
-        );
-    }
-    gogoRegister = () => {
-        let m = document.getElementById("message");
-        m.className = "";
-        if(document.getElementById("pass").value !== document.getElementById("pass2").value){
-            m.className = "error";
-            m.innerHTML = Lang("passwordsNotMatch");
-            return false;
-        }
-        let a = document.querySelectorAll("#modal .row input");
-        for(let f=0;f<a.length;f++){
-            if(a[f].value.length < a[f].minLength || a[f].value.length > a[f].maxLength){
-                m.className = "error";
-                m.innerHTML = Lang("fieldRuleText1").replace("$", a[f].placeholder) + Lang("fieldRuleText2").replace("$", a[f].minLength+"-"+a[f].maxLength);
-                return false;
-            }
-        }
-        postData({
-            url: window.loft.apiserver + "sign-up",
-            data: {
-                display_name:   document.getElementById("name").value,
-                username:       document.getElementById("login").value,
-                password:       sha1(document.getElementById("pass").value),
-                email:          document.getElementById("email").value,
-            },
-            device: window.loft.device,
-            success: (d)=>{
-                if (d.success) {
-                    m.className = "success";
-                    m.innerHTML = Lang("success");
-                } else {
-                    m.className = "error";
-                    m.innerHTML = d.errors ? d.errors[Object.keys(d.errors).shift()] : Lang("failed");
-                }
-                
-                
-                /*this.saveSetting("atoken",d.data.token);
-                if(d.success) window.location.reload();*/
-            }
-        });
-    }
-    signIn = () => {
-        window.loft.showModal(
-            <div className="container">
-                <div className="row">
-                    <div className="col-12" id="message"></div>
-                    <div className="col-12">
-                        <input type="text" id="login" placeholder={Lang("loginText")} maxLength="30" />
-                    </div>
-                    <div className="col-12">
-                        <input type="password" id="pass" placeholder={Lang("passwordText")} />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Button
-                            action={this.gogoSign} 
-                            href="" 
-                            value={Lang("signInText")} 
-                            theme="neon"
-                            strong="true"
-                        />
-                    </div>
-                </div>
-            </div>,
-            Lang("authText")
-        );
-    }
-    gogoSign = () => {
-        postData({
-            url: window.loft.apiserver + "sign-in",
-            data: {
-                username:  document.querySelector("#login").value,
-                password:   document.querySelector("#pass").value
-            },
-            device: window.loft.device,
-            success: (d)=>{
-                let m = document.querySelector("#message");
-                if(d.success){
-                    m.className = "success";
-                    m.innerHTML = Lang("success");
-                    window.loft.showModal(false);
-                }else{
-                    m.className = "error";
-                    m.innerHTML = d.errors[Object.keys(d.errors).shift()]
-                }
-            }
-        });
-    }
-    signOut = () => {
-        this.saveSetting("atoken","");
-        window.location.reload();
-    }
-
-    goHome = () => Routing("/home");
 
     navigatorClick = (h = null) => {
         if (h === null) this.setState({naviActive: !this.state.naviActive});
         else this.setState({naviActive: h});
     }
+
     animationend = (event) => {
         event.target.className = "uhicon";
         event.target.style.animationDelay = "0ms";
     }
+
     componentDidMount = () => {
         let title = document.getElementById('utitle');
         document.getElementById("uhiconcontainer").style.top = `${title.offsetHeight}px`;
@@ -312,8 +140,10 @@ export default class AppHeader extends React.Component{
             event.target.className = "fa-2x";
         });
     }
+
     render(){
-        
+        let acc = new Acc(this.props.setAppState);
+
         let gameclass = "fa fa-gamepad";
         if(this.props.status === "in_game" && this.props.online) gameclass = "fa fa-stop-circle";
         if(this.props.searching) gameclass = "fa fa-ellipsis-h fa-smx-spin";
@@ -331,23 +161,23 @@ export default class AppHeader extends React.Component{
             <div className="uhicon" onClick={this.settingsClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 
-        if(this.props.playerSigned){
+        if(!this.props.isGuest){
             accDiv = <React.Fragment>
-                        <div className="uhicon" onClick={this.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerName}</span></div>
+                        <div className="uhicon" onClick={acc.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerName}</span></div>
                         {accDiv}
-                        <div className="uhicon" onClick={this.signOut}><i className="fa fa-times"></i><span> {Lang("signOutText")}</span></div>
+                        <div className="uhicon" onClick={acc.signOut}><i className="fa fa-times"></i><span> {Lang("signOutText")}</span></div>
                     </React.Fragment>;
         }else{
             accDiv = <React.Fragment>
-                        <div className="uhicon" onClick={this.signIn} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
-                        <div className="uhicon" onClick={this.newRegistration} onMouseDown={() => Noise("menu-click")}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
+                        <div className="uhicon" onClick={acc.signIn} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sign-in-alt"></i><span> {Lang("signInText")}</span></div>
+                        <div className="uhicon" onClick={acc.signUp} onMouseDown={() => Noise("menu-click")}><i className="fa fa-key"></i><span> {Lang("signUpText")}</span></div>
                         {accDiv}
                     </React.Fragment>;
         }
 
         accDiv = <div id="uhiconcontainer" className={uhcclass}>
                     <div id="uhiconcontainershadow" onClick={() => this.navigatorClick(false)}></div>
-                    <div className="uhicon" onClick={this.goHome} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
+                    <div className="uhicon" onClick={() => Routing("/home")} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
                     {accDiv}
                 </div>;
 
