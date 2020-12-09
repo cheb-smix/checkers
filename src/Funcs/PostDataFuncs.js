@@ -6,7 +6,7 @@ export default function postData(obj = {})
     for (let k in obj) o[k] = obj[k];
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
-    if (Object.keys(window.loft.device) > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
     
     console.log("using", type, o);
 

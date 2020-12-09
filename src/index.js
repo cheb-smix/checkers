@@ -9,7 +9,7 @@ import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 import { Settings } from './Components/Setting/index.js';
 
-let device = {};
+//let device = {};
 
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
@@ -28,7 +28,8 @@ function onDeviceReady()
 {
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
-    console.log(device);
+    window.loft.device = {};
+    console.log(window.loft.device);
 }
 function onPause() 
 {
@@ -88,7 +89,6 @@ Math.pifagorColored = (c1,c2,color="any") => {
     }
     return Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2)) * directionCorrection;
 }
-
 
 ReactDOM.render(
     <Router history={window.loft.history}>

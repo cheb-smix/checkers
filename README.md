@@ -6,17 +6,26 @@
 - Set android:usesCleartextTraffic="true" at android manifest
 - Configure config.xml
 - Add platforms (android, ios)
+- Install cordova-simulate (sudo npm install -g cordova-simulate)
+- Cordova-simulate usage: simulate --device=Nexus10 --dir=<DIR> --target=opera
 
 # Порядок билда
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
-4. remove folders in cordova/www/ (music, static, sound)
-5. copy build folder to cordova/www
-6. cordova build
+4. build/static/js/main.*.chunk.js > "window.loft.device={}" to "window.loft.device=device"
+5. (free to use action)
+6. (free to use action)
+7. remove folders in cordova/www/ (music, static, sound)
+8. copy build folder to cordova/www
+9. cordova build
 
-# Запуск автобилдера (При первом запуске запросит рабочую папку cordova)
+# Запуск автобубилдера (При первом запуске запросит рабочую папку cordova)
 php build.php (workfolder=...) (steps=1234567)
+## Варианты запуска автобубилдера:
+- php build.php steps=12348   # Сборка реакта и копирование в cordova без удаления старых файлов с заменой на новые без билда cordova для дебага в cordova-simulate
+- php build.php steps=9       # Сборка только в cordova уже имеющегося в рабочей папке проекта
+
 
 # TODO
 0. Нужны звуки: Rampage.
@@ -42,7 +51,6 @@ php build.php (workfolder=...) (steps=1234567)
 
 # Баги
 - Бот иногда предпочитает сожрать одну чем две
-- Device опять отвалился
 - Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket (вряд ли)
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 
@@ -110,6 +118,8 @@ php build.php (workfolder=...) (steps=1234567)
 + Добавлены звуки эпик-хода и фанфар
 + Небольшая реструктуризация настроек
 + Добавлена автозапись версии
++ DeviceInfo снова работает. Ajax починен. Авторизация и кукирование работают.
++ Запись девайсов и закрепление за пользователем
 
 
 
