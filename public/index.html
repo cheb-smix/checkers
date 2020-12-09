@@ -22,11 +22,18 @@
         pointer-events: none;
         transition: top 0.5s ease;
       }
+      #version {
+        position: absolute;
+        bottom: 1vh;
+        right: 1vw;
+        color:white;
+      }
     </style>
   </head>
   <body>
     <img src="checker.gif" alt="Checkers" class="App-logo">
     <audio id="musicplayer" autoplay="autoplay" type="audio/mpeg"></audio>
     <div id="root"></div>
+    <span id="version"></span>
   </body>
 </html>
