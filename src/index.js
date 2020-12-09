@@ -9,13 +9,26 @@ import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 import { Settings } from './Components/Setting/index.js';
 
-
 let device = {};
+
+window.loft = {
+    wsserver: "wss://ws.smix-soft.ru:8080",
+    apiserver: "https://smix-soft.ru/api/v2/game/",
+    settings: new Settings(),
+    device: {},
+    history: window.cordova ? createHashHistory() : createBrowserHistory(),
+    sounds: {},
+};
+
+window.loft.usersettings = window.loft.settings.getSettings();
+
 document.addEventListener("deviceready", onDeviceReady, false);
+
 function onDeviceReady()
 {
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
+    console.log(device);
 }
 function onPause() 
 {
@@ -23,19 +36,8 @@ function onPause()
 }
 function onResume() 
 {
-    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").pause();
+    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").play();
 }
-
-window.loft = {
-    wsserver: "wss://ws.smix-soft.ru:8080",
-    apiserver: "https://smix-soft.ru/api/v2/game/",
-    device: device,
-    settings: new Settings(),
-    history: window.cordova ? createHashHistory() : createBrowserHistory(),
-    sounds: {},
-};
-
-window.loft.usersettings = window.loft.settings.getSettings();
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
     window.loft.wsserver = "ws://192.168.31.168:7777";

@@ -5,7 +5,6 @@ import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Funcs/Lang';
 import postData from '../../Funcs/PostDataFuncs';
-import Cookie from '../../Funcs/Cookie';
 import Routing from '../../Funcs/Routing';
 import Noise from '../../Funcs/Noise';
 import Setting from '../Setting';
@@ -282,9 +281,7 @@ export default class AppHeader extends React.Component{
                 if(d.success){
                     m.className = "success";
                     m.innerHTML = Lang("success");
-                    Cookie.set("_identity-frontend", d.atoken);
-                    /*this.saveSetting("atoken",d.data.token);
-                    window.location.reload();*/
+                    window.loft.showModal(false);
                 }else{
                     m.className = "error";
                     m.innerHTML = d.errors[Object.keys(d.errors).shift()]
