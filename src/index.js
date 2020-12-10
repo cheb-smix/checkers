@@ -50,6 +50,7 @@ async function DOMLoaded()
 
 function onDeviceReady()
 {
+    window.screen.orientation.lock('portrait');
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
     document.addEventListener("online", onOnline, false);

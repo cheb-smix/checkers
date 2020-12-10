@@ -2,7 +2,12 @@
 - Install ReactJS
 - Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
-- Install cordova-plugin-device and cordova-plugin-whitelist
+- Install plugins: 
+    - cordova-plugin-device
+    - cordova-plugin-whitelist
+    - cordova-plugin-network-information
+    - cordova-plugin-vibration
+    - cordova-plugin-screen-orientation
 - Set android:usesCleartextTraffic="true" at android manifest
 - Configure config.xml
 - Add platforms (android, ios)
@@ -33,7 +38,6 @@ php build.php (workfolder=...) (steps=1234567)
 4. Вывести опыт в видное место
 5. Придумать реализацию режима bluetooth вместо local
 6. Кидать приглашения по сети по никнейму
-7. Отключить поворот экрана
 
 -  Стоит подумать о билде отдельных приложух.. 
 -  Отрендерить нормальную иконку!
@@ -50,15 +54,13 @@ php build.php (workfolder=...) (steps=1234567)
 -  Вынести сокет в глобаль?
 
 # Баги
-- Фанфары глюкнули
+- Анимация фанфар
 - Бот иногда почему то отдаёт две на съедение (неправильный подсчет будущего)
 - Бот иногда предпочитает сожрать одну чем две
 - Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket (вряд ли)
 - Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
 
 # Баги/Фичи на проверке
-- Ajax теперь проходит в cordova!
-- Авторизация и сохранение куки осуществляется!
 
 # Выполнено / исправлено
 + Заставка
@@ -130,6 +132,7 @@ php build.php (workfolder=...) (steps=1234567)
 + Прикручена регистрация, конфирмация, восстановление пароля
 + Хэширование пароля перед отправкой
 + Авторизация теперь запоминается на устройстве
++ Поворот экрана отключен
 
 
 
