@@ -20,7 +20,8 @@ export default class App extends React.Component{
         cells: {},
         bestMove: null,
         playerInfo: {
-            name: "player"+Math.round(Math.random()*1000 + 1000), 
+            display_name: "player"+Math.round(Math.random()*1000 + 1000), 
+            username: false,
             status: "in_game",
             color: "white",
             signed: false,
@@ -29,12 +30,20 @@ export default class App extends React.Component{
             cells: 12,
             done: 0,
             possibilities: 10,
-            statistics: {
-                games:0,won:0,lost:0,steps:0,moves:0,exp:0,lvl:1
+            stat: {
+                total_games:    0,
+                total_wins:     0,
+                total_failes:   0, 
+                total_draws:    0,
+                total_steps:    0,
+                total_hops:     0,
+                experience:     0,
+                level:          1,
             }
         },
         opponentInfo: {
-            name: "bot"+Math.round(Math.random()*1000 + 1000), 
+            display_name: "bot"+Math.round(Math.random()*1000 + 1000), 
+            username: false,
             status: "in_game",
             color: "black",
             steps: 0,
@@ -90,13 +99,12 @@ export default class App extends React.Component{
     initiation = (state) => {
         let {playerInfo, opponentInfo} = this.state;
         if(!window.loft.isGuest){
-            playerInfo.signed = true;
-            playerInfo.name = window.loft.user_info.display_name;
-            playerInfo.login = window.loft.user_info.username;
-            playerInfo.statistics = window.loft.user_info.stat;
+            playerInfo.display_name = window.loft.user_info.display_name;
+            playerInfo.username = window.loft.user_info.username;
+            playerInfo.stat = window.loft.user_info.stat;
         }
         //if(window.loft.usersettings.mode === "online") this.connectSocket();
-        if(this.state.autochess) playerInfo.name = "bot"+Math.round(Math.random()*1000 + 1000);
+        if(this.state.autochess) playerInfo.display_name = "bot"+Math.round(Math.random()*1000 + 1000);
 
         state.playerInfo = playerInfo;
 
@@ -638,6 +646,7 @@ export default class App extends React.Component{
                             
                             if (needToEatMore) {
                                 Noise("warning");
+                                if (window.cordova) navigator.vibrate(200);
                                 if (needToEatMore.more) this.consoleLog( Lang("youHaveToTakeMore") );
                                 else this.consoleLog( Lang("youHaveToTake") );
                                 for (let k in needToEatMore.kills) {
@@ -734,7 +743,7 @@ export default class App extends React.Component{
         let regdata = {
             action:"REGISTER",
             game: this.state.game,
-            name: this.state.playerInfo.name,
+            name: this.state.playerInfo.display_name,
         };
         if(typeof(this.state.playerInfo.login)!=="undefined") regdata['login'] = this.state.playerInfo.login;
         if(socketOpened) this.socketSend(regdata);
@@ -873,10 +882,10 @@ export default class App extends React.Component{
             <div className="ucon">
                 <AppHeader 
                         gamename={this.state.game} 
-                        playerName={this.state.playerInfo.name}
+                        playerName={this.state.playerInfo.display_name}
                         playerColor={this.state.playerInfo.color}
                         playerStatus={this.state.playerInfo.status}
-                        playerStat={this.state.playerInfo.signed ? this.state.playerInfo.statistics : {}}
+                        playerStat={window.loft.isGuest ? {} : this.state.playerInfo.stat}
                         searching={this.state.searchingOnlineOpponent} 
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
@@ -910,8 +919,8 @@ export default class App extends React.Component{
                         text={this.state.consoleText} 
                         online={this.state.online}
                         rampageCode={this.state.rampageCode}
-                        player={this.state.playerInfo.name}
-                        opponent={this.state.opponentInfo.name}
+                        player={this.state.playerInfo.display_name}
+                        opponent={this.state.opponentInfo.display_name}
                         searching={this.state.searchingOnlineOpponent} 
                         count={this.state.searchingOnlineCounter} 
                         serverInfo={this.state.serverInfo}

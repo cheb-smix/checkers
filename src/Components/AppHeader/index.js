@@ -1,10 +1,8 @@
 import React from 'react';
 import "./appheader.css";
 import Droplist from "../Droplist";
-import sha1 from "../../Funcs/sha1";
 import Button from '../Button';
 import Lang from '../../Funcs/Lang';
-import postData from '../../Funcs/PostDataFuncs';
 import Routing from '../../Funcs/Routing';
 import Noise from '../../Funcs/Noise';
 import Setting from '../Setting';

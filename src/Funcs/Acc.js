@@ -1,11 +1,20 @@
 import Button from "../Components/Button";
 import Lang from "./Lang";
 import postData from "./PostDataFuncs";
+import sha1 from "./Sha1";
 
 export default class Acc
 {
     constructor(setAppState = () => {}) {
         this.setAppState = setAppState;
+    }
+
+    setAuth = (data) => {
+        localStorage.setItem("atoken", data.atoken);
+        window.loft.user_info = data.user_info;
+        window.loft.atoken = data.atoken;
+        window.loft.isGuest = false;
+        this.setAppState({isGuest: false});
     }
 
     signIn = () => {
@@ -18,6 +27,20 @@ export default class Acc
                     </div>
                     <div className="col-12">
                         <input type="password" id="pass" placeholder={Lang("passwordText")} />
+                    </div>
+                    <div className="col-12">
+                        <Button
+                            action={this.forgotPass} 
+                            href="" 
+                            value={Lang("forgotPassword")} 
+                            theme="link"
+                        />
+                        <Button
+                            action={this.signUp} 
+                            href="" 
+                            value={Lang("dontHaveAccount")} 
+                            theme="link"
+                        />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
@@ -39,7 +62,7 @@ export default class Acc
             url: window.loft.apiserver + "sign-in",
             data: {
                 username:  document.querySelector("#login").value,
-                password:   document.querySelector("#pass").value
+                password:  sha1(document.querySelector("#pass").value),
             },
             device: window.loft.device,
             success: (d)=>{
@@ -47,10 +70,8 @@ export default class Acc
                 if(d.success){
                     m.className = "success";
                     m.innerHTML = Lang("success");
-                    window.loft.user_info = d.user_info;
-                    window.loft.isGuest = false;
+                    this.setAuth(d);
                     window.loft.showModal(false);
-                    this.setAppState({isGuest: false});
                 }else{
                     m.className = "error";
                     m.innerHTML = d.errors[Object.keys(d.errors).shift()]
@@ -66,23 +87,58 @@ export default class Acc
                 if(d.success){
                     window.loft.user_info = [];
                     window.loft.isGuest = true;
+                    delete window.lotf.atoken;
+                    localStorage.removeItem("atoken");
                     this.setAppState({isGuest: true});
                 }
             }
         });
     }
 
-    showAccStat = () => {
-
+    forgotPass = () => {
+        window.loft.showModal(
+            <div className="container">
+                <div className="row">
+                    <div className="col-12" id="message"></div>
+                    <div className="col-12">
+                        <input type="text" id="email" placeholder={Lang("emailText")} minLength="4" maxLength="70" />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={this.gogoRessurect} 
+                            href="" 
+                            value={Lang("confirm")} 
+                            theme="neon"
+                            strong="true"
+                        />
+                    </div>
+                </div>
+            </div>,
+            Lang("ressurectingPass")
+        );
     }
 
-    signUp = () => {
-
+    gogoRessurect = () => {
+        postData({
+            url: window.loft.apiserver + "pass-reset",
+            data: {
+                email:  document.querySelector("#email").value,
+            },
+            success: (d)=>{
+                let m = document.querySelector("#message");
+                if(d.success){
+                    m.className = "success";
+                    m.innerHTML = Lang("email4Instructions");
+                }else{
+                    m.className = "error";
+                    m.innerHTML = Lang("failed");
+                }
+            }
+        });
     }
 
-    /*
     showAccStat = () => {
-        let s = this.props.playerStat;
+        /*let s = this.props.playerStat;
         let startexp = 0;
         if(s.lvl > 1) startexp = 50*(Math.pow(2,s.lvl-1));
         let endexp = 50*(Math.pow(2,s.lvl));
@@ -119,9 +175,11 @@ export default class Acc
                 </div>
             </div>,
             this.props.playerName
-        );
+        );*/
     }
-    newRegistration = () => {
+
+    signUp = () => {
+        console.log(window.loft);
         window.loft.showModal(
             <div className="container">
                 <div className="row">
@@ -152,14 +210,10 @@ export default class Acc
             Lang("signUpText")
         );
     }
+
     gogoRegister = () => {
         let m = document.getElementById("message");
         m.className = "";
-        if(document.getElementById("pass").value !== document.getElementById("pass2").value){
-            m.className = "error";
-            m.innerHTML = Lang("passwordsNotMatch");
-            return false;
-        }
         let a = document.querySelectorAll("#modal .row input");
         for(let f=0;f<a.length;f++){
             if(a[f].value.length < a[f].minLength || a[f].value.length > a[f].maxLength){
@@ -180,7 +234,9 @@ export default class Acc
             success: (d)=>{
                 if (d.success) {
                     m.className = "success";
-                    m.innerHTML = Lang("success");
+                    m.innerHTML = Lang("pincode");
+                    window.loft.showModal(false);
+                    setTimeout(() => this.emailConfirm(), 700);
                 } else {
                     m.className = "error";
                     m.innerHTML = d.errors ? d.errors[Object.keys(d.errors).shift()] : Lang("failed");
@@ -188,5 +244,55 @@ export default class Acc
             }
         });
     }
-    */
+
+    emailConfirm = () => {
+        window.loft.showModal(
+            <div className="container">
+                <div className="row">
+                    <div className="col-12" id="message"></div>
+                    <div className="col-12">
+                        <input type="text" id="pincode" placeholder={Lang("pincodeText")} minLength="6" maxLength="6" />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={this.gogoConfirm} 
+                            href="" 
+                            value={Lang("finish")} 
+                            theme="neon"
+                            strong="true"
+                        />
+                    </div>
+                </div>
+            </div>,
+            Lang("pincodeText")
+        );
+    }
+
+    gogoConfirm = () => {
+        let m = document.getElementById("message");
+        m.className = "";
+        let a = document.querySelectorAll("#modal .row input");
+        for(let f=0;f<a.length;f++){
+            if(a[f].value.length < a[f].minLength || a[f].value.length > a[f].maxLength){
+                m.className = "error";
+                m.innerHTML = Lang("fieldRuleText1").replace("$", a[f].placeholder) + Lang("fieldRuleText2").replace("$", a[f].minLength+"-"+a[f].maxLength);
+                return false;
+            }
+        }
+        postData({
+            url: window.loft.apiserver + "verify-pin-code/" + document.getElementById("pincode").value,
+            success: (d)=>{
+                if (d.success) {
+                    m.className = "success";
+                    m.innerHTML = Lang("success");
+                    this.setAuth(d);
+                    window.loft.showModal(false);
+                } else {
+                    m.className = "error";
+                    m.innerHTML = d.errors ? d.errors[Object.keys(d.errors).shift()] : Lang("failed");
+                }
+            }
+        });
+    }
+    
 }

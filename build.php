@@ -138,7 +138,7 @@ function rrmdir($dir)
                 if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
                     rrmdir($dir. DIRECTORY_SEPARATOR .$object);
                 } else {
-                    echo " - Removing folder " . $dir. DIRECTORY_SEPARATOR . $object ;
+                    echo " - Removing file " . $dir. DIRECTORY_SEPARATOR . $object ;
                     echo unlink($dir. DIRECTORY_SEPARATOR .$object) ? "\n" : " - FAILED\n"; 
                 }
             } 

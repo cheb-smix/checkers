@@ -7,6 +7,7 @@ export default function postData(obj = {})
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
     if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
     console.log("using", type, o);
 
@@ -74,6 +75,8 @@ async function fatch(o = {})
         } else {
             res = await response.text();
         }
+
+        console.log(res);
         
         if (o.success) o.success(res);
         return res;

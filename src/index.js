@@ -19,6 +19,7 @@ window.loft = {
     sounds: {},
     config: { WriteSteps: false, WriteStats: false, Debug: false },
     user_info: {},
+    atoken: localStorage.getItem("atoken"),
     isGuest: true,
     AjaxAvailable: false,
 };
@@ -33,10 +34,11 @@ window.loft.usersettings = window.loft.settings.getSettings();
 if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
 else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
 
-function DOMLoaded()
+async function DOMLoaded()
 {
-    checkConnection();
+    await checkConnection();
 
+    console.log("render");
     ReactDOM.render(
         <Router history={window.loft.history}>
           <App/>
@@ -57,26 +59,22 @@ function onDeviceReady()
     DOMLoaded();
 }
 
-function checkConnection()
+async function checkConnection()
 {
     window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
-    postData({
-        url: window.loft.apiserver + "config",
-        success: (res)=>{
-            window.loft.config = res.config;
-            window.loft.user_info = res.user_info;
-            window.loft.isGuest = res.isGuest;
-            window.loft.AjaxAvailable = true;
-        },
-        error: (res)=>{
-            console.log(res);
-        }
-    });
+    let res = await postData({url: window.loft.apiserver + "config"});
+    
+    if (res) {
+        window.loft.config = res.config;
+        window.loft.user_info = res.user_info;
+        window.loft.isGuest = res.isGuest;
+        window.loft.AjaxAvailable = true;
+    }
 }
 
-function onOnline()
+async function onOnline()
 {
-    checkConnection();
+    await checkConnection();
     alert("Connection restored!");
 }
 

@@ -1,8 +1,8 @@
 export default function sha1(str){
-    var hash;
+    let hash;
     try {
-      var crypto = require('crypto');
-      var sha1sum = crypto.createHash('sha1');
+      let crypto = require('crypto');
+      let sha1sum = crypto.createHash('sha1');
       sha1sum.update(str);
       hash = sha1sum.digest('hex');
     } catch (e) {
@@ -11,34 +11,34 @@ export default function sha1(str){
     if (hash !== undefined) {
       return hash;
     }
-    var _rotLeft = function (n, s) {
-      var t4 = (n << s) | (n >>> (32 - s));
+    let _rotLeft = function (n, s) {
+      let t4 = (n << s) | (n >>> (32 - s));
       return t4;
     }
-    var _cvtHex = function (val) {
-      var str = '';
-      var i;
-      var v;
+    let _cvtHex = function (val) {
+      let str = '';
+      let i;
+      let v;
       for (i = 7; i >= 0; i--) {;
         v = (val >>> (i * 4)) & 0x0f;
         str += v.toString(16);
       }
       return str;
     }
-    var blockstart;
-    var i, j;
-    var W = new Array(80);
-    var H0 = 0x67452301;
-    var H1 = 0xEFCDAB89;
-    var H2 = 0x98BADCFE;
-    var H3 = 0x10325476;
-    var H4 = 0xC3D2E1F0;
-    var A, B, C, D, E;
-    var temp;
+    let blockstart;
+    let i, j;
+    let W = new Array(80);
+    let H0 = 0x67452301;
+    let H1 = 0xEFCDAB89;
+    let H2 = 0x98BADCFE;
+    let H3 = 0x10325476;
+    let H4 = 0xC3D2E1F0;
+    let A, B, C, D, E;
+    let temp;
     // utf8_encode
     str = unescape(encodeURIComponent(str));
-    var strLen = str.length;
-    var wordArray = [];
+    let strLen = str.length;
+    let wordArray = [];
     for (i = 0; i < strLen - 3; i += 4) {
       j = (str.charCodeAt(i) << 24) | (str.charCodeAt(i + 1) << 16) | (str.charCodeAt(i + 2) << 8) | (str.charCodeAt(i + 3));
       wordArray.push(j);
