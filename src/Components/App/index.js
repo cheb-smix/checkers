@@ -11,14 +11,27 @@ import postData from '../../Funcs/PostDataFuncs';
 
 import './app.css';
 import Noise from '../../Funcs/Noise';
+//import Server from '../../Funcs/Server';
 
 
 export default class App extends React.Component{
+
+    INT = 0;
+
+    BLACK = 0;
+    WHITE = 1;
+
+    STATUS_IN_GAME    = 0;
+    STATUS_DONE       = 5;
+    STATUS_FAIL       = 6;
+    STATUS_WON        = 7;
+    STATUS_DRAW       = 8;
 
     state = {
         /* USERS DYNAMIC INFO */
         cells: {},
         bestMove: null,
+        //server: new Server(),
         playerInfo: {
             display_name: "player"+Math.round(Math.random()*1000 + 1000), 
             username: false,
@@ -59,7 +72,6 @@ export default class App extends React.Component{
         lastStep: "",
         lastStepTime: 0,
         animationSpeed: 45,
-        isLoading: true,
         online: false,
         socketOpened: false,
         botspeed: 1,
@@ -98,12 +110,13 @@ export default class App extends React.Component{
 
     initiation = (state) => {
         let {playerInfo, opponentInfo} = this.state;
+        
         if(!window.loft.isGuest){
             playerInfo.display_name = window.loft.user_info.display_name;
             playerInfo.username = window.loft.user_info.username;
             playerInfo.stat = window.loft.user_info.stat;
         }
-        //if(window.loft.usersettings.mode === "online") this.connectSocket();
+
         if(this.state.autochess) playerInfo.display_name = "bot"+Math.round(Math.random()*1000 + 1000);
 
         state.playerInfo = playerInfo;
@@ -119,8 +132,6 @@ export default class App extends React.Component{
             state.opponentInfo = opponentInfo;
             state.playersStep = state.playerInfo.color === "white";
         }
-        
-        state.isLoading = false;
 
         state.targetCells = this.setTargetCells();
 
@@ -131,116 +142,165 @@ export default class App extends React.Component{
         if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
     }
 
-    socketReplyProcessing(response){
-        response = JSON.parse(response.data);
-        let data = response.data;
-        if(response.response==="SERVERINFO"){
-            if(data!==null) this.setMazafuckinState({serverInfo: data});
-            return;
+
+
+
+
+
+    // Working with server
+
+    // Main wrap
+
+    act = (o = {}) => {
+        if (window.loft.SocketAvailable) {
+            console.log("socket!");
+        } else if (window.loft.AjaxAvailable) {
+            postData({
+                url: window.loft.apiserver + o.action + (typeof(o.id) !== "undefined" ? `/${o.id}` : ""),
+                data: o.data,
+                success: o.success
+            });
         }
-        if(response.response==="REGISTERED"){
-            if(data!==null){
-                let {playerInfo} = this.state;
-                for(let k in data){
-                    playerInfo[k] = data[k];
-                }
-                this.setMazafuckinState({ playerInfo: playerInfo});
-            }
-            return;
-        }
-        if(response.response==="STARTGAME"){
-            clearInterval(this.state.searchingOnlineOpponent);
-            let playersStep = data.lastStep!==this.state.playerInfo.token;
-            let colorInfo = Lang(`${data.players[this.state.playerInfo.token].color}IsYours`);
-            let newStateObject = {
-                playersStep: playersStep,
-                lastStep: data.lastStep,
-                lastStepTime: data.lastStepTime,
-                opponentInfo: data.players[data.players[this.state.playerInfo.token].opponent],
-                playerInfo: data.players[this.state.playerInfo.token],
-                consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+colorInfo,
-                isLoading: false,
-                online: true,
-                cells: this.dropCheckersToDefaults(),
-                searchingOnlineOpponent: false,
-                searchingOnlineCounter: 0,
-                timeoutCheckInterval: setInterval(()=>{
-                    if(this.state.online && this.state.playerInfo.status === "in_game" && this.state.lastStepTime>0){
-                        let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                        if(r > this.state.serverInfo.steptimelimit * 2 / 3){
-                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(this.state.serverInfo.steptimelimit - r));
-                        }
-                        if(r > this.state.serverInfo.steptimelimit){
-                            if(!this.state.playersStep){
-                                this.socketSend({action:"TIMEOUTOPPO"});
-                                this.suggestNewOneGame(Lang("enemyLostByTimeout"));
-                            }
-                            this.consoleLog(Lang("gameOverByTimeout"));
-                            clearInterval(this.state.timeoutCheckInterval);
+    }
+
+    checkFor = (target = "check-search") => {
+        if (window.loft.SocketAvailable) {
+            console.log("socket!");
+        } else {
+            clearInterval(this.INT);
+            this.INT = setInterval(() => {
+                postData({
+                    url: window.loft.apiserver + target,
+                    success: (res) => {
+                        if (res.success && res.game) {
+                            clearInterval(this.INT);
+                            this.startGame(res.game);
                         }
                     }
-                },1000)
-            }
-            this.setMazafuckinState(newStateObject);
-            return;
-        }
-        if(response.response==="OPPOQUIT"){
-            let {playerInfo,opponentInfo} = this.state;
-            playerInfo['status'] = data[this.state.playerInfo.token]['status'];
-            opponentInfo['status'] = data[this.state.opponentInfo.token]['status'];
-            playerInfo['done'] = data[this.state.playerInfo.token]['done'];
-            opponentInfo['done'] = data[this.state.opponentInfo.token]['done'];
-            this.setMazafuckinState({playerInfo:playerInfo,opponentInfo:opponentInfo});
-        }
-        if(response.response==="THESTEP"){
-            const a = this.state.cells[data.from].possibilities[data.to];
-
-            if(a !== "undefined"){
-                let o = {
-                    lastStep: data.lastStep,
-                    lastStepTime: data.lastStepTime
-                };
-                if(typeof(data[this.state.playerInfo.token]) !== "undefined" && (data[this.state.playerInfo.token]['status'] !== this.state.playerInfo['status'] || this.state.opponentInfo['status'] !== data[this.state.opponentInfo.token]['status'])){
-                    //let {playerInfo, opponentInfo} = this.state;
-                    o.playerInfo = this.state.playerInfo;
-                    o.opponentInfo = this.state.opponentInfo;
-                    o.playerInfo['status'] = data[this.state.playerInfo.token]['status'];
-                    o.opponentInfo['status'] = data[this.state.opponentInfo.token]['status'];
-                    o.playerInfo['done'] = data[this.state.playerInfo.token]['done'];
-                    o.opponentInfo['done'] = data[this.state.opponentInfo.token]['done'];
-                }
-                this.setMazafuckinState(o);
-
-                this.doStep(
-                    data.to,
-                    data.from,
-                    data.lastStep!==this.state.playerInfo.token,
-                    null
-                );
-                
-            }
-            return;
-        }
-        /*if(response.response==="GAMEOVER"){
-            if(response.data.reason === "OPPOTIMEOUT"){
-                clearInterval(this.state.timeoutCheckInterval);
-                this.setMazafuckinState({
-                    timeoutCheckInterval: false,
-                    online: false,
-                    consoleText: Lang("enemyLostByTimeout")
                 });
-            }
-            if(response.data.reason === "TIMEOUT"){
-                clearInterval(this.state.timeoutCheckInterval);
-                this.setMazafuckinState({
-                    timeoutCheckInterval: false,
-                    online: false,
-                    consoleText: Lang("youveLostByTimeout")
-                });
-            }
-        }*/
-        this.consoleLog(response.response);
+            }, 3000)
+        }
     }
+
+    // Funcs
+
+    startNewSearch = () => {
+        this.act({
+            action: 'search',
+            success: (res) => {
+                if (res.success && res.game) {
+                    this.startGame(res.game);
+                } else {
+                    this.checkFor("check-search");
+                }
+            }
+        });
+    }
+
+    stopTheSearch = () => {
+        this.act({
+            action: 'stop-search',
+            success: () => {
+                clearInterval(this.INT);
+            }
+        });
+    }
+
+    startGame = (game) => {
+        let playersStep = game.players["player"].color = this.WHITE;
+        let newStateObject = {
+            playersStep: playersStep,
+            opponentInfo: game.players["player"],
+            playerInfo: game.players["opponent"],
+            lastStepTime: game.started,
+            consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")),
+            online: true,
+            cells: this.dropCheckersToDefaults(),
+            searchingOnlineOpponent: false,
+            searchingOnlineCounter: 0,
+            timeoutCheckInterval: setInterval(()=>{
+                if(this.state.online && this.state.playerInfo.status === this.STATUS_IN_GAME && this.state.lastStepTime>0){
+                    let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
+                    if(r > window.loft.config.StepTimeLimit * 2 / 3){
+                        this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
+                    }
+                    if(r > window.loft.config.StepTimeLimit){
+                        if(!this.state.playersStep){
+                            //this.socketSend({action:"TIMEOUTOPPO"});
+                            this.suggestNewOneGame(Lang("enemyLostByTimeout"));
+                        }
+                        this.consoleLog(Lang("gameOverByTimeout"));
+                        clearInterval(this.state.timeoutCheckInterval);
+                    }
+                }
+            },1000)
+        }
+        this.setMazafuckinState(newStateObject);
+    }
+
+    getBotStep = (color) => {
+        this.act({
+            action: 'get-bot-step',
+            data: {
+                playstage: this.state.debug ? 3 : this.state.playstage,
+                mask: this.getDeskMask(),
+                color: color[0]
+            },
+            success: (res) => {
+                if(!res.success){
+                    this.iiStep(color);
+                }else{
+                    if(this.state.cells[res.data.from].color===color && typeof(this.state.cells[res.data.from].possibilities[res.data.to])!=="undefined"){
+                        this.doStep(res.data.to, res.data.from, true, null);
+                    }else{
+                        this.iiStep(color);
+                    }
+                }
+            }
+        });
+    }
+
+    saveStepResults = (koordsto, koordsfrom, pflag) => {
+        let {cells} = this.state;
+        this.act({
+            action: 'set-step',
+            id: this.state.game_id,
+            data: {
+                mask:   this.getDeskMask(),
+                pflag:  pflag,
+                from:   koordsfrom,
+                to:     koordsto,
+                effectivity: this.cells[koordsfrom].possibilities[koordsto].effectivity,
+                color:  cells[koordsfrom].color[0],
+                game_id:this.state.game_id,
+                gtoken: this.state.gtoken,
+            },
+            success: (res)=>{
+                if(res.success){
+                    if(this.state.game_id === 0){
+                        if(res.data.game_id){
+                            this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
+                        }else{
+                            window.loft.AjaxAvailable = false;
+                        } 
+                    }
+                }
+            }
+        });
+    }
+
+    
+
+
+
+
+
+
+
+
+
+
+    // Animations and logic
 
     rampage = (steps, word="", returnObj=false) => {
         clearTimeout(this.state.rampageTO);
@@ -269,7 +329,6 @@ export default class App extends React.Component{
     }
 
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
-        //console.log("step",koordsfrom,koordsto);
         let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
         let {color} = cells[koordsfrom];
         let steps = cells[koordsfrom].possibilities[koordsto].path.length;
@@ -381,61 +440,6 @@ export default class App extends React.Component{
             }
         }
         return mask;
-    }
-
-    saveStepResults = (koordsto,koordsfrom,pflag) => {
-        if(this.state.online || !window.loft.AjaxAvailable) return;
-        let {cells} = this.state;
-        let postdata = {
-            action: 'saveStep',
-            mask: this.getDeskMask(),
-            pflag: pflag,
-            from: koordsfrom,
-            to: koordsto,
-            effectivity: Math.diagonalEffectivity(cells[koordsfrom],cells[koordsto],cells[koordsfrom].color, this.state.playstage),
-            color: cells[koordsfrom].color[0],
-            game_id: this.state.game_id,
-            gtoken: this.state.gtoken,
-        };
-        postData({
-            url: window.loft.apiserver + "set-step",
-            data: postdata,
-            success: (res)=>{
-                if(res.success){
-                    if(this.state.game_id===0){
-                        if(res.data.game_id){
-                            this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
-                        }else{
-                            window.loft.AjaxAvailable = false;
-                        } 
-                    }
-                }
-            }
-        });
-    }
-
-    getBotStep = (color) => {
-        let postdata = {
-            action: 'getStep',
-            playstage: this.state.debug?3:this.state.playstage,
-            mask: this.getDeskMask(),
-            color: color[0]
-        };
-        postData({
-            url: window.loft.apiserver + "get-bot-step",
-            data: postdata,
-            success: (res)=>{
-                if(!res.success){
-                    this.iiStep(color);
-                }else{
-                    if(this.state.cells[res.data.from].color===color && typeof(this.state.cells[res.data.from].possibilities[res.data.to])!=="undefined"){
-                        this.doStep(res.data.to, res.data.from, true, null);
-                    }else{
-                        this.iiStep(color);
-                    }
-                }
-            }
-        });
     }
 
     botStep = (lastStepColor) => {
@@ -582,6 +586,98 @@ export default class App extends React.Component{
         }, t*2);
     }
 
+    consoleLog = (text) => {
+        this.setMazafuckinState({consoleText: text});
+    }
+
+    clearPlayerInfoAfterGameOver = () => {
+        let {playerInfo} = this.state;
+        playerInfo.status = "in_game";
+        playerInfo.color = "white";
+        playerInfo.steps = 0;
+        playerInfo.moves = 0;
+        playerInfo.done = 0;
+        this.setMazafuckinState({
+            playersStep: true,
+            opponentInfo: {
+                name: "bot"+Math.round(Math.random()*1000 + 1000), 
+                status: "in_game",
+                color: "black",
+                steps: 0,
+                moves: 0,
+                done: 0
+            },
+            afkcounter: 0,
+            cells: this.dropCheckersToDefaults(),
+            playstage: 1,
+            online: false,
+            playerInfo: playerInfo,
+            modal: {code: "", bg: true, panel: true, autoclose: false},
+            consoleText: Lang("disconnected") + ". " + Lang("yourTurnText")
+        });
+    }
+
+    updatePI = (data) => {
+        let {playerInfo: pi} = this.state;
+        for(let k in data){
+            if(typeof(pi.statistics[k])!=="undefined") pi.statistics[k] = data[k];
+        }
+        this.setMazafuckinState({playerInfo: pi});
+    }
+
+    showBestMove = () => {
+        /*let {bestMove:b} = this.state;
+        console.log("replay");
+        console.log(b);
+        if(b!==null && b.steps>3){
+            setTimeout(()=>{
+                let f = document.getElementById("fanfara");
+                f.style.transition = "all 0.3s ease";
+                f.style.opacity = "0.5";
+                let cells = {};
+                for(let i=0;i<b.mask.length;i++){
+                    let x = (i%8)+1;
+                    let y = Math.floor(i/8)+1;
+                    let color = false;
+                    let checker = false;
+                    if(b.mask[i]==="0"){
+                        color = "black";
+                        checker = "black";
+                    }
+                    if(b.mask[i]==="1"){
+                        color = "white";
+                        checker = "white";
+                    }
+                    cells[x+":"+y] = {x:x,y:y,k:i+1,checker:checker,color:color};
+                }
+                this.setMazafuckinState({cells:cells});
+                setTimeout(()=>{
+                    this.stepAnimation(b.to,b.from,false,b.path);
+                },200);
+            },1000);
+        }*/
+    }
+
+    setMazafuckinState = (o) => { // method just for debug
+        //console.log("Changing state",o); 
+        this.setState(o);
+    }
+    
+
+    deepCopy = (o) => {
+        let t = {};
+        for(let k in o) t[k] = typeof(o[k])!=="object" ? o[k] : this.deepCopy(o[k]);
+        return t;
+    }
+
+    deepArrCopy = (o) => {
+        let t = [];
+        for(let k in o) t[k] = o[k];
+        return t;
+    }
+
+    // Main user action
+
     onCheckerClick = (koords) => {
         let {cells} = this.state;
         if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status==="in_game")
@@ -664,204 +760,7 @@ export default class App extends React.Component{
         }
     }
 
-    consoleLog = (text) => {
-        this.setMazafuckinState({consoleText: text});
-    }
-/*
-    updateSetting = (key, val) => {
-        console.log("state updated");
-        let {usersettings} = this.state;
-        usersettings[key] = val;
-        this.setState({usersettings: usersettings});
-    }
-*/
-    socketSend = (param) => {
-        console.log(param);
-        this.socket.send(JSON.stringify(param));
-    }
-
-    connectSocket = () => {
-        console.log(`Connecting socket ${window.loft.wsserver}`);
-        this.socket = new WebSocket(window.loft.wsserver);
-        this.socket.onopen = () => {
-            this.consoleLog(Lang("connected"));
-            this.setMazafuckinState({socketOpened: true});
-            this.startNewSearch(true);
-        };
-        this.socket.onclose = evt => { 
-            if (evt.wasClean) {
-                this.consoleLog(Lang("disconnected"));
-            } else {
-                this.consoleLog(Lang("serversUnavailable"));
-            }
-            this.setMazafuckinState({socketOpened: false});
-            console.log('Code: ' + evt.code + ' reason: ' + evt.reason);
-        };
-        this.socket.onerror = evt => { 
-            console.log('Socket connection failed', evt);
-            this.setMazafuckinState({socketOpened: false, consoleText: Lang("serversUnavailable")});
-        };
-        this.socket.onmessage = evt => { 
-            this.socketReplyProcessing(evt);
-        };
-    }
-
-    clearPlayerInfoAfterGameOver = () => {
-        let {playerInfo} = this.state;
-        playerInfo.status = "in_game";
-        playerInfo.color = "white";
-        playerInfo.steps = 0;
-        playerInfo.moves = 0;
-        playerInfo.done = 0;
-        this.setMazafuckinState({
-            playersStep: true,
-            opponentInfo: {
-                name: "bot"+Math.round(Math.random()*1000 + 1000), 
-                status: "in_game",
-                color: "black",
-                steps: 0,
-                moves: 0,
-                done: 0
-            },
-            afkcounter: 0,
-            cells: this.dropCheckersToDefaults(),
-            playstage: 1,
-            online: false,
-            playerInfo: playerInfo,
-            modal: {code: "", bg: true, panel: true, autoclose: false},
-            consoleText: Lang("disconnected") + ". " + Lang("yourTurnText")
-        });
-    }
-
-    continueWithSameOpponent = () => {
-        if(this.state.socketOpened) this.socketSend({action:"REREGISTER"});
-        else this.consoleLog(Lang("serversUnavailable"));
-        this.clearPlayerInfoAfterGameOver();
-    }
-
-    searchNewOpponent = (reset=true,socketOpened=this.state.socketOpened) => {
-        let regdata = {
-            action:"REGISTER",
-            game: this.state.game,
-            name: this.state.playerInfo.display_name,
-        };
-        if(typeof(this.state.playerInfo.login)!=="undefined") regdata['login'] = this.state.playerInfo.login;
-        if(socketOpened) this.socketSend(regdata);
-        else this.consoleLog(Lang("serversUnavailable"));
-        if(reset) this.clearPlayerInfoAfterGameOver();
-    }
-
-    suggestNewOneGame = (text="") => {
-        window.loft.showModal(
-            <div>
-                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
-                <Button action={()=>this.searchNewOpponent()} href="" value={Lang("yesText")} />
-            </div>,
-            text + "<br />" + Lang("findAnewGame")
-        );
-    }
-
-    quit = (suggestNewOne=true,juststopsearching=true) =>{
-        if(this.state.socketOpened) this.socketSend({action:"QUIT"});
-        else this.consoleLog(Lang("serversUnavailable"));
-        this.setMazafuckinState({
-            online: false,
-            consoleText: Lang("disconnected")
-        });
-        if(suggestNewOne) this.suggestNewOneGame();
-        else if(juststopsearching) this.clearPlayerInfoAfterGameOver();
-    }
-
-    startNewSearch = (socketOpened=this.state.socketOpened) => {
-        clearInterval(this.state.searchingOnlineOpponent);
-        this.setMazafuckinState({
-            consoleText: Lang("searchingTheEnemy"), 
-            searchingOnlineCounter: 0,
-            searchingOnlineOpponent: setInterval(()=>{
-                this.setMazafuckinState({searchingOnlineCounter: this.state.searchingOnlineCounter+1})
-            },1000)
-        });
-        this.searchNewOpponent(false,socketOpened);
-    }
-
-    stopTheSearch = () => {
-        clearInterval(this.state.searchingOnlineOpponent);
-        this.setMazafuckinState({
-            consoleText: "", 
-            searchingOnlineCounter: 0,
-            searchingOnlineOpponent: false
-        });
-        this.quit(false,false);
-    }
-
-    object2string = (obj) => {
-        let s = [];
-        for(let i in obj){
-            s.push(i+"="+encodeURIComponent(obj[i]));
-        }
-        return s.join("&");
-    }
-
-    updatePI = (data) => {
-        let {playerInfo: pi} = this.state;
-        for(let k in data){
-            if(typeof(pi.statistics[k])!=="undefined") pi.statistics[k] = data[k];
-        }
-        this.setMazafuckinState({playerInfo: pi});
-    }
-
-    showBestMove = () => {
-        /*let {bestMove:b} = this.state;
-        console.log("replay");
-        console.log(b);
-        if(b!==null && b.steps>3){
-            setTimeout(()=>{
-                let f = document.getElementById("fanfara");
-                f.style.transition = "all 0.3s ease";
-                f.style.opacity = "0.5";
-                let cells = {};
-                for(let i=0;i<b.mask.length;i++){
-                    let x = (i%8)+1;
-                    let y = Math.floor(i/8)+1;
-                    let color = false;
-                    let checker = false;
-                    if(b.mask[i]==="0"){
-                        color = "black";
-                        checker = "black";
-                    }
-                    if(b.mask[i]==="1"){
-                        color = "white";
-                        checker = "white";
-                    }
-                    cells[x+":"+y] = {x:x,y:y,k:i+1,checker:checker,color:color};
-                }
-                this.setMazafuckinState({cells:cells});
-                setTimeout(()=>{
-                    this.stepAnimation(b.to,b.from,false,b.path);
-                },200);
-            },1000);
-        }*/
-    }
-
-    setMazafuckinState = (o) =>{
-        //console.log("Changing state",o);
-        this.setState(o);
-    }
-
-    /*-------------------------*/
-    
-
-    deepCopy = (o) => {
-        let t = {};
-        for(let k in o) t[k] = typeof(o[k])!=="object" ? o[k] : this.deepCopy(o[k]);
-        return t;
-    }
-
-    deepArrCopy = (o) => {
-        let t = [];
-        for(let k in o) t[k] = o[k];
-        return t;
-    }
+    // Render
 
     render(){
         let renderedField = '';
@@ -875,8 +774,8 @@ export default class App extends React.Component{
             });
         }
 
-        let fieldClass = this.state.isLoading ? "loading" : "";
-        if (this.state.playerInfo.color === "black") fieldClass += " forBlacks";
+        let fieldClass = "";
+        if (this.state.playerInfo.color === "black") fieldClass = "forBlacks";
 
         return (
             <div className="ucon">

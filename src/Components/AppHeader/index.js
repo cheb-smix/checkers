@@ -36,7 +36,6 @@ export default class AppHeader extends React.Component{
                                 Routing("/" + v);
                             }}
                         />
-                        <i className="fa fa-play fa-2x"></i>
                     </div>
                 </div>
             </div>,

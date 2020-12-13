@@ -12,21 +12,20 @@ export default class Home extends React.Component{
     }
 
     gameChoice = () => {
-        this.props.showModal(
+        window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="game"
                             items={{"checkers":Lang("checkersGameName"),"giveaway":Lang("giveawayGameName"),"corners":Lang("cornersGameName"),"checkmates":Lang("chessGameName")}}
-                            selected={this.props.gamename}
+                            selected={window.loft.usersettings.game}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
-                                this.props.showModal(false);
+                                window.loft.showModal(false);
                                 this.state.settings.saveSetting("game", v);
                             }}
                         />
-                        <i className="fa fa-play fa-2x"></i>
                     </div>
                 </div>
             </div>,

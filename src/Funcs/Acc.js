@@ -87,7 +87,7 @@ export default class Acc
                 if(d.success){
                     window.loft.user_info = [];
                     window.loft.isGuest = true;
-                    delete window.lotf.atoken;
+                    delete window.loft.atoken;
                     localStorage.removeItem("atoken");
                     this.setAppState({isGuest: true});
                 }

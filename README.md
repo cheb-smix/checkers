@@ -2,7 +2,7 @@
 - Install ReactJS
 - Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
-- Install plugins: 
+- Install plugins (cordova plugin add): 
     - cordova-plugin-device
     - cordova-plugin-whitelist
     - cordova-plugin-network-information
@@ -36,8 +36,7 @@ php build.php (workfolder=...) (steps=1234567)
 0. Нужны звуки: Rampage.
 3. Локализация API (либо заблаговременно подготовленные здесь ответы API)
 4. Вывести опыт в видное место
-5. Придумать реализацию режима bluetooth вместо local
-6. Кидать приглашения по сети по никнейму
+6. Приглашения по сети по никнейму
 
 -  Стоит подумать о билде отдельных приложух.. 
 -  Отрендерить нормальную иконку!
@@ -52,6 +51,7 @@ php build.php (workfolder=...) (steps=1234567)
 -  Скины ?) Лол
 -  Реализация WS на consik/yii2-websocket в одном проекте вместе с API
 -  Вынести сокет в глобаль?
+-  Bluetooth режим?
 
 # Баги
 - Анимация фанфар

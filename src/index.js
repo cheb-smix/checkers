@@ -15,13 +15,32 @@ window.loft = {
     apiserver: "https://smix-soft.ru/api/v2/game/",
     settings: new Settings(),
     device: {},
+    devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
-    config: { WriteSteps: false, WriteStats: false, Debug: false },
+    config: { 
+        WriteSteps: false, 
+        WriteStats: false, 
+        Debug: false,
+        StepTimeLimit: 30,
+        AnimationSpeed: 45,
+        EpicStepNum: 4,
+    },
+    constants: {
+        BLACK: 0,
+        WHITE: 1,
+        STATUS_IN_GAME : 0,
+        STATUS_DONE    : 5,
+        STATUS_FAIL    : 6,
+        STATUS_WON     : 7,
+        STATUS_DRAW    : 8,
+    },
     user_info: {},
+    serverInfo: {},
     atoken: localStorage.getItem("atoken"),
     isGuest: true,
     AjaxAvailable: false,
+    SocketAvailable: false,
 };
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
@@ -70,6 +89,8 @@ async function checkConnection()
         window.loft.user_info = res.user_info;
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
+        window.loft.devInfo = res.devInfo;
+        window.loft.serverInfo = res.serverInfo;
     }
 }
 
