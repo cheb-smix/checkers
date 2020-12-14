@@ -6,20 +6,15 @@ import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
 import Lang from '../../Funcs/Lang';
-import Button from '../Button';
 import postData from '../../Funcs/PostDataFuncs';
+import Noise from '../../Funcs/Noise';
 
 import './app.css';
-import Noise from '../../Funcs/Noise';
-//import Server from '../../Funcs/Server';
 
 
 export default class App extends React.Component{
 
     INT = 0;
-
-    BLACK = 0;
-    WHITE = 1;
 
     STATUS_IN_GAME    = 0;
     STATUS_DONE       = 5;
@@ -31,11 +26,10 @@ export default class App extends React.Component{
         /* USERS DYNAMIC INFO */
         cells: {},
         bestMove: null,
-        //server: new Server(),
         playerInfo: {
             display_name: "player"+Math.round(Math.random()*1000 + 1000), 
             username: false,
-            status: "in_game",
+            status: window.loft.constants.STATUS_IN_GAME,
             color: "white",
             signed: false,
             steps: 0,
@@ -57,7 +51,7 @@ export default class App extends React.Component{
         opponentInfo: {
             display_name: "bot"+Math.round(Math.random()*1000 + 1000), 
             username: false,
-            status: "in_game",
+            status: window.loft.constants.STATUS_IN_GAME,
             color: "black",
             steps: 0,
             moves: 0,
@@ -207,7 +201,10 @@ export default class App extends React.Component{
     }
 
     startGame = (game) => {
-        let playersStep = game.players["player"].color = this.WHITE;
+        game.players["player"].color = game.players["player"].color === 0 ? "black" : "white";
+        game.players["opponent"].color = game.players["opponent"].color === 0 ? "black" : "white";
+
+        let playersStep = game.players["player"].color = "white";
         let newStateObject = {
             playersStep: playersStep,
             opponentInfo: game.players["player"],
@@ -219,7 +216,7 @@ export default class App extends React.Component{
             searchingOnlineOpponent: false,
             searchingOnlineCounter: 0,
             timeoutCheckInterval: setInterval(()=>{
-                if(this.state.online && this.state.playerInfo.status === this.STATUS_IN_GAME && this.state.lastStepTime>0){
+                if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
                     let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
                     if(r > window.loft.config.StepTimeLimit * 2 / 3){
                         this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
@@ -405,8 +402,8 @@ export default class App extends React.Component{
                 if (totalWhiteDamkas === gameTotalStat.TWD && totalBlackDamkas === gameTotalStat.TBD && totalCheckers === gameTotalStat.TC) {
                     gameTotalStat.MC++;
                     if (gameTotalStat.MC === 15) {
-                        playerInfo.status = "done";
-                        opponentInfo.status = "done";
+                        playerInfo.status = window.loft.constants.STATUS_DONE;
+                        opponentInfo.status = window.loft.constants.STATUS_DONE;
                     }
                 }
             }
@@ -445,7 +442,7 @@ export default class App extends React.Component{
     botStep = (lastStepColor) => {
         let color = this.state.autochess?(lastStepColor==="white"?"black":"white"):(this.state.playerInfo.color==="white"?"black":"white");
 
-        let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === "in_game") || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === "in_game"));
+        let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === window.loft.constants.STATUS_IN_GAME));
         
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
             setTimeout(()=>{
@@ -592,7 +589,7 @@ export default class App extends React.Component{
 
     clearPlayerInfoAfterGameOver = () => {
         let {playerInfo} = this.state;
-        playerInfo.status = "in_game";
+        playerInfo.status = window.loft.constants.STATUS_IN_GAME;
         playerInfo.color = "white";
         playerInfo.steps = 0;
         playerInfo.moves = 0;
@@ -601,7 +598,7 @@ export default class App extends React.Component{
             playersStep: true,
             opponentInfo: {
                 name: "bot"+Math.round(Math.random()*1000 + 1000), 
-                status: "in_game",
+                status: window.loft.constants.STATUS_IN_GAME,
                 color: "black",
                 steps: 0,
                 moves: 0,
@@ -680,7 +677,7 @@ export default class App extends React.Component{
 
     onCheckerClick = (koords) => {
         let {cells} = this.state;
-        if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status==="in_game")
+        if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status===window.loft.constants.STATUS_IN_GAME)
         {
             //Cell exists and it is a players turn to do a step
             if(this.state.cells[koords].color===this.state.playerInfo.color || this.state.cells[koords].color===false){

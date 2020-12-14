@@ -12,7 +12,7 @@ export default class Fanfara extends React.Component{
     }
 
     animate = () => {
-        if(this.props.playerInfo.status==="in_game" || this.state.animated) return;
+        if(this.props.playerInfo.status===window.loft.constants.STATUS_IN_GAME || this.state.animated) return;
 
         postData({
             url: window.loft.apiserver + "user-info",
@@ -130,9 +130,9 @@ export default class Fanfara extends React.Component{
 
         let gonnashow = false;
 
-        if(playerInfo.status!=="winner" && playerInfo.status!=="looser" && playerInfo.status!=="done") playerInfo.status = "in_game";
+        //if(playerInfo.status!==window.loft.constants.STATUS_WON && playerInfo.status!==window.loft.constants.STATUS_FAIL && playerInfo.status!==window.loft.constants.STATUS_DONE) playerInfo.status = window.loft.constants.STATUS_IN_GAME;
 
-        if(playerInfo.status==="winner"){
+        if(playerInfo.status===window.loft.constants.STATUS_WON){
             header = Lang("congratulations");
             let diff = opponentCheckersUnDone;
             if (playerInfo.done === 12) {
@@ -149,7 +149,7 @@ export default class Fanfara extends React.Component{
 
             Noise("victory");
         }
-        if(playerInfo.status==="looser"){
+        if(playerInfo.status===window.loft.constants.STATUS_FAIL){
             header = Lang("regrets");
             if (opponentInfo.done === 12) {
                 podtext = Lang("youLooseThisOne");
@@ -164,19 +164,20 @@ export default class Fanfara extends React.Component{
 
             Noise("fail");
         }
-        if(playerInfo.status==="done" && opponentInfo.status==="done" /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
+        if(playerInfo.status===window.loft.constants.STATUS_DONE && opponentInfo.status===window.loft.constants.STATUS_DONE /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
             header = Lang("noBadText");
             podtext = Lang("betterThanNothing");
             gonnashow = true;
             Noise("draw");
         }
-        if(playerInfo.status==="done" && opponentInfo.status!=="done" && playerInfo.done === 12){
+        if(playerInfo.status===window.loft.constants.STATUS_DONE && opponentInfo.status!==window.loft.constants.STATUS_DONE && playerInfo.done === 12){
             header = Lang("congratulations");
             text = <p>{Lang("lastEnemyStep")}</p>
             Noise("warning");
         }else{
             text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
         }
+        console.log(playerInfo);
         let expdiv = '';
         if(gonnashow && typeof(playerInfo.stat)!=="undefined"){
             let {stat:s} = playerInfo;
@@ -191,7 +192,7 @@ export default class Fanfara extends React.Component{
             </div>;
         }
         return (
-            <div className={playerInfo.status} id="fanfara"><br/>
+            <div className={"status" + playerInfo.status} id="fanfara"><br/>
                 <h3>{header}<br/>{playerInfo.display_name}<br/></h3>
                 {expdiv}
                 {text}

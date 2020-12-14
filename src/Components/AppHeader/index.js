@@ -16,7 +16,7 @@ export default class AppHeader extends React.Component{
 
     gameChoice = () => {
         let doptext = "";
-        if(this.props.playerStatus === "in_game" && this.props.online) doptext = <h5 className="warning">{Lang("gameCloseWarning")}</h5>;
+        if(this.props.playerStatus === window.loft.constants.STATUS_IN_GAME && this.props.online) doptext = <h5 className="warning">{Lang("gameCloseWarning")}</h5>;
         if(this.props.searching) doptext = <h5>{Lang("gameCloseWarning")}</h5>;
 
         if (doptext) doptext = <div className="col-md-6 col-12">{doptext}</div>
@@ -49,7 +49,7 @@ export default class AppHeader extends React.Component{
     }
 
     gameButClick = () => {
-        if(this.props.playerStatus === "in_game" && this.props.online){
+        if(this.props.playerStatus === window.loft.constants.STATUS_IN_GAME && this.props.online){
             window.loft.showModal(
                 <div className="container">
                     <div className="row">
@@ -142,11 +142,11 @@ export default class AppHeader extends React.Component{
         let acc = new Acc(this.props.setAppState);
 
         let gameclass = "fa fa-gamepad";
-        if(this.props.status === "in_game" && this.props.online) gameclass = "fa fa-stop-circle";
+        if(this.props.status === window.loft.constants.STATUS_IN_GAME && this.props.online) gameclass = "fa fa-stop-circle";
         if(this.props.searching) gameclass = "fa fa-ellipsis-h fa-smx-spin";
 
         let gametitle = Lang("searchingTheEnemy");
-        if(this.props.status === "in_game" && this.props.online) gametitle = Lang("quitTheGame");
+        if(this.props.status === window.loft.constants.STATUS_IN_GAME && this.props.online) gametitle = Lang("quitTheGame");
         if(this.props.searching) gametitle = Lang("cancelSearchConfirm");
 
         let uhcclass = "fa-2x";
