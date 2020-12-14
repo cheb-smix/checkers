@@ -71,9 +71,7 @@ export default class App extends React.Component{
         lastStepTime: 0,
         animationSpeed: 45,
         online: false,
-        socketOpened: false,
         botspeed: 1,
-        epicstepnum: 2,
         playstage: 1,
         consoleText: "",
         gameTotalStat: {
@@ -91,7 +89,6 @@ export default class App extends React.Component{
         autochess: false,
         writesteps: window.loft.config.WriteSteps,
         writestats: window.loft.config.WriteStats,
-        game_id: 0,
         gtoken: "",
     };
 
@@ -468,9 +465,9 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        if (index === steps - 1 && steps > this.state.epicstepnum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
+        if (index === steps - 1 && steps > window.loft.config.EpicStepNum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
             
-            if (steps > this.state.epicstepnum + 2 || Math.random() > 0.5) {
+            if (steps > window.loft.config.EpicStepNum + 2 || Math.random() > 0.5) {
                 Noise("epic-rock");
             } else {
                 Noise("epic");
@@ -696,7 +693,7 @@ export default class App extends React.Component{
                                     effectivity: cells[this.state.selectedChecker].possibilities[koords].effectivity
                                 };
                                 if(this.state.playerInfo.done>9) param.checkdone = 1;
-                                if(this.state.socketOpened) this.socketSend(param);
+                                //if(this.state.socketOpened) this.socketSend(param);
                             }else{
                                 this.doStep(koords);
                             }
