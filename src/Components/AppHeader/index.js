@@ -160,7 +160,7 @@ export default class AppHeader extends React.Component{
             <div className="uhicon" onClick={this.settingsClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 
-        if(!this.props.isGuest){
+        if(!window.loft.isGuest){
             accDiv = <React.Fragment>
                         <div className="uhicon" onClick={acc.showAccStat}><i className="fa fa-id-badge"></i><span> {this.props.playerInfo.user.display_name}</span></div>
                         {accDiv}

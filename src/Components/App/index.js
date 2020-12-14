@@ -33,9 +33,8 @@ export default class App extends React.Component{
             },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "white",
-            signed: false,
+            hops: 0,
             steps: 0,
-            moves: 0,
             cells: 12,
             done: 0,
             possibilities: 10,
@@ -57,8 +56,8 @@ export default class App extends React.Component{
             },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "black",
+            hops: 0,
             steps: 0,
-            moves: 0,
             cells: 12,
             done: 0,
             possibilities: 10,
@@ -175,13 +174,14 @@ export default class App extends React.Component{
 
     startNewSearch = () => {
         this.act({
-            action: 'search',
+            action: 'search/' + window.loft.usersettings.game,
             success: (res) => {
                 if (res.success && res.game) {
                     this.startGame(res.game);
                 } else {
                     this.checkFor("check-search");
                 }
+                window.loft.showModal(false);
             }
         });
     }
@@ -286,10 +286,10 @@ export default class App extends React.Component{
 
     // Animations and logic
 
-    rampage = (steps, word="", returnObj=false) => {
+    rampage = (hops, word="", returnObj=false) => {
         clearTimeout(this.state.rampageTO);
         let newstate = {
-            rampageCode:<Rampage steps={steps} word={word} />,
+            rampageCode:<Rampage hops={hops} word={word} />,
             rampageTO:setTimeout(()=>{
                 this.setMazafuckinState({rampageCode:"",rampageTO:null});
             },3000)
@@ -315,7 +315,7 @@ export default class App extends React.Component{
     theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
         let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
         let {color} = cells[koordsfrom];
-        let steps = cells[koordsfrom].possibilities[koordsto].path.length;
+        let hops = cells[koordsfrom].possibilities[koordsto].path.length;
 
         if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
             cells[koordsfrom].possibilities[koordsto].kills.forEach((k, v) => {
@@ -326,22 +326,22 @@ export default class App extends React.Component{
             });
         }
         
-        if(bestMove===null || bestMove.steps<steps || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity){
+        if(bestMove===null || bestMove.hops<hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity){
             bestMove = {
                 mask: this.getDeskMask(this.state.cells,true),
                 from:koordsfrom,
                 to:koordsto,
-                steps:steps,
+                hops:hops,
                 path:cells[koordsfrom].possibilities[koordsto].path,
                 effectivity:cells[koordsfrom].possibilities[koordsto].effectivity
             };
         }
         if(cells[koordsfrom].color === playerInfo.color){
-            playerInfo.steps += steps;
-            playerInfo.moves++;
+            playerInfo.hops += hops;
+            playerInfo.steps++;
         }else{
-            opponentInfo.steps += steps;
-            opponentInfo.moves++;
+            opponentInfo.hops += hops;
+            opponentInfo.steps++;
         }
         cells[koordsto].checker = cells[koordsfrom].checker;
         cells[koordsto].color = cells[koordsfrom].color;
@@ -364,7 +364,7 @@ export default class App extends React.Component{
         if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = Lang("gameOverText");
 
         let playstage = 1;
-        if(playerInfo.moves + opponentInfo.moves > 4){
+        if(playerInfo.steps + opponentInfo.steps > 4){
             playstage = 2;
             if(playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
         }
@@ -396,8 +396,8 @@ export default class App extends React.Component{
             }
         }
         let newstate = {}
-        if(steps>2) newstate = this.rampage(steps, "", true);
-        Noise(steps);
+        if(hops>2) newstate = this.rampage(hops, "", true);
+        Noise(hops);
 
         newstate.playerInfo = playerInfo;
         newstate.opponentInfo = opponentInfo;
@@ -450,7 +450,7 @@ export default class App extends React.Component{
 
         let k1 = possibility.path[index - 1];
         let k2 = possibility.path[index];
-        let steps = possibility.path.length;
+        let hops = possibility.path.length;
 
         let ooo = document.querySelector(`.ucell[koords="${k1}"]`);
 
@@ -465,9 +465,9 @@ export default class App extends React.Component{
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        if (index === steps - 1 && steps > window.loft.config.EpicStepNum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
+        if (index === hops - 1 && hops > window.loft.config.EpicStepNum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
             
-            if (steps > window.loft.config.EpicStepNum + 2 || Math.random() > 0.5) {
+            if (hops > window.loft.config.EpicStepNum + 2 || Math.random() > 0.5) {
                 Noise("epic-rock");
             } else {
                 Noise("epic");
@@ -523,7 +523,7 @@ export default class App extends React.Component{
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
 
-        if (index === steps - 1) {
+        if (index === hops - 1) {
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
@@ -578,8 +578,8 @@ export default class App extends React.Component{
         let {playerInfo} = this.state;
         playerInfo.status = window.loft.constants.STATUS_IN_GAME;
         playerInfo.color = "white";
+        playerInfo.hops = 0;
         playerInfo.steps = 0;
-        playerInfo.moves = 0;
         playerInfo.done = 0;
         this.setMazafuckinState({
             playersStep: true,
@@ -587,8 +587,8 @@ export default class App extends React.Component{
                 name: "bot"+Math.round(Math.random()*1000 + 1000), 
                 status: window.loft.constants.STATUS_IN_GAME,
                 color: "black",
+                hops: 0,
                 steps: 0,
-                moves: 0,
                 done: 0
             },
             afkcounter: 0,
@@ -613,7 +613,7 @@ export default class App extends React.Component{
         /*let {bestMove:b} = this.state;
         console.log("replay");
         console.log(b);
-        if(b!==null && b.steps>3){
+        if(b!==null && b.hops>3){
             setTimeout(()=>{
                 let f = document.getElementById("fanfara");
                 f.style.transition = "all 0.3s ease";
@@ -688,7 +688,7 @@ export default class App extends React.Component{
                                     action:"THESTEP",
                                     from:this.state.selectedChecker,
                                     to:koords,
-                                    steps: cells[this.state.selectedChecker].possibilities[koords].len,
+                                    hops: cells[this.state.selectedChecker].possibilities[koords].path.length,
                                     checker:cells[this.state.selectedChecker].checker,
                                     effectivity: cells[this.state.selectedChecker].possibilities[koords].effectivity
                                 };
@@ -775,7 +775,6 @@ export default class App extends React.Component{
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
                         setAppState={this.props.setAppState}
-                        isGuest={this.props.isGuest}
                         quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
