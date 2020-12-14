@@ -157,16 +157,26 @@ export default class App extends React.Component{
         } else {
             clearInterval(this.INT);
             this.INT = setInterval(() => {
-                postData({
-                    url: window.loft.apiserver + target,
-                    success: (res) => {
-                        if (res.success && res.game) {
-                            clearInterval(this.INT);
-                            this.startGame(res.game);
-                        }
-                    }
+                this.setState({
+                    searchingOnlineOpponent: true,
+                    searchingOnlineCounter: this.state.searchingOnlineCounter + 1,
                 });
-            }, 3000)
+                if (this.state.searchingOnlineCounter % 4 === 0) {
+                    postData({
+                        url: window.loft.apiserver + target,
+                        success: (res) => {
+                            if (res.success && res.game) {
+                                clearInterval(this.INT);
+                                this.startGame(res.game);
+                                this.setState({
+                                    searchingOnlineOpponent: false,
+                                    searchingOnlineCounter: 0,
+                                });
+                            }
+                        }
+                    });
+                }
+            }, 1000)
         }
     }
 
@@ -187,6 +197,10 @@ export default class App extends React.Component{
     }
 
     stopTheSearch = () => {
+        this.setState({
+            searchingOnlineOpponent: false,
+            searchingOnlineCounter: 0,
+        });
         this.act({
             action: 'stop-search',
             success: () => {

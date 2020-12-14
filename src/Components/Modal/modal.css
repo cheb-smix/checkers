@@ -58,6 +58,12 @@
     color: var(--neon-bg-color);
     border-bottom: 1px solid var(--neon-bg-color);
 }
+#modal h5{
+    font-family: ForwardExtra-Light;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
 
 
 @media (orientation: portrait), (max-aspect-ratio: 10/13){

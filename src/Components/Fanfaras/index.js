@@ -177,7 +177,7 @@ export default class Fanfara extends React.Component{
         }else{
             text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
         }
-        console.log(playerInfo);
+        
         let expdiv = '';
         if(gonnashow && typeof(playerInfo.stat)!=="undefined"){
             let {stat:s} = playerInfo;
