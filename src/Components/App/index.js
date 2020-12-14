@@ -27,8 +27,10 @@ export default class App extends React.Component{
         cells: {},
         bestMove: null,
         playerInfo: {
-            display_name: "player"+Math.round(Math.random()*1000 + 1000), 
-            username: false,
+            user: {
+                display_name: "player" + Math.round(Math.random() * 1000 + 1000), 
+                username: false,
+            },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "white",
             signed: false,
@@ -49,8 +51,10 @@ export default class App extends React.Component{
             }
         },
         opponentInfo: {
-            display_name: "bot"+Math.round(Math.random()*1000 + 1000), 
-            username: false,
+            user: {
+                display_name: "bot" + Math.round(Math.random() * 1000 + 1000), 
+                username: false,
+            },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "black",
             steps: 0,
@@ -59,7 +63,7 @@ export default class App extends React.Component{
             done: 0,
             possibilities: 10,
         },
-        game: window.location.href.split("/").pop(),
+        game: window.loft.usersettings.game,
         /* TECH INFO */
         selectedChecker: false,
         playersStep: true,
@@ -81,12 +85,6 @@ export default class App extends React.Component{
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
-        AjaxAvailable: false,
-        serverInfo: {
-            avgwaittime: {cnt: 0, ttl: 0, avg: 0},
-            playersstat: {total: 0, searching: 0, in_game: 0},
-            steptimelimit: 30
-        },
         
         /* DEV FIELDS */
         debug: window.loft.config.Debug,
@@ -106,12 +104,12 @@ export default class App extends React.Component{
         let {playerInfo, opponentInfo} = this.state;
         
         if(!window.loft.isGuest){
-            playerInfo.display_name = window.loft.user_info.display_name;
-            playerInfo.username = window.loft.user_info.username;
+            playerInfo.user.display_name = window.loft.user_info.display_name;
+            playerInfo.user.username = window.loft.user_info.username;
             playerInfo.stat = window.loft.user_info.stat;
         }
 
-        if(this.state.autochess) playerInfo.display_name = "bot"+Math.round(Math.random()*1000 + 1000);
+        if(this.state.autochess) playerInfo.user.display_name = "bot"+Math.round(Math.random()*1000 + 1000);
 
         state.playerInfo = playerInfo;
 
@@ -261,7 +259,6 @@ export default class App extends React.Component{
         let {cells} = this.state;
         this.act({
             action: 'set-step',
-            id: this.state.game_id,
             data: {
                 mask:   this.getDeskMask(),
                 pflag:  pflag,
@@ -269,18 +266,11 @@ export default class App extends React.Component{
                 to:     koordsto,
                 effectivity: this.cells[koordsfrom].possibilities[koordsto].effectivity,
                 color:  cells[koordsfrom].color[0],
-                game_id:this.state.game_id,
                 gtoken: this.state.gtoken,
             },
             success: (res)=>{
                 if(res.success){
-                    if(this.state.game_id === 0){
-                        if(res.data.game_id){
-                            this.setMazafuckinState({game_id: res.data.game_id, gtoken: res.data.gtoken});
-                        }else{
-                            window.loft.AjaxAvailable = false;
-                        } 
-                    }
+                    // nothing to do here
                 }
             }
         });
@@ -316,7 +306,7 @@ export default class App extends React.Component{
     }
 
     doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
-        if(pflag!==null && (this.state.writesteps || (this.state.game_id===0 && this.state.writestats))) this.saveStepResults(koordsto,koordsfrom,pflag);
+        if(pflag!==null && (this.state.writesteps || this.state.writestats)) this.saveStepResults(koordsto,koordsfrom,pflag);
         
         if(window.loft.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
@@ -389,7 +379,7 @@ export default class App extends React.Component{
                 opponentInfo = o.opponentInfo;
             }
         }
-        if (this.state.game === "checkers" || this.state.game === "giveaway") {
+        if (window.loft.usersettings.isCheckers) {
             let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.white.damka`).length;
             let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.black.damka`).length;
             let totalCheckers = document.querySelectorAll(`.ucell .uchecker.black,.ucell .uchecker.white`).length;
@@ -559,7 +549,7 @@ export default class App extends React.Component{
 
     stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
         let {cells} = this.state;
-        if (this.state.game === "corners" && cells[koordsfrom].possibilities[koordsto].path.length > 2) {
+        if (window.loft.usersettings.game === "corners" && cells[koordsfrom].possibilities[koordsto].path.length > 2) {
             cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v,k) => k%2===0);
         }
         let possibility = cells[koordsfrom].possibilities[koordsto];
@@ -715,7 +705,7 @@ export default class App extends React.Component{
                             //cells[this.state.selectedChecker].active = false;
                             
                             let needToEatMore = false;
-                            if (this.state.game === "checkers" || this.state.game === "giveaway") {
+                            if (window.loft.usersettings.isCheckers) {
                                 for (let p in cells[this.state.selectedChecker].possibilities) {
                                     let pos = cells[this.state.selectedChecker].possibilities[p];
                                     if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
@@ -761,11 +751,10 @@ export default class App extends React.Component{
 
     render(){
         let renderedField = '';
-        let checkers = (this.state.game === "checkers" || this.state.game === "giveaway");
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
                 let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
-                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && checkers);
+                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && window.loft.usersettings.isCheckers);
                 let active = koords === this.state.selectedChecker;
                 return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
@@ -777,15 +766,14 @@ export default class App extends React.Component{
         return (
             <div className="ucon">
                 <AppHeader 
-                        gamename={this.state.game} 
-                        playerName={this.state.playerInfo.display_name}
+                        /*playerName={this.state.playerInfo.display_name}
                         playerColor={this.state.playerInfo.color}
                         playerStatus={this.state.playerInfo.status}
-                        playerStat={window.loft.isGuest ? {} : this.state.playerInfo.stat}
+                        playerStat={window.loft.isGuest ? {} : this.state.playerInfo.stat}*/
+                        playerInfo={this.state.playerInfo}
                         searching={this.state.searchingOnlineOpponent} 
                         count={this.state.searchingOnlineCounter} 
                         online={this.state.online}
-                        serverInfo={this.state.serverInfo}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
                         updateSetting={this.updateSetting}
@@ -815,11 +803,10 @@ export default class App extends React.Component{
                         text={this.state.consoleText} 
                         online={this.state.online}
                         rampageCode={this.state.rampageCode}
-                        player={this.state.playerInfo.display_name}
-                        opponent={this.state.opponentInfo.display_name}
+                        player={this.state.playerInfo.user.display_name}
+                        opponent={this.state.opponentInfo.user.display_name}
                         searching={this.state.searchingOnlineOpponent} 
                         count={this.state.searchingOnlineCounter} 
-                        serverInfo={this.state.serverInfo}
                         rec={this.state.writesteps}
                     />
                 </div>

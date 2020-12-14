@@ -111,7 +111,7 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.continueWithSameOpponent} 
                             href="" 
-                            value={Lang("continueWith").replace("$", opponentInfo.display_name)} 
+                            value={Lang("continueWith").replace("$", opponentInfo.user.display_name)} 
                             theme="neon"
                             strong="true"
                         />
@@ -193,7 +193,7 @@ export default class Fanfara extends React.Component{
         }
         return (
             <div className={"status" + playerInfo.status} id="fanfara"><br/>
-                <h3>{header}<br/>{playerInfo.display_name}<br/></h3>
+                <h3>{header}<br/>{playerInfo.user.display_name}<br/></h3>
                 {expdiv}
                 {text}
             </div>

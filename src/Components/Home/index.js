@@ -2,15 +2,9 @@ import React from 'react';
 import Button from '../Button';
 import Lang from '../../Funcs/Lang';
 import Droplist from '../Droplist';
-import { Settings } from '../Setting';
 import Acc from '../../Funcs/Acc';
 
 export default class Home extends React.Component{
-
-    state = {
-        settings: new Settings()
-    }
-
     gameChoice = () => {
         window.loft.showModal(
             <div className="container">
@@ -23,7 +17,8 @@ export default class Home extends React.Component{
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
                                 window.loft.showModal(false);
-                                this.state.settings.saveSetting("game", v);
+                                window.loft.settings.saveSetting("game", v);
+                                window.loft.settings.saveSetting("isCheckers", (v === "checkers" || v === "corners"));
                             }}
                         />
                     </div>
@@ -34,7 +29,7 @@ export default class Home extends React.Component{
     }
 
     getGame = () => {
-        return this.state.settings.getSettings("game") ?? "checkers";
+        return window.loft.settings.getSettings("game") ?? "checkers";
     }
 
     getGameRoute = () => {
@@ -47,17 +42,17 @@ export default class Home extends React.Component{
             <div id="btnContainer" className="animate__fadeIn animate__animated">
                 <h5 onClick={this.gameChoice}>{Lang(this.getGame() + "GameName")}</h5>
                 <Button 
-                    action={()=>this.state.settings.saveSetting("mode", "bot")} 
+                    action={()=>window.loft.settings.saveSetting("mode", "bot")} 
                     href={this.getGameRoute()} 
                     value={Lang("playWithBot")} 
                 />
                 <Button 
-                    action={()=>this.state.settings.saveSetting("mode", "local")} 
+                    action={()=>window.loft.settings.saveSetting("mode", "local")} 
                     href={this.getGameRoute()} 
                     value={Lang("playByBlueTooth")} 
                 />
                 <Button 
-                    action={()=>this.state.settings.saveSetting("mode", "online")} 
+                    action={()=>window.loft.settings.saveSetting("mode", "online")} 
                     href={this.getGameRoute()} 
                     value={Lang("playOnlineGame")} 
                 />
