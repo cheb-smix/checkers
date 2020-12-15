@@ -210,38 +210,98 @@ export default class App extends React.Component{
     }
 
     startGame = (game) => {
-        game.players["player"].color = game.players["player"].color === 0 ? "black" : "white";
-        game.players["opponent"].color = game.players["opponent"].color === 0 ? "black" : "white";
-
-        let playersStep = game.players["player"].color = "white";
+        let playersStep = game.players["player"].color === "white";
         let newStateObject = {
             playersStep: playersStep,
-            opponentInfo: game.players["player"],
-            playerInfo: game.players["opponent"],
-            lastStepTime: game.started,
+            opponentInfo: game.players["opponent"],
+            playerInfo: game.players["player"],
+            lastStepTime: game.lastStepTime,
             consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")),
             online: true,
             cells: this.dropCheckersToDefaults(),
             searchingOnlineOpponent: false,
             searchingOnlineCounter: 0,
+            gtoken: game.gtoken,
             timeoutCheckInterval: setInterval(()=>{
                 if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
                     let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                    if(r > window.loft.config.StepTimeLimit * 2 / 3){
-                        this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
+                    if (!this.state.playersStep && !window.loft.SocketAvailable && r%5===0) {
+                        this.checkStep("check-step");
                     }
-                    if(r > window.loft.config.StepTimeLimit){
-                        if(!this.state.playersStep){
-                            //this.socketSend({action:"TIMEOUTOPPO"});
-                            this.suggestNewOneGame(Lang("enemyLostByTimeout"));
-                        }
-                        this.consoleLog(Lang("gameOverByTimeout"));
-                        clearInterval(this.state.timeoutCheckInterval);
+                    if (this.state.playersStep && !window.loft.SocketAvailable && r%10===0) {
+                        this.checkStep("game-status");
+                    }
+                    if (window.loft.SocketAvailable) {
+                        this.checkTOI();
                     }
                 }
             },1000)
         }
         this.setMazafuckinState(newStateObject);
+    }
+
+    checkTOI = () => {
+        let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
+        if(r > window.loft.config.StepTimeLimit * 2 / 3){
+            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
+        }
+        if(r > window.loft.config.StepTimeLimit){
+            if(!this.state.playersStep){
+                //this.socketSend({action:"TIMEOUTOPPO"});
+                //this.suggestNewOneGame(Lang("enemyLostByTimeout"));
+            }
+            this.consoleLog(Lang("gameOverByTimeout"));
+            clearInterval(this.state.timeoutCheckInterval);
+        }
+    }
+
+    checkStep = (action) => {
+        this.act({
+            action: action,
+            data: {gtoken: this.state.gtoken},
+            success: (res) => {
+                if (res.success){
+                    this.procedureStepData(res);
+                } else {
+                    console.log(res);
+                }
+                this.checkTOI();
+            }
+        });
+    }
+
+    procedureStepData = (stepData) => {
+        if (typeof(stepData.game_results) !== "undefined") {
+            if (stepData.game_results.status === window.loft.constants.STATUS_NOMANS) {
+                let {playerInfo, opponentInfo} = this.state;
+                playerInfo.status = window.loft.constants.STATUS_DRAW;
+                opponentInfo.status = window.loft.constants.STATUS_DRAW;
+                this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+            } else if (stepData.game_results.status === window.loft.constants.STATUS_FINISHED) {
+                let {playerInfo, opponentInfo} = this.state;
+                if (typeof(stepData.game_results.winner) !== "undefined") {
+                    playerInfo.status = window.loft.constants.STATUS_WON;
+                    opponentInfo.status = window.loft.constants.STATUS_FAIL;
+                } else if (typeof(stepData.game_results.winner) !== "undefined") {
+                    playerInfo.status = window.loft.constants.STATUS_FAIL;
+                    opponentInfo.status = window.loft.constants.STATUS_WON;
+                }
+                this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+            }
+            return;
+        }
+        if (typeof(stepData.lastStep) !== "undefined") {
+            this.setState({
+                lastStepTime: stepData.lastStep.timestamp,
+            });
+            this.doStep(
+                stepData.lastStep.to,
+                stepData.lastStep.from,
+                stepData.lastStep.color !== (this.state.playerInfo.color === "white" ? 1 : 0),
+                null
+            );
+            return;
+        }
     }
 
     getBotStep = (color) => {
@@ -250,7 +310,7 @@ export default class App extends React.Component{
             data: {
                 playstage: this.state.debug ? 3 : this.state.playstage,
                 mask: this.getDeskMask(),
-                color: color[0]
+                color: color
             },
             success: (res) => {
                 if(!res.success){
@@ -272,11 +332,10 @@ export default class App extends React.Component{
             action: 'set-step',
             data: {
                 mask:   this.getDeskMask(),
-                pflag:  pflag,
                 from:   koordsfrom,
                 to:     koordsto,
                 effectivity: this.cells[koordsfrom].possibilities[koordsto].effectivity,
-                color:  cells[koordsfrom].color[0],
+                color:  cells[koordsfrom].color,
                 gtoken: this.state.gtoken,
             },
             success: (res)=>{

@@ -27,6 +27,9 @@ window.loft = {
         EpicStepNum: 4,
     },
     constants: {
+        STATUS_ACTIVE  : "A",
+        STATUS_FINISHED: "F",
+        STATUS_NOMANS  : "N",
         STATUS_IN_GAME : "A",
         STATUS_DONE    : "D",
         STATUS_FAIL    : "F",
