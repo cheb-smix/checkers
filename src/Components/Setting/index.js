@@ -65,7 +65,10 @@ export class Settings{
                 musicplayer.play();
             }
             if (value === 0 && !musicplayer.paused) musicplayer.pause();
-            
+        }
+
+        if (key === "game") {
+            window.loft.isCheckers = ["checkers", "giveaway"].indexOf(value) >= 0;
         }
     }
 

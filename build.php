@@ -42,6 +42,8 @@ if (substr($cordova_workfolder, -1, 1) != "/") {
     $cordova_workfolder .= "/";
 }
 
+$dev_info["cordova_workfolder"] = $cordova_workfolder;
+
 echo "Cordova workfolder initiated at $cordova_workfolder\n";
 
 if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "1")) {

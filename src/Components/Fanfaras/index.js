@@ -181,13 +181,13 @@ export default class Fanfara extends React.Component{
         let expdiv = '';
         if(gonnashow && typeof(playerInfo.stat)!=="undefined"){
             let {stat:s} = playerInfo;
-            let startexp = (s.lvl > 1) ? (50*(Math.pow(2,s.lvl-1))) : 0;
-            let endexp = 50*(Math.pow(2,s.lvl));
-            let progress = Math.percent(s.exp - startexp,endexp - startexp);
+            let startexp = (s.level > 1) ? (50*(Math.pow(2,s.level-1))) : 0;
+            let endexp = 50*(Math.pow(2,s.level));
+            let progress = Math.percent(s.experience - startexp,endexp - startexp);
             let left = 50 - parseInt(progress,10)/2;
             if(this.state.animated===false) setTimeout(()=>{this.animate()},1000);
             expdiv = <div className="exp">
-                <div className="progress" style={{width: progress, left: left+"%"}}>{s.exp}</div>
+                <div className="progress" style={{width: progress, left: left+"%"}}>{s.experience}</div>
                 <table className="stable" style={{padding: "0px"}}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
             </div>;
         }

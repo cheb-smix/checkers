@@ -36,6 +36,7 @@ window.loft = {
         STATUS_WON     : "W",
         STATUS_DRAW    : "X",
     },
+    //timezoneOffset: new Date().getTimezoneOffset(),
     user_info: {},
     serverInfo: {},
     atoken: localStorage.getItem("atoken"),
@@ -50,6 +51,7 @@ if (window.location.hostname === "localhost" || window.location.hostname === "12
 }
 
 window.loft.usersettings = window.loft.settings.getSettings();
+window.loft.isCheckers = ["checkers", "giveaway"].indexOf(window.loft.usersettings.game) >= 0;
 
 if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
 else document.addEventListener("DOMContentLoaded", DOMLoaded, false);

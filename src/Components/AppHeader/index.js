@@ -51,6 +51,7 @@ export default class AppHeader extends React.Component{
     }
 
     gameButClick = () => {
+        this.navigatorClick(false);
         if(this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online){
             window.loft.showModal(
                 <div className="container">

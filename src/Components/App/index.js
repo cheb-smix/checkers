@@ -5,6 +5,7 @@ import Cell from '../Cell/';
 import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
+import Button from '../Button';
 import Lang from '../../Funcs/Lang';
 import postData from '../../Funcs/PostDataFuncs';
 import Noise from '../../Funcs/Noise';
@@ -105,7 +106,7 @@ export default class App extends React.Component{
             playerInfo.stat = window.loft.user_info.stat;
         }
 
-        if(this.state.autochess) playerInfo.user.display_name = "bot"+Math.round(Math.random()*1000 + 1000);
+        if(this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
 
         state.playerInfo = playerInfo;
 
@@ -242,13 +243,14 @@ export default class App extends React.Component{
 
     checkTOI = () => {
         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
+        console.log(r);
         if(r > window.loft.config.StepTimeLimit * 2 / 3){
             this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
         }
         if(r > window.loft.config.StepTimeLimit){
             if(!this.state.playersStep){
-                //this.socketSend({action:"TIMEOUTOPPO"});
-                //this.suggestNewOneGame(Lang("enemyLostByTimeout"));
+                //this.socketSend({action:"TIMEOUTOPPO"}); // one more check on server side by socket
+                this.suggestNewOneGame(Lang("enemyLostByTimeout"));
             }
             this.consoleLog(Lang("gameOverByTimeout"));
             clearInterval(this.state.timeoutCheckInterval);
@@ -277,6 +279,7 @@ export default class App extends React.Component{
                 playerInfo.status = window.loft.constants.STATUS_DRAW;
                 opponentInfo.status = window.loft.constants.STATUS_DRAW;
                 this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                clearInterval(this.state.timeoutCheckInterval);
             } else if (stepData.game_results.status === window.loft.constants.STATUS_FINISHED) {
                 let {playerInfo, opponentInfo} = this.state;
                 if (typeof(stepData.game_results.winner) !== "undefined") {
@@ -287,6 +290,7 @@ export default class App extends React.Component{
                     opponentInfo.status = window.loft.constants.STATUS_WON;
                 }
                 this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                clearInterval(this.state.timeoutCheckInterval);
             }
             return;
         }
@@ -298,7 +302,8 @@ export default class App extends React.Component{
                 stepData.lastStep.to,
                 stepData.lastStep.from,
                 stepData.lastStep.color !== (this.state.playerInfo.color === "white" ? 1 : 0),
-                null
+                null,
+                false
             );
             return;
         }
@@ -334,8 +339,9 @@ export default class App extends React.Component{
                 mask:   this.getDeskMask(),
                 from:   koordsfrom,
                 to:     koordsto,
-                effectivity: this.cells[koordsfrom].possibilities[koordsto].effectivity,
-                color:  cells[koordsfrom].color,
+                kills:  cells[koordsfrom].possibilities[koordsto].kills ?? [],
+                effectivity: cells[koordsfrom].possibilities[koordsto].effectivity,
+                ep:     this.state.opponentInfo.possibilities,
                 gtoken: this.state.gtoken,
             },
             success: (res)=>{
@@ -350,7 +356,15 @@ export default class App extends React.Component{
 
 
 
-
+    suggestNewOneGame = (text = "") => {
+        window.loft.showModal(
+            <div>
+                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
+                <Button action={()=>this.startNewSearch()} href="" value={Lang("yesText")} />
+            </div>,
+            text + "<br />" + Lang("findAnewGame")
+        );
+    }
 
 
 
@@ -375,8 +389,8 @@ export default class App extends React.Component{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    doStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,pflag=true) => {
-        if(pflag!==null && (this.state.writesteps || this.state.writestats)) this.saveStepResults(koordsto,koordsfrom,pflag);
+    doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, pflag = true, write = true) => {
+        if (write) if(this.state.writesteps || this.state.online) this.saveStepResults(koordsto,koordsfrom,pflag);
         
         if(window.loft.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
@@ -449,7 +463,7 @@ export default class App extends React.Component{
                 opponentInfo = o.opponentInfo;
             }
         }
-        if (window.loft.usersettings.isCheckers) {
+        if (window.loft.isCheckers) {
             let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.white.damka`).length;
             let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.black.damka`).length;
             let totalCheckers = document.querySelectorAll(`.ucell .uchecker.black,.ucell .uchecker.white`).length;
@@ -737,12 +751,12 @@ export default class App extends React.Component{
 
     onCheckerClick = (koords) => {
         let {cells} = this.state;
-        if(typeof(this.state.cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status===window.loft.constants.STATUS_IN_GAME)
+        if (typeof(cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status===window.loft.constants.STATUS_IN_GAME)
         {
             //Cell exists and it is a players turn to do a step
-            if(this.state.cells[koords].color===this.state.playerInfo.color || this.state.cells[koords].color===false){
+            if (cells[koords].color !== this.state.opponentInfo.color) {
                 //If checker is player`s one or empty cell
-                if(cells[koords].checker!==false){
+                if(cells[koords].checker !== false){
                     //New checker click
                     let newselectedChecker = false;
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
@@ -752,11 +766,12 @@ export default class App extends React.Component{
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
                 }else{
                     //Trying to do a step
-                    if(this.state.selectedChecker!==false){
+                    if (this.state.selectedChecker !== false) {
                         //If we have an active checker
                         if(typeof(cells[this.state.selectedChecker].possibilities[koords]) !== "undefined"){
                             //If we have such step as possible
-                            if(this.state.online){
+                            this.doStep(koords);
+                            /*if (this.state.online) {
                                 let param = {
                                     action:"THESTEP",
                                     from:this.state.selectedChecker,
@@ -769,13 +784,13 @@ export default class App extends React.Component{
                                 //if(this.state.socketOpened) this.socketSend(param);
                             }else{
                                 this.doStep(koords);
-                            }
+                            }*/
                         }else{
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;
                             
                             let needToEatMore = false;
-                            if (window.loft.usersettings.isCheckers) {
+                            if (window.loft.isCheckers) {
                                 for (let p in cells[this.state.selectedChecker].possibilities) {
                                     let pos = cells[this.state.selectedChecker].possibilities[p];
                                     if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
@@ -824,7 +839,7 @@ export default class App extends React.Component{
         if(Object.keys(this.state.cells).length > 0){
             renderedField = Object.keys(this.state.cells).map((koords) => {
                 let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
-                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && window.loft.usersettings.isCheckers);
+                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && window.loft.isCheckers);
                 let active = koords === this.state.selectedChecker;
                 return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
