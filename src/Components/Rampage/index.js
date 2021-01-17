@@ -5,13 +5,13 @@ export default class Rampage extends React.Component{
         const words = ["LOOSER","NOT BAD","COOL","AWESOME","UNBELIEVABLE","INCREDIBLE","RAGE","FURY","RAMPAGE","INSANITY"];
 
         let word = "AWESOME";
-        if(this.props.steps<words.length) word = words[this.props.steps];
+        if(this.props.hops<words.length) word = words[this.props.hops];
         else word = words[words.length-1];
         
-        let delayexp = this.props.steps * 5;
-        let classNames = this.props.steps>=words.length-2?"glitch":"redtext";
+        let delayexp = this.props.hops * 5;
+        let classNames = this.props.hops>=words.length-2?"glitch":"redtext";
 
-        if(this.props.steps===0){
+        if(this.props.hops===0){
             word = this.props.word;
             classNames = "glitch";
         }
@@ -23,7 +23,7 @@ export default class Rampage extends React.Component{
         if(classNames === "glitch"){
             offs = 90;
         }else{
-            if(this.props.steps > words.length/2){
+            if(this.props.hops > words.length/2){
                 renderedField = word.split("").map((ch) => {
                     i += delayexp;
                     let key = "char"+i;

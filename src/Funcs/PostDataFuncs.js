@@ -1,4 +1,4 @@
-let type = "xhr";
+let type = "fatch";
 
 export default function postData(obj = {})
 {
@@ -6,15 +6,16 @@ export default function postData(obj = {})
     for (let k in obj) o[k] = obj[k];
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
-    if (Object.keys(window.loft.device) > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
     console.log("using", type, o);
 
-    if (type === "fetch") {
-        return fatch(o); // Fetch is not supported on cordova
+    if (type === "fatch") {
+        return fatch(o); 
     } else if (type === "xhr") {
         return xhr(o);
-    }
+    } 
 }
 
 function xhr(o = {})
@@ -62,6 +63,7 @@ async function fatch(o = {})
     });
 
     if (response.ok) {
+
         let res = "";
         if (o.dataType==="json") {
             try {
@@ -73,12 +75,12 @@ async function fatch(o = {})
         } else {
             res = await response.text();
         }
-        response.headers.forEach(function(value, name) {
-            console.log(name + ": " + value);
-        });
+
         console.log(res);
+        
         if (o.success) o.success(res);
         return res;
+
     } else {
         console.log("Ошибка HTTP: " + response.status);
         o.error();

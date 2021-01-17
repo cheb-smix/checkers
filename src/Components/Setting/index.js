@@ -11,9 +11,9 @@ export class Settings{
         this.usersettings = {
             animation: 1,
             difficulty: 1,
-            fanfaravolume: 70,
+            fanfaravolume: 50,
             soundvolume: 70,
-            musicvolume: 70,
+            musicvolume: 20,
             mode: "bot",
             atoken: "",
             loaded: false,
@@ -22,9 +22,9 @@ export class Settings{
         this.defaultusersettings = {
             animation: 1,
             difficulty: 1,
-            fanfaravolume: 70,
+            fanfaravolume: 50,
             soundvolume: 70,
-            musicvolume: 70,
+            musicvolume: 20,
             mode: "bot",
             atoken: "",
             loaded: false,
@@ -65,7 +65,10 @@ export class Settings{
                 musicplayer.play();
             }
             if (value === 0 && !musicplayer.paused) musicplayer.pause();
-            
+        }
+
+        if (key === "game") {
+            window.loft.isCheckers = ["checkers", "giveaway"].indexOf(value) >= 0;
         }
     }
 

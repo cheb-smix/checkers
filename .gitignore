@@ -10,7 +10,7 @@
 
 # production
 /build
-.cordova_workfolder
+.dev_info
 
 # misc
 .DS_Store

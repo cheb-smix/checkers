@@ -3,26 +3,46 @@
 echo "Initation of build process\n";
 
 $argumentos = getArgs($argv);
+$dev_info_file = "./.dev_info";
+$dev_info = (file_exists($dev_info_file) && $dev_info = json_decode(file_get_contents($dev_info_file), true)) ? $dev_info : [
+    "version" => [
+        "major"     => 1,
+        "minor"     => 3,
+        "micro"     => 50,
+        "build"     => 101,
+    ],
+    "lastUpdate"=> "",
+];
+
+$cordova_workfolder = isset($dev_info["cordova_workfolder"]) ? $dev_info["cordova_workfolder"] : "";
 
 if (isset($argumentos["path"]) && strtolower(readline("Continue with cordova workfolder '{$argumentos["path"]}'? ")) == "y") {
 
     $cordova_workfolder = $argumentos["path"];
-    file_put_contents("./.cordova_workfolder", $cordova_workfolder);
+    $dev_info["cordova_workfolder"] = $cordova_workfolder;
 
 } else {
 
-    if (file_exists("./.cordova_workfolder")) {
-        $cordova_workfolder = file_get_contents("./.cordova_workfolder");
-    } else {
+    if (!file_exists($dev_info_file)) {
         $cordova_workfolder = readline("Enter new cordova workfolder: ");
-        file_put_contents("./.cordova_workfolder", $cordova_workfolder);
+        $dev_info["cordova_workfolder"] = $cordova_workfolder;
     }
 
 }
 
+$dev_info["version"]["build"]++;
+$dev_info["version"]["micro"] = 50 + floor(($dev_info["version"]["build"] - 100) / 10);
+$dev_info["lastUpdate"] = date('l jS \of F Y H:i:s');
+
+
 if (strrpos($cordova_workfolder, "/www") >= strlen($cordova_workfolder) - 5) {
     $cordova_workfolder = str_replace("/www", "", $cordova_workfolder);
 }
+if (substr($cordova_workfolder, -1, 1) != "/") {
+    $cordova_workfolder .= "/";
+}
+
+$dev_info["cordova_workfolder"] = $cordova_workfolder;
 
 echo "Cordova workfolder initiated at $cordova_workfolder\n";
 
@@ -37,7 +57,8 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "2")) {
     foreach ($files as $i => $file) {
         $content = file_get_contents($file);
         $content = str_replace("/static/", "static/", $content);
-        $content = str_replace('id="cordova">', 'id="cordova" src="cordova.js">', $content);
+        $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
+        $content = str_replace('id="version">', 'id="version">' . implode(".", $dev_info["version"]) . " " . $dev_info["lastUpdate"], $content);
         file_put_contents($file, $content);
     }
 }
@@ -55,7 +76,20 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "3")) {
 
 
 if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "4")) {
-    echo "4. Removing subfolder of cordova/www/\n";
+    echo "4. Rebuilding build/static/js/main.*.chunk.js\n";
+    $files = getFolderFilesByMask("./build/static/js/", "main.*.chunk.js");
+    foreach ($files as $i => $file) {
+        $content = file_get_contents($file);
+        $content = str_replace("window.loft.device={}", "window.loft.device=device", $content);
+        file_put_contents($file, $content);
+    }
+}
+
+// steps 5,6 are free to use
+
+
+if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "7")) {
+    echo "7. Removing subfolder of cordova/www/\n";
     $files = scandir("{$cordova_workfolder}www");
     foreach ($files as $i => $file) {
         if ($file != "." && $file != ".." && is_dir("{$cordova_workfolder}www" . DIRECTORY_SEPARATOR .$file) && !is_link("{$cordova_workfolder}www/$file"))
@@ -64,16 +98,16 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "4")) {
 }
 
 
-if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "5")) {
-    echo "5. Copy build folder to cordova/www\n";
+if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "8")) {
+    echo "8. Copy build folder to cordova/www\n";
     echo `mv ./build ./www`;
     echo `cp -r ./www {$cordova_workfolder}`;
     echo `mv ./www ./build`;
 }
 
 
-if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "6")) {
-    echo "6. Cordova build\n";
+if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "9")) {
+    echo "9. Cordova build\n";
     $res = `cd {$cordova_workfolder}
     cordova build`;
 
@@ -84,6 +118,8 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "6")) {
     echo `cp {$cordova_workfolder}$res ./app-debug.apk`;
 }
 
+
+file_put_contents($dev_info_file, json_encode($dev_info));
 
 
 
@@ -104,7 +140,7 @@ function rrmdir($dir)
                 if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
                     rrmdir($dir. DIRECTORY_SEPARATOR .$object);
                 } else {
-                    echo " - Removing folder " . $dir. DIRECTORY_SEPARATOR . $object ;
+                    echo " - Removing file " . $dir. DIRECTORY_SEPARATOR . $object ;
                     echo unlink($dir. DIRECTORY_SEPARATOR .$object) ? "\n" : " - FAILED\n"; 
                 }
             } 

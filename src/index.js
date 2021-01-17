@@ -8,41 +8,135 @@ import App from './App.js';
 import 'font-awesome5/css/fontawesome-all.css';
 import "animate.css/animate.css";
 import { Settings } from './Components/Setting/index.js';
-
-
-let device = {};
-document.addEventListener("deviceready", onDeviceReady, false);
-function onDeviceReady()
-{
-    document.addEventListener("pause", onPause, false);
-    document.addEventListener("resume", onResume, false);
-}
-function onPause() 
-{
-    document.querySelector("#musicplayer").pause();
-}
-function onResume() 
-{
-    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").pause();
-}
+import postData from './Funcs/PostDataFuncs';
 
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
     apiserver: "https://smix-soft.ru/api/v2/game/",
-    device: device,
     settings: new Settings(),
+    device: {},
+    devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
+    config: { 
+        WriteSteps: false, 
+        WriteStats: false, 
+        Debug: false,
+        StepTimeLimit: 30,
+        AnimationSpeed: 45,
+        EpicStepNum: 4,
+    },
+    constants: {
+        STATUS_ACTIVE  : "A",
+        STATUS_FINISHED: "F",
+        STATUS_NOMANS  : "N",
+        STATUS_IN_GAME : "A",
+        STATUS_DONE    : "D",
+        STATUS_FAIL    : "F",
+        STATUS_WON     : "W",
+        STATUS_DRAW    : "X",
+    },
+    //timezoneOffset: new Date().getTimezoneOffset(),
+    user_info: {},
+    serverInfo: {},
+    atoken: localStorage.getItem("atoken"),
+    isGuest: true,
+    AjaxAvailable: false,
+    SocketAvailable: false,
 };
-
-window.loft.usersettings = window.loft.settings.getSettings();
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
     window.loft.wsserver = "ws://192.168.31.168:7777";
-    window.loft.apiserver = "http://192.168.31.168:3333/game/";
+    //window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
 
-//alert(JSON.stringify([apiserver, window.location.hostname]));
+window.loft.usersettings = window.loft.settings.getSettings();
+window.loft.isCheckers = ["checkers", "giveaway"].indexOf(window.loft.usersettings.game) >= 0;
+window.loft._eventHandlers = {};
+window.loft.addListener = (node, event, handler, capture = false) => {
+    if (!(event in window.loft._eventHandlers)) {
+        window.loft._eventHandlers[event] = [];
+    }
+    
+    window.loft._eventHandlers[event].push({ node: node, handler: handler, capture: capture });
+    node.addEventListener(event, handler, capture);
+}
+window.loft.removeAllListeners = (targetNode, event) => {
+    if (!(event in window.loft._eventHandlers)) {
+        return;
+    }
+    window.loft._eventHandlers[event]
+      .filter(({ node }) => node === targetNode)
+      .forEach(({ node, handler, capture }) => node.removeEventListener(event, handler, capture));
+  
+    window.loft._eventHandlers[event] = window.loft._eventHandlers[event].filter(
+      ({ node }) => node !== targetNode
+    );
+}
+
+if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
+else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+
+async function DOMLoaded()
+{
+    await checkConnection();
+    ReactDOM.render(
+        <Router history={window.loft.history}>
+          <App/>
+        </Router>
+        ,
+        document.getElementById('root')
+    );
+}
+
+function onDeviceReady()
+{
+    window.screen.orientation.lock('portrait');
+    document.addEventListener("pause", onPause, false);
+    document.addEventListener("resume", onResume, false);
+    document.addEventListener("online", onOnline, false);
+    document.addEventListener("offline", onOffline, false);
+    window.loft.device = {};
+    console.log(window.loft);
+    DOMLoaded();
+}
+
+async function checkConnection()
+{
+    window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
+    let res = await postData({url: window.loft.apiserver + "config"});
+    
+    if (res) {
+        window.loft.config = res.config;
+        window.loft.user_info = res.user_info;
+        window.loft.isGuest = res.isGuest;
+        window.loft.AjaxAvailable = true;
+        window.loft.devInfo = res.devInfo;
+        window.loft.serverInfo = res.serverInfo;
+    }
+}
+
+async function onOnline()
+{
+    await checkConnection();
+    //alert("Connection restored!");
+}
+
+function onOffline()
+{
+    window.loft.AjaxAvailable = false;
+    //alert("Connection lost!");
+}
+
+function onPause() 
+{
+    document.querySelector("#musicplayer").pause();
+}
+
+function onResume() 
+{
+    if (document.querySelector("#musicplayer").volume > 0) document.querySelector("#musicplayer").play();
+}
 
 Math.coefficient = (n1,n2,f=0) => {
     n2 = n2>0?n2:1;
@@ -88,10 +182,3 @@ Math.pifagorColored = (c1,c2,color="any") => {
 }
 
 
-ReactDOM.render(
-    <Router history={window.loft.history}>
-      <App/>
-    </Router>
-    ,
-    document.getElementById('root')
-);

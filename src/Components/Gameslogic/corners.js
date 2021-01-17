@@ -378,24 +378,23 @@ export default class Corners extends App{
     }
 
     checkOfflineGameStatus = (playerInfo,opponentInfo) => {
-        if(opponentInfo.status==="winner" || playerInfo.status==="winner") return false;
+        if(opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) return false;
 
         let changes = false;
-        if(playerInfo.done===12 && playerInfo.status==="in_game"){
+        if(playerInfo.done===12 && playerInfo.status===window.loft.constants.STATUS_IN_GAME){
             changes = true;
-            playerInfo.status = "winner";
-            opponentInfo.status = "looser";
+            playerInfo.status = window.loft.constants.STATUS_WON;
+            opponentInfo.status = window.loft.constants.STATUS_FAIL;
         }
-        if(opponentInfo.done===12 && opponentInfo.status==="in_game"){
+        if(opponentInfo.done===12 && opponentInfo.status===window.loft.constants.STATUS_IN_GAME){
             changes = true;
-            playerInfo.status = "looser";
-            opponentInfo.status = "winner";
+            playerInfo.status = window.loft.constants.STATUS_FAIL;
+            opponentInfo.status = window.loft.constants.STATUS_WON;
         }
         
-        if((opponentInfo.status==="winner" || playerInfo.status==="winner") && (this.state.writesteps || this.state.writestats)){
+        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && (this.state.writesteps || this.state.writestats)){
             let postdata = {
                 action: "saveGameEnding",
-                game_id: this.state.game_id,
                 gtoken: this.state.gtoken,
             }
             for(let n in playerInfo){

@@ -13,7 +13,7 @@ export default function Noise(type = "soft") {
     }
     if (volume === 0) return;
 
-    volume /= 2;
+    volume /= 1.5;
 
     let src = type + ".wav";
     if (type > 0) {

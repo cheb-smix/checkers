@@ -23,6 +23,8 @@ let strings = new LocalizedStrings({
         yesText:            "Yes",
         success:            "Success!",
         failed:             "Failed!",
+        confirm:            "Confirm",
+        finish:             "Finish",
         // Home
         playWithBot:        "Versus Bot",
         playByBlueTooth:    "BlueTooth Game",
@@ -84,6 +86,7 @@ let strings = new LocalizedStrings({
         // Sign in / Sing up
         displayName:        "Display name",
         loginText:          "Login",
+        emailText:          "E-mail",
         passwordText:       "Password",
         passwordConfirm:    "Reveal password",
         passwordsNotMatch:  "Passwords doesn`t match",
@@ -93,6 +96,13 @@ let strings = new LocalizedStrings({
         authText:           "Sign In",
         fieldRuleText1:     "Field «$»",
         fieldRuleText2:     " have to be $ length!",
+        forgotPassword:     "Forgot password?",
+        dontHaveAccount:    "Don't have account?",
+        email4Instructions: "Check your email for further instructions",
+        ressurectingPass:   "Recovery password",
+        pincode:            "Pin code from message",
+        pincodeText:        "Pin code",
+        registerSuccess:    "You`ve been successfully registered! Please, confirm your registration by using a link in e-mail you recieved.",
         // Main
         whiteIsYours:       "Whites is yours",
         blackIsYours:       "Blacks is yours",
@@ -100,6 +110,7 @@ let strings = new LocalizedStrings({
         enemyTurnText:      "Waiting for an opponent`s next step",
         youveLostByTimeout: "You have been defeated for inaction",
         enemyLostByTimeout: "Opponent timed out. You won!",
+        enemyQuit:          "Your opponent surrendered!",
         gameOverByTimeout:  "Game over by timeout",
         gameOverText:       "Game over",
         youHaveToTakeMore:  "You have to capture more!",
@@ -110,6 +121,10 @@ let strings = new LocalizedStrings({
         serversUnavailable: "Servers unavailable",
         findAnewGame:       "Search for a new game?",
     },
+
+
+
+
     ru: {
         // Common
         settingsText:       "Настройки",
@@ -132,6 +147,8 @@ let strings = new LocalizedStrings({
         yesText:            "Да",
         success:            "Успешно!",
         failed:             "Ошибка!",
+        confirm:            "Подтвердить",
+        finish:             "Завершить",
         // Home
         playWithBot:        "Против бота",
         playByBlueTooth:    "По BlueTooth",
@@ -193,6 +210,7 @@ let strings = new LocalizedStrings({
         // Sign in / Sing up
         displayName:        "Отображаемое имя",
         loginText:          "Логин",
+        emailText:          "E-mail",
         passwordText:       "Пароль",
         passwordConfirm:    "Повторите пароль",
         passwordsNotMatch:  "Пароли не совпадают",
@@ -202,6 +220,13 @@ let strings = new LocalizedStrings({
         authText:           "Авторизация",
         fieldRuleText1:     "Поле «$»",
         fieldRuleText2:     " должно быть в диапазоне $ символов!",
+        forgotPassword:     "Забыли пароль?",
+        dontHaveAccount:    "Нет аккаунта?",
+        email4Instructions: "Проверьте свою почту для получения дальнейших инструкций",
+        ressurectingPass:   "Восстановление пароля",
+        pincode:            "Введите пин-код из письма",
+        pincodeText:        "Пин-код",
+        registerSuccess:    "Вы успешно зарегистрировались! Пожалуйста, подтвердите свою регистрацию, перейдя по ссылке в полученном вами электронном письме.",
         // Main
         whiteIsYours:       "Вы играете белыми",
         blackIsYours:       "Вы играете чёрными",
@@ -209,6 +234,7 @@ let strings = new LocalizedStrings({
         enemyTurnText:      "Ожидание хода противника",
         youveLostByTimeout: "Вам засчитано поражение за бездействие.",
         enemyLostByTimeout: "Противнику зачитано поражение за бездействие.",
+        enemyQuit:          "Ваш противник сдался!",
         gameOverByTimeout:  "Завершение игры по таймауту",
         gameOverText:       "Игра окончена",
         youHaveToTakeMore:  "Вы должны взять больше!",
@@ -223,5 +249,5 @@ let strings = new LocalizedStrings({
 
 export default function Lang(key)
 {
-    return strings[key];
+    return strings[key] ?? key;
 }

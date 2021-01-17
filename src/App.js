@@ -27,7 +27,8 @@ class App extends Component{
         ],
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
-        }
+        },
+        isGuest: window.loft.isGuest,
     }
 
     hideModal = () => {
@@ -64,6 +65,10 @@ class App extends Component{
         
     }
 
+    setAppState = (o = {}) => {
+        this.setState(o);
+    }
+
     componentDidMount = () => {
         document.querySelector("#musicplayer").volume = window.loft.usersettings.musicvolume / 100;
         this.setNewTrack();
@@ -71,7 +76,8 @@ class App extends Component{
         document.querySelector(".App-logo").style.top = "15vh";
 
         if (window.cordova) {
-            document.addEventListener("backbutton", () => {
+            window.loft.removeAllListeners(document, "backbutton");
+            window.loft.addListener(document, "backbutton", () => {
                 this.hideModal();
                 if (document.location.href.indexOf('/home') > 0) navigator.app.exitApp();
                 else navigator.app.backHistory();
@@ -85,9 +91,9 @@ class App extends Component{
         return (
             <React.Fragment>
             <Switch>
-                <Route path='/home' render={(props) => <Home {...props} />} />
-                <Route path='/checkers' render={(props) => <Checkers {...props} />} />
-                <Route path='/corners' render={(props) => <Corners {...props} />} />
+                <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                <Route path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                <Route path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
                 <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
                 <Redirect from='/' to='/home'/>
             </Switch>

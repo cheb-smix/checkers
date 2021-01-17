@@ -12,23 +12,21 @@ export default class Fanfara extends React.Component{
     }
 
     animate = () => {
-        if(typeof(this.props.playerInfo.login)==="undefined" || this.props.playerInfo.status==="in_game" || this.state.animated) return;
+        if(this.props.playerInfo.status===window.loft.constants.STATUS_IN_GAME || this.state.animated) return;
 
         postData({
-            url: this.props.apiserver + "get-stat",
-            data: { username: this.props.playerInfo.login },
-            device: this.props.device,
-            success: (data)=>{
+            url: window.loft.apiserver + "user-info",
+            success: (res)=> {
                 this.setState({animated:true});
-                if(data.success){
-                    //data.data.lvl++;
-                    //data.data.exp = parseInt(data.data.exp,10)+1850;
+                if (res) {
+                    res.stat.level++;
+                    res.stat.experience = parseInt(res.stat.experience, 10) + 1850;
                     let pdiv = document.querySelector(".progress");
-                    let newLVL = data.data.lvl;
-                    let curLVL = this.props.playerInfo.statistics.lvl;
+                    let newLVL = res.stat.level;
+                    let curLVL = this.props.playerInfo.stat.lvl;
                     let lvlDIF = newLVL - curLVL;
-                    let newEXP = data.data.exp;
-                    let expDIF = newEXP - this.props.playerInfo.statistics.exp;
+                    let newEXP = res.stat.experience;
+                    let expDIF = newEXP - this.props.playerInfo.stat.exp;
 
                     document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML+"<br>"+(expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
                     if(lvlDIF>0){
@@ -61,17 +59,17 @@ export default class Fanfara extends React.Component{
                                 this.props.rampage(0,"NEW LEVEL "+newLVL+"!");
                                 pdiv.innerHTML = newEXP;
                                 clearInterval(s);
-                                this.props.updatePI(data.data);
+                                this.props.updatePI(res.stat);
                             }
                         },600)
                     }else{
                         let startexp = (curLVL > 1) ? (50*(Math.pow(2,curLVL-1))) : 0;
                         let endexp = 50*(Math.pow(2,curLVL));
-                        let progress = Math.percent(newEXP - startexp,endexp - startexp);
+                        let progress = Math.percent(newEXP - startexp, endexp - startexp);
                         pdiv.style.width = progress;
                         pdiv.style.left = (50 - parseInt(progress,10)/2)+"%";
                         pdiv.innerHTML = newEXP;
-                        this.props.updatePI(data.data);
+                        this.props.updatePI(res.stat);
                     }
                     this.props.showBestMove();
                 }
@@ -87,7 +85,7 @@ export default class Fanfara extends React.Component{
     }
 
     render(){        
-        let {playerInfo,opponentInfo} = this.props;
+        let {playerInfo, opponentInfo} = this.props;
         let header = "";
         let text = <p></p>;
         let podtext = "";
@@ -102,7 +100,7 @@ export default class Fanfara extends React.Component{
                 <div className="row">
                     <div className="col-12">
                         <Button
-                            action={()=>{this.props.quit(false)}} 
+                            action={this.props.quit} 
                             href="" 
                             value={Lang("closeText")} 
                             theme="grey"
@@ -113,7 +111,7 @@ export default class Fanfara extends React.Component{
                         <Button
                             action={this.props.continueWithSameOpponent} 
                             href="" 
-                            value={Lang("continueWith").replace("$", opponentInfo.name)} 
+                            value={Lang("continueWith").replace("$", opponentInfo.user.display_name)} 
                             theme="neon"
                             strong="true"
                         />
@@ -132,26 +130,32 @@ export default class Fanfara extends React.Component{
 
         let gonnashow = false;
 
-        if(playerInfo.status!=="winner" && playerInfo.status!=="looser" && playerInfo.status!=="done") playerInfo.status = "in_game";
+        //if(playerInfo.status!==window.loft.constants.STATUS_WON && playerInfo.status!==window.loft.constants.STATUS_FAIL && playerInfo.status!==window.loft.constants.STATUS_DONE) playerInfo.status = window.loft.constants.STATUS_IN_GAME;
 
-        if(playerInfo.status==="winner"){
+        if(playerInfo.status===window.loft.constants.STATUS_WON){
             header = Lang("congratulations");
             let diff = opponentCheckersUnDone;
             if (playerInfo.done === 12) {
                 podtext = Lang("youCrashedOpponent");
             } else {
-                podtext = Lang("youCorneredEnemy");
-                diff = opponentCheckersUnDone - playersCheckersUnDone;
+                if (opponentInfo.possibilities === 0) {
+                    podtext = Lang("youCorneredEnemy");
+                    diff = opponentCheckersUnDone - playersCheckersUnDone;
+                } else {
+                    podtext = Lang("enemyQuit");
+                }
             }
-            if(diff===1) podtext += Lang("wonOnlyOneChecker");
-            if(diff>1 && diff<5) podtext += Lang("won2to4checkers").replace("$", diff);
-            if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
-            podtext += " ("+opercent+"%)!";
+            if (opponentInfo.possibilities === 0) {
+                if(diff===1) podtext += Lang("wonOnlyOneChecker");
+                if(diff>1 && diff<5) podtext += Lang("won2to4checkers").replace("$", diff);
+                if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
+                podtext += " ("+opercent+"%)!";
+            }
             gonnashow = true;
 
             Noise("victory");
         }
-        if(playerInfo.status==="looser"){
+        if(playerInfo.status===window.loft.constants.STATUS_FAIL){
             header = Lang("regrets");
             if (opponentInfo.done === 12) {
                 podtext = Lang("youLooseThisOne");
@@ -166,35 +170,36 @@ export default class Fanfara extends React.Component{
 
             Noise("fail");
         }
-        if(playerInfo.status==="done" && opponentInfo.status==="done" /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
+        if(playerInfo.status===window.loft.constants.STATUS_DONE && opponentInfo.status===window.loft.constants.STATUS_DONE /*&& playerInfo.done === 12 && opponentInfo.done === 12*/){
             header = Lang("noBadText");
             podtext = Lang("betterThanNothing");
             gonnashow = true;
             Noise("draw");
         }
-        if(playerInfo.status==="done" && opponentInfo.status!=="done" && playerInfo.done === 12){
+        if(playerInfo.status===window.loft.constants.STATUS_DONE && opponentInfo.status!==window.loft.constants.STATUS_DONE && playerInfo.done === 12){
             header = Lang("congratulations");
             text = <p>{Lang("lastEnemyStep")}</p>
             Noise("warning");
         }else{
             text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
         }
+        
         let expdiv = '';
-        if(gonnashow && typeof(playerInfo.statistics)!=="undefined"){
-            let {statistics:s} = playerInfo;
-            let startexp = (s.lvl > 1) ? (50*(Math.pow(2,s.lvl-1))) : 0;
-            let endexp = 50*(Math.pow(2,s.lvl));
-            let progress = Math.percent(s.exp - startexp,endexp - startexp);
+        if(gonnashow && typeof(playerInfo.stat)!=="undefined"){
+            let {stat:s} = playerInfo;
+            let startexp = (s.level > 1) ? (50*(Math.pow(2,s.level-1))) : 0;
+            let endexp = 50*(Math.pow(2,s.level));
+            let progress = Math.percent(s.experience - startexp,endexp - startexp);
             let left = 50 - parseInt(progress,10)/2;
             if(this.state.animated===false) setTimeout(()=>{this.animate()},1000);
             expdiv = <div className="exp">
-                <div className="progress" style={{width: progress, left: left+"%"}}>{s.exp}</div>
+                <div className="progress" style={{width: progress, left: left+"%"}}>{s.experience}</div>
                 <table className="stable" style={{padding: "0px"}}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
             </div>;
         }
         return (
-            <div className={playerInfo.status} id="fanfara"><br/>
-                <h3>{header}<br/>{playerInfo.name}<br/></h3>
+            <div className={"status" + playerInfo.status} id="fanfara"><br/>
+                <h3>{header}<br/>{playerInfo.user.display_name}<br/></h3>
                 {expdiv}
                 {text}
             </div>

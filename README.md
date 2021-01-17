@@ -2,49 +2,67 @@
 - Install ReactJS
 - Run "composer install"
 - Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
-- Install cordova-plugin-device and cordova-plugin-whitelist
+- Install plugins (cordova plugin add): 
+    - cordova-plugin-device
+    - cordova-plugin-whitelist
+    - cordova-plugin-network-information
+    - cordova-plugin-vibration
+    - cordova-plugin-screen-orientation
 - Set android:usesCleartextTraffic="true" at android manifest
 - Configure config.xml
 - Add platforms (android, ios)
+- Install cordova-simulate (sudo npm install -g cordova-simulate)
+- Cordova-simulate usage: simulate --device=Nexus10 --dir=<DIR> --target=opera
 
 # Порядок билда
 1. npm run build
 2. build/index.html > "/static/" to "static/"
 3. build/static/css/*.css > "/static/" to "../"
-4. remove folders in cordova/www/ (music, static, sound)
-5. copy build folder to cordova/www
-6. cordova build
+4. build/static/js/main.*.chunk.js > "window.loft.device={}" to "window.loft.device=device"
+5. (free to use action)
+6. (free to use action)
+7. remove folders in cordova/www/ (music, static, sound)
+8. copy build folder to cordova/www
+9. cordova build
 
-# Запуск автобилдера (При первом запуске запросит рабочую папку cordova)
+# Запуск автобубилдера (При первом запуске запросит рабочую папку cordova)
 php build.php (workfolder=...) (steps=1234567)
+## Варианты запуска автобубилдера:
+- php build.php steps=12348   # Сборка реакта и копирование в cordova без удаления старых файлов с заменой на новые без билда cordova для дебага в cordova-simulate
+- php build.php steps=9       # Сборка только в cordova уже имеющегося в рабочей папке проекта
+
 
 # TODO
-0. Нужны звуки: Rampage.
-0. Реализация WS на consik/yii2-websocket в одном проекте вместе с API
-1. Вынести авторизацию / регистрацию / вход / аккаунт в отдельный компонент ? Чтобы не дублировать ? Или не стоит?
-2. Вынести сокет в глобаль?
+0. Разделение способов подключения к онлайну и наследование Connection -> Ajax , Socket , Bluetooth
+0. Исключить возможность играть с самим собой
+1. Нужны звуки: Rampage.
 3. Локализация API (либо заблаговременно подготовленные здесь ответы API)
 4. Вывести опыт в видное место
-5. Придумать реализацию режима bluetooth вместо local
+6. Приглашения по сети по никнейму
+7. Все таки сменить хотя бы статус игроков на глобальные значения ?????????? зачем ?
 
+-  Стоит подумать о билде отдельных приложух.. 
 -  Отрендерить нормальную иконку!
 -  Реклама
 -  Реализация в уголках схожей логики анализа будущих ходов как и в шашках.
 -  Правила игры с локализацией
 -  Испанский язык? Португальский? Немецкий? Французский? Китайский? Итальянский?
--  cordova-plugin-vibration?
--  https://cordova.apache.org/docs/en/latest/reference/cordova-plugin-network-information/index.html
 -  Оптимизация RAMPAGE 
 -  Внутриигровая валюта?
 -  Скины ?) Лол
+-  Реализация WS на consik/yii2-websocket в одном проекте вместе с API
+-  Вынести сокет в глобаль?
+-  Bluetooth режим?
+-  Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket (вряд ли, скорей всего нативно)
 
 # Баги
-- Для сокетов стало быть - https://www.npmjs.com/package/cordova-plugin-websocket
-- Увеличение глубины анализа будущих ходов дает слишком предсказуемый результат - бот играет агрессивно, но по одной шашке
+- Иногда подключение соперников в Ajax происходит нестабильно 
+- Фанфары не включаются в онлайне
+- Анимация фанфар
+- Бот иногда почему то отдаёт две на съедение (неправильный подсчет будущего)
+- Бот иногда предпочитает сожрать одну чем две
 
 # Баги/Фичи на проверке
-- Ajax теперь проходит в cordova!
-- Авторизация и сохранение куки осуществляется!
 
 # Выполнено / исправлено
 + Заставка
@@ -105,7 +123,22 @@ php build.php (workfolder=...) (steps=1234567)
 + Для звуков реализована ленивая загрузка
 + Добавлены звуки эпик-хода и фанфар
 + Небольшая реструктуризация настроек
-
++ Добавлена автозапись версии
++ DeviceInfo снова работает. Ajax починен. Авторизация и кукирование работают.
++ Запись девайсов и закрепление за пользователем
++ Запрос конфига перенесен в index. Главный рендер теперь стартует от событий deviceReady или DOMLoaded
++ Вынесение авторизации в отдельный функционал
++ Проверка соединения
++ Прикручена вибрация
++ Главный рендер теперь стартует после проверки соединения и получения конфига
++ Прикручена регистрация, конфирмация, восстановление пароля
++ Хэширование пароля перед отправкой
++ Авторизация теперь запоминается на устройстве
++ Поворот экрана отключен
++ Взаимодействие с бэкендом по AJAX налажено
++ Дамки больше глючат
++ Ходы на бэкенде как-никак проверяются
++ Шашки в онлайне испаряются при свернутой игре... (это уже причуды JS, вернее ограничение анимации)
 
 
 
