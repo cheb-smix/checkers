@@ -12,7 +12,6 @@ import Noise from '../../Funcs/Noise';
 
 import './app.css';
 
-
 export default class App extends React.Component{
 
     INT = 0;
@@ -94,7 +93,22 @@ export default class App extends React.Component{
 
     componentDidMount() {
         console.log(window.loft);
+        if (window.cordova) {
+            window.loft.removeAllListeners(document, "backbutton");
+            window.loft.addListener(document, "backbutton", () => {
+                if (this.state.online) {
+                    this.quitGameConfirmer(navigator.app.backHistory);
+                } else if (this.state.searchingOnlineOpponent) {
+                    this.stopTheSearch();
+                    navigator.app.backHistory();
+                } else {
+                    navigator.app.backHistory();
+                }
+            }, false);
+        }
         this.initiation({});
+
+        if (window.loft.usersettings.mode === "online") this.startNewSearch();
     }
 
     initiation = (state) => {
@@ -210,6 +224,13 @@ export default class App extends React.Component{
         });
     }
 
+    quit = () => {
+        this.clearPlayerInfoAfterGameOver();
+        this.act({
+            action: 'quit'
+        });
+    }
+
     startGame = (game) => {
         let playersStep = game.players["player"].color === "white";
         let newStateObject = {
@@ -243,7 +264,7 @@ export default class App extends React.Component{
 
     checkTOI = () => {
         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-        console.log(r);
+        
         if(r > window.loft.config.StepTimeLimit * 2 / 3){
             this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
         }
@@ -274,6 +295,7 @@ export default class App extends React.Component{
 
     procedureStepData = (stepData) => {
         if (typeof(stepData.game_results) !== "undefined") {
+            console.log(stepData.game_results, window.loft.constants);
             if (stepData.game_results.status === window.loft.constants.STATUS_NOMANS) {
                 let {playerInfo, opponentInfo} = this.state;
                 playerInfo.status = window.loft.constants.STATUS_DRAW;
@@ -285,7 +307,7 @@ export default class App extends React.Component{
                 if (typeof(stepData.game_results.winner) !== "undefined") {
                     playerInfo.status = window.loft.constants.STATUS_WON;
                     opponentInfo.status = window.loft.constants.STATUS_FAIL;
-                } else if (typeof(stepData.game_results.winner) !== "undefined") {
+                } else if (typeof(stepData.game_results.looser) !== "undefined") {
                     playerInfo.status = window.loft.constants.STATUS_FAIL;
                     opponentInfo.status = window.loft.constants.STATUS_WON;
                 }
@@ -356,6 +378,13 @@ export default class App extends React.Component{
 
 
 
+
+
+
+
+
+    // Animations and logic
+
     suggestNewOneGame = (text = "") => {
         window.loft.showModal(
             <div>
@@ -367,11 +396,36 @@ export default class App extends React.Component{
     }
 
 
-
-
-
-
-    // Animations and logic
+    quitGameConfirmer = (onconfirm = () => {}) => {
+        window.loft.showModal(
+            <div className="container">
+                <div className="row">
+                    <div className="col-12">
+                    <h5>{Lang("sureYouWannaQuit")}</h5><h5 className="warning">{Lang("youllLooseIfYouQuit")}</h5>
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={() => window.loft.showModal(false)} 
+                            href="" 
+                            value={Lang("cancelText")} 
+                            theme="neon"
+                            strong="true"
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={() => { this.quit(); onconfirm(); }} 
+                            href="" 
+                            value={Lang("quitTheGame")}
+                            theme="neon"
+                            strong="light"
+                        />
+                    </div>
+                </div>
+            </div>,
+            Lang("attention")
+        );
+    }
 
     rampage = (hops, word="", returnObj=false) => {
         clearTimeout(this.state.rampageTO);
@@ -668,24 +722,31 @@ export default class App extends React.Component{
         playerInfo.hops = 0;
         playerInfo.steps = 0;
         playerInfo.done = 0;
+        playerInfo.possibilities = 0;
+
         this.setMazafuckinState({
             playersStep: true,
             opponentInfo: {
+                user: {
+                    display_name: "bot" + Math.round(Math.random() * 1000 + 1000), 
+                    username: false,
+                },
                 name: "bot"+Math.round(Math.random()*1000 + 1000), 
                 status: window.loft.constants.STATUS_IN_GAME,
                 color: "black",
                 hops: 0,
                 steps: 0,
-                done: 0
+                done: 0,
+                possibilities: 10,
             },
             afkcounter: 0,
             cells: this.dropCheckersToDefaults(),
             playstage: 1,
             online: false,
             playerInfo: playerInfo,
-            modal: {code: "", bg: true, panel: true, autoclose: false},
             consoleText: Lang("disconnected") + ". " + Lang("yourTurnText")
         });
+        window.loft.showModal(false);
     }
 
     updatePI = (data) => {
@@ -861,6 +922,7 @@ export default class App extends React.Component{
                         online={this.state.online}
                         startNewSearch={this.startNewSearch}
                         stopTheSearch={this.stopTheSearch}
+                        quitGameConfirmer={this.quitGameConfirmer}
                         updateSetting={this.updateSetting}
                         setAppState={this.props.setAppState}
                         quit={this.quit}

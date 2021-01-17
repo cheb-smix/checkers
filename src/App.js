@@ -76,7 +76,8 @@ class App extends Component{
         document.querySelector(".App-logo").style.top = "15vh";
 
         if (window.cordova) {
-            document.addEventListener("backbutton", () => {
+            window.loft.removeAllListeners(document, "backbutton");
+            window.loft.addListener(document, "backbutton", () => {
                 this.hideModal();
                 if (document.location.href.indexOf('/home') > 0) navigator.app.exitApp();
                 else navigator.app.backHistory();

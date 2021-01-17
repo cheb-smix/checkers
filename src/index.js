@@ -47,11 +47,32 @@ window.loft = {
 
 if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
     window.loft.wsserver = "ws://192.168.31.168:7777";
-    window.loft.apiserver = "http://192.168.31.168:3333/game/";
+    //window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
 
 window.loft.usersettings = window.loft.settings.getSettings();
 window.loft.isCheckers = ["checkers", "giveaway"].indexOf(window.loft.usersettings.game) >= 0;
+window.loft._eventHandlers = {};
+window.loft.addListener = (node, event, handler, capture = false) => {
+    if (!(event in window.loft._eventHandlers)) {
+        window.loft._eventHandlers[event] = [];
+    }
+    
+    window.loft._eventHandlers[event].push({ node: node, handler: handler, capture: capture });
+    node.addEventListener(event, handler, capture);
+}
+window.loft.removeAllListeners = (targetNode, event) => {
+    if (!(event in window.loft._eventHandlers)) {
+        return;
+    }
+    window.loft._eventHandlers[event]
+      .filter(({ node }) => node === targetNode)
+      .forEach(({ node, handler, capture }) => node.removeEventListener(event, handler, capture));
+  
+    window.loft._eventHandlers[event] = window.loft._eventHandlers[event].filter(
+      ({ node }) => node !== targetNode
+    );
+}
 
 if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
 else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
@@ -59,8 +80,6 @@ else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
 async function DOMLoaded()
 {
     await checkConnection();
-
-    console.log("render");
     ReactDOM.render(
         <Router history={window.loft.history}>
           <App/>
@@ -100,13 +119,13 @@ async function checkConnection()
 async function onOnline()
 {
     await checkConnection();
-    alert("Connection restored!");
+    //alert("Connection restored!");
 }
 
 function onOffline()
 {
     window.loft.AjaxAvailable = false;
-    alert("Connection lost!");
+    //alert("Connection lost!");
 }
 
 function onPause() 

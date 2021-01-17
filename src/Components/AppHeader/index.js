@@ -32,10 +32,18 @@ export default class AppHeader extends React.Component{
                             selected={window.loft.usersettings.game}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
-                                window.loft.showModal(false);
-                                window.loft.settings.saveSetting("game", v);
-                                window.loft.settings.saveSetting("isCheckers", (v === "checkers" || v === "corners"));
-                                Routing("/" + v);
+
+                                if (this.props.online) {
+                                    window.loft.showModal(false);
+                                    setTimeout(this.props.quitGameConfirmer, 300);
+                                } else {
+                                    if (this.props.searching) this.props.stopTheSearch();
+                                    window.loft.showModal(false);
+                                    window.loft.settings.saveSetting("game", v);
+                                    window.loft.settings.saveSetting("isCheckers", (v === "checkers" || v === "corners"));
+                                    Routing("/" + v);
+                                }
+
                             }}
                         />
                     </div>
@@ -50,40 +58,8 @@ export default class AppHeader extends React.Component{
         window.loft.showModal(false);
     }
 
-    gameButClick = () => {
-        this.navigatorClick(false);
-        if(this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online){
-            window.loft.showModal(
-                <div className="container">
-                    <div className="row">
-                        <div className="col-12">
-                        <h5>{Lang("sureYouWannaQuit")}</h5><h5 className="warning">{Lang("youllLooseIfYouQuit")}</h5>
-                        </div>
-                        <div className="col-md-6 col-12">
-                            <Button
-                                action={() => window.loft.showModal(false)} 
-                                href="" 
-                                value={Lang("cancelText")} 
-                                theme="neon"
-                                strong="true"
-                            />
-                        </div>
-                        <div className="col-md-6 col-12">
-                            <Button
-                                action={this.props.quit} 
-                                href="" 
-                                value={Lang("quitTheGame")}
-                                theme="neon"
-                                strong="light"
-                            />
-                        </div>
-                    </div>
-                </div>,
-                Lang("attention")
-            )
-        }
-        if(this.props.searching){
-            let approxtext = <h5>{Lang("cancelSearchText").replace("$", window.loft.serverInfo.avgwaittime.avg - this.props.count)}</h5>;
+    stopSearchConfirmer = (onconfirm = () => {}) => {
+        let approxtext = <h5>{Lang("cancelSearchText").replace("$", window.loft.serverInfo.avgwaittime.avg - this.props.count)}</h5>;
             if(window.loft.serverInfo.avgwaittime.cnt===0 || window.loft.serverInfo.playersstat.total<5) approxtext = <h5>{Lang("cancelSearchConfirm")}?</h5>;
             window.loft.showModal(
                 <div className="container">
@@ -102,7 +78,7 @@ export default class AppHeader extends React.Component{
                         </div>
                         <div className="col-md-6 col-12">
                             <Button
-                                action={this.stopSearchingOpponent} 
+                                action={() => { this.stopSearchingOpponent(); onconfirm(); }} 
                                 href="" 
                                 value={Lang("cancelSearchConfirm")} 
                                 theme="light"
@@ -113,7 +89,26 @@ export default class AppHeader extends React.Component{
                 </div>,
                 Lang("attention")
             )
-        }else{
+    }
+
+    homeButClick = () => {
+        this.navigatorClick(false);
+        if (this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online) {
+            this.props.quitGameConfirmer(() => { Routing("/home") });
+        } else if (this.props.searching) {
+            this.stopSearchConfirmer(() => { Routing("/home"); });
+        } else {
+            Routing("/home");
+        }
+    }
+
+    gameButClick = () => {
+        this.navigatorClick(false);
+        if (this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online) {
+            this.props.quitGameConfirmer();
+        } else if(this.props.searching){
+            this.stopSearchConfirmer(this.stopSearchingOpponent);
+        } else {
             this.props.startNewSearch();
         }
     }
@@ -177,7 +172,7 @@ export default class AppHeader extends React.Component{
 
         accDiv = <div id="uhiconcontainer" className={uhcclass}>
                     <div id="uhiconcontainershadow" onClick={() => this.navigatorClick(false)}></div>
-                    <div className="uhicon" onClick={() => Routing("/home")} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
+                    <div className="uhicon" onClick={this.homeButClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-home"></i><span> {Lang("homePageText")}</span></div>
                     {accDiv}
                 </div>;
 

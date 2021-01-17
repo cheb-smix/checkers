@@ -100,7 +100,7 @@ export default class Fanfara extends React.Component{
                 <div className="row">
                     <div className="col-12">
                         <Button
-                            action={()=>{this.props.quit(false)}} 
+                            action={this.props.quit} 
                             href="" 
                             value={Lang("closeText")} 
                             theme="grey"
@@ -138,13 +138,19 @@ export default class Fanfara extends React.Component{
             if (playerInfo.done === 12) {
                 podtext = Lang("youCrashedOpponent");
             } else {
-                podtext = Lang("youCorneredEnemy");
-                diff = opponentCheckersUnDone - playersCheckersUnDone;
+                if (opponentInfo.possibilities === 0) {
+                    podtext = Lang("youCorneredEnemy");
+                    diff = opponentCheckersUnDone - playersCheckersUnDone;
+                } else {
+                    podtext = Lang("enemyQuit");
+                }
             }
-            if(diff===1) podtext += Lang("wonOnlyOneChecker");
-            if(diff>1 && diff<5) podtext += Lang("won2to4checkers").replace("$", diff);
-            if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
-            podtext += " ("+opercent+"%)!";
+            if (opponentInfo.possibilities === 0) {
+                if(diff===1) podtext += Lang("wonOnlyOneChecker");
+                if(diff>1 && diff<5) podtext += Lang("won2to4checkers").replace("$", diff);
+                if(diff>4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
+                podtext += " ("+opercent+"%)!";
+            }
             gonnashow = true;
 
             Noise("victory");

@@ -47,11 +47,6 @@ export default class Home extends React.Component{
                     value={Lang("playWithBot")} 
                 />
                 <Button 
-                    action={()=>window.loft.settings.saveSetting("mode", "local")} 
-                    href={this.getGameRoute()} 
-                    value={Lang("playByBlueTooth")} 
-                />
-                <Button 
                     action={()=>window.loft.settings.saveSetting("mode", "online")} 
                     href={this.getGameRoute()} 
                     value={Lang("playOnlineGame")} 
@@ -71,3 +66,11 @@ export default class Home extends React.Component{
         );
     };
 }
+
+/*
+<Button 
+                    action={()=>window.loft.settings.saveSetting("mode", "local")} 
+                    href={this.getGameRoute()} 
+                    value={Lang("playByBlueTooth")} 
+                />
+                */
