@@ -1,24 +1,40 @@
+import Lang from "./Lang";
+
 export default class Socket
 {
     socketOpened = false;
     name = "";
     game = "checkers";
+    dataRecieved = null;
 
-    constructor(name, game = "checkers")
+    constructor(name, game = "checkers", dataRecieved)
     {
         console.log(`Connecting socket ${window.loft.wsserver}`);
         this.name = name;
         this.game = game;
+        this.dataRecieved = dataRecieved;
         this.socket = new WebSocket(window.loft.wsserver);
         this.socket.onopen = () => {
             this.socketOpened = true;
+            console.log("Connected to socket!");
+
+            let regData = {
+                action: "register",
+                game: this.game,
+                name: this.name,
+            };
+
+            if (Object.keys(window.loft.device) > 0) regData.aua = window.loft.device;
+            if (window.loft.atoken) regData.atoken = window.loft.atoken;
+
+            this.socketSend(regData);
         };
         this.socket.onclose = evt => { 
-            /*if (evt.wasClean) {
-                this.consoleLog(Lang("disconnected"));
+            if (evt.wasClean) {
+                console.log(Lang("disconnected"));
             } else {
-                this.consoleLog(Lang("serversUnavailable"));
-            }*/
+                console.log(Lang("serversUnavailable"));
+            }
             this.socketOpened = false;
             console.log('Code: ' + evt.code + ' reason: ' + evt.reason);
         };
@@ -27,7 +43,8 @@ export default class Socket
             this.socketOpened = false;
         };
         this.socket.onmessage = evt => { 
-            this.socketReplyProcessing(evt);
+            console.log(evt);
+            this.dataRecieved(evt.data);
         };
     }
 
@@ -74,12 +91,12 @@ export default class Socket
         this.quit(false,false);
     }
 
-/*
+
     socketReplyProcessing(response){
         response = JSON.parse(response.data);
         let data = response.data;
-        if(response.response==="SERVERINFO"){
-            if(data!==null) this.setMazafuckinState({serverInfo: data});
+        if(typeof(data.serverInfo) !== "undefined"){
+            this.setMazafuckinState({serverInfo: data.serverInfo});
             return;
         }
         if(response.response==="REGISTERED"){
@@ -183,7 +200,7 @@ export default class Socket
             }
         }
         this.consoleLog(response.response);
-    }*/
+    }
 
 
     socketSend = (param) => {
