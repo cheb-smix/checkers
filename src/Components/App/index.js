@@ -381,7 +381,7 @@ export default class App extends React.Component{
                     game_id: this.state.game_id,
                 },
                 success: (res)=>{
-                    if(res.success){
+                    if (res.success) {
                         if (typeof(res.game) != "undefined") {
                             this.state.game_id = res.game.game_id;
                         }
@@ -704,15 +704,17 @@ export default class App extends React.Component{
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === window.loft.constants.STATUS_IN_GAME));
         
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
-            setTimeout(()=>{
+            setTimeout(() => {
 
-                if(window.loft.AjaxAvailable && !this.state.autochess){
+                let rndBOOL = 3.5 - window.loft.usersettings.difficulty < Math.random() * 3;
+
+                if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
                     this.getBotStep(color);
-                }else{
+                } else {
                     this.iiStep(color);
                 }
 
-            },this.state.botspeed * 1000 * Math.random());
+            }, this.state.botspeed * 500 * Math.random());
         }
     }
 

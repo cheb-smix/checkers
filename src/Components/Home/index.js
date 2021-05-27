@@ -46,11 +46,14 @@ export default class Home extends React.Component{
                     href={this.getGameRoute()} 
                     value={Lang("playWithBot")} 
                 />
+                {
+                    (window.loft.config.onlineAvailable || window.loft.config.Debug) ? 
                 <Button 
                     action={()=>window.loft.settings.saveSetting("mode", "online")} 
                     href={this.getGameRoute()} 
                     value={Lang("playOnlineGame")} 
-                />
+                /> : ""
+                }
                 {
                     this.props.isGuest 
                     ? 

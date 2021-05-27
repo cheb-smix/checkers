@@ -35,7 +35,7 @@ export default class Console extends React.Component{
                     {writeStepsBlock!==""?<br/>:""}
                     {writeStepsBlock}
                 </td>
-                <td id="fps"></td>
+                <td id="fps" style={{display: window.loft.config.Debug ? "block" : "none" }}></td>
             </tr></tbody></table>
             <div id="rampageContainer">{this.props.rampageCode}</div>
             </div>

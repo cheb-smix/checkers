@@ -18,6 +18,7 @@ window.loft = {
     devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
+    musicEnabled: false,
     config: { 
         WriteSteps: false, 
         WriteStats: false, 
@@ -76,8 +77,11 @@ window.loft.removeAllListeners = (targetNode, event) => {
     );
 }
 
-if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
-else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+if (window.cordova) {
+    document.addEventListener("deviceready", onDeviceReady, false);
+} else {
+    document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+} 
 
 async function DOMLoaded()
 {
@@ -105,7 +109,6 @@ function onDeviceReady()
 
 async function checkConnection()
 {
-    console.log(navigator);
     if (typeof(navigator.connection) !== "undefined") {
         window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
     } else {
