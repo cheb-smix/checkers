@@ -18,6 +18,7 @@ window.loft = {
     devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
+    musicEnabled: false,
     config: { 
         WriteSteps: false, 
         WriteStats: false, 
@@ -37,22 +38,23 @@ window.loft = {
         STATUS_DRAW    : "X",
     },
     //timezoneOffset: new Date().getTimezoneOffset(),
+    _eventHandlers: {},
     user_info: {},
     serverInfo: {},
     atoken: localStorage.getItem("atoken"),
     isGuest: true,
-    AjaxAvailable: false,
-    SocketAvailable: false,
+    AjaxAvailable: null,
+    socket: null,
 };
 
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "") {
-    window.loft.wsserver = "ws://192.168.31.168:7777";
-    //window.loft.apiserver = "http://192.168.31.168:3333/game/";
+if (["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
+    window.loft.wsserver = "ws://192.168.31.168:1988";
+    window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
 
 window.loft.usersettings = window.loft.settings.getSettings();
 window.loft.isCheckers = ["checkers", "giveaway"].indexOf(window.loft.usersettings.game) >= 0;
-window.loft._eventHandlers = {};
+
 window.loft.addListener = (node, event, handler, capture = false) => {
     if (!(event in window.loft._eventHandlers)) {
         window.loft._eventHandlers[event] = [];
@@ -61,6 +63,7 @@ window.loft.addListener = (node, event, handler, capture = false) => {
     window.loft._eventHandlers[event].push({ node: node, handler: handler, capture: capture });
     node.addEventListener(event, handler, capture);
 }
+
 window.loft.removeAllListeners = (targetNode, event) => {
     if (!(event in window.loft._eventHandlers)) {
         return;
@@ -74,8 +77,11 @@ window.loft.removeAllListeners = (targetNode, event) => {
     );
 }
 
-if (window.cordova) document.addEventListener("deviceready", onDeviceReady, false);
-else document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+if (window.cordova) {
+    document.addEventListener("deviceready", onDeviceReady, false);
+} else {
+    document.addEventListener("DOMContentLoaded", DOMLoaded, false);
+} 
 
 async function DOMLoaded()
 {
@@ -103,7 +109,11 @@ function onDeviceReady()
 
 async function checkConnection()
 {
-    window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
+    if (typeof(navigator.connection) !== "undefined") {
+        window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
+    } else {
+        window.loft.connectionType = "unknown";
+    }
     let res = await postData({url: window.loft.apiserver + "config"});
     
     if (res) {

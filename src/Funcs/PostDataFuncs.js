@@ -1,4 +1,7 @@
+import fetch from './fetch';
+
 let type = "fatch";
+let timeout = 5000;
 
 export default function postData(obj = {})
 {
@@ -22,6 +25,8 @@ function xhr(o = {})
 {
     let xhr = new XMLHttpRequest();
     xhr.open(o.method, o.url, true);
+
+    xhr.timeout = timeout;
 
     for (let h in o.headers) xhr.setRequestHeader(h, o.headers[h]);
 
@@ -60,6 +65,8 @@ async function fatch(o = {})
         method: o.method,
         headers: o.headers,
         body: object2string(o.data),
+    }, timeout).catch((e) => {
+        return false;
     });
 
     if (response.ok) {

@@ -13,7 +13,7 @@ export class Settings{
             difficulty: 1,
             fanfaravolume: 50,
             soundvolume: 70,
-            musicvolume: 20,
+            musicvolume: 0,
             mode: "bot",
             atoken: "",
             loaded: false,
@@ -24,7 +24,7 @@ export class Settings{
             difficulty: 1,
             fanfaravolume: 50,
             soundvolume: 70,
-            musicvolume: 20,
+            musicvolume: 0,
             mode: "bot",
             atoken: "",
             loaded: false,
@@ -122,6 +122,7 @@ export default class Setting extends React.Component{
                             onSet={window.loft.settings.saveSetting}
                         />
                     </div>
+                    { window.loft.musicEnabled ? 
                     <div className="col-md-6 col-12">
                         <Slider
                             id="musicvolume"
@@ -130,6 +131,7 @@ export default class Setting extends React.Component{
                             onSet={window.loft.settings.saveSetting}
                         />
                     </div>
+                    : "" }
                     <div className="col-md-6 col-12">
                         <Button
                             action={window.loft.settings.dropSettings} 

@@ -20,10 +20,10 @@ class App extends Component{
 
     state = {
         playlist: [
-            "music/sadness_and_hate.mp3",
-            "music/hidden_inside.mp3",
-            "music/liricue.mp3",
-            "music/road_begins.mp3",
+            //"music/sadness_and_hate.mp3",
+            //"music/hidden_inside.mp3",
+            //"music/liricue.mp3",
+            //"music/road_begins.mp3",
         ],
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
@@ -51,7 +51,7 @@ class App extends Component{
     setNewTrack = () => {
         
         let musicplayer = document.querySelector("#musicplayer");
-        if (musicplayer.volume === 0) return;
+        if (!this.state.playlist || musicplayer.volume === 0) return;
         
         let r = Math.floor(Math.random() * this.state.playlist.length);
         let c = 0;
@@ -85,6 +85,7 @@ class App extends Component{
         }
         window.loft.showModal = this.showModal;
         window.loft.nextTrack = this.setNewTrack;
+        window.loft.musicEnabled = this.state.playlist.length > 0;
     }
 
     render() {  
