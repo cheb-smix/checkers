@@ -1,6 +1,6 @@
 @font-face {
-    font-family: 'Neon';
-    src: url('../../Fonts/AA-Neon.ttf');
+    font-family: 'NeonFont';
+    src: url('../../Fonts/vlashu.ttf');
 }
 .console{
     position: relative;
@@ -67,7 +67,7 @@
     z-index: -1;
     font-size: 2.3vh;
     font-style: italic;
-    font-family: Neon;
+    font-family: NeonFont;
     color: #fff;
     width: 93%;
     height: 10vh;
@@ -90,7 +90,7 @@
     z-index: -1;
     font-size: 2.2vh;
     font-style: italic;
-    font-family: Neon;
+    font-family: NeonFont;
     color: #fff;
     width: 100%;
     height: 15vh;

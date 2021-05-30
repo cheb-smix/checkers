@@ -15,6 +15,7 @@ export default class AppHeader extends React.Component{
     }
 
     gameChoice = () => {
+        console.log(window.loft.gvar);
         let doptext = "";
         if(this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online) doptext = <h5 className="warning">{Lang("gameCloseWarning")}</h5>;
         if(this.props.searching) doptext = <h5>{Lang("gameCloseWarning")}</h5>;
