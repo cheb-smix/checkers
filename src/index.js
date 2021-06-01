@@ -5,7 +5,7 @@ import { Router } from "react-router-dom";
 import {createBrowserHistory, createHashHistory} from 'history';
 import App from './App.js';
 
-import 'font-awesome5/css/fontawesome-all.css';
+import './FontAwesome.css';
 import "animate.css/animate.css";
 import { Settings } from './Components/Setting/index.js';
 import postData from './Funcs/PostDataFuncs';
@@ -85,6 +85,7 @@ if (window.cordova) {
 
 async function DOMLoaded()
 {
+    document.getElementById("version").style.display = 'block';
     await checkConnection();
     ReactDOM.render(
         <Router history={window.loft.history}>

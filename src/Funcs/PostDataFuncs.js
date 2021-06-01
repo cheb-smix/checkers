@@ -1,4 +1,4 @@
-import fetch from './fetch';
+import custom_fetch from './fetch';
 
 let type = "fatch";
 let timeout = 5000;
@@ -61,7 +61,7 @@ function xhr(o = {})
 
 async function fatch(o = {})
 {
-    let response = await fetch(o.url, {
+    let response = await custom_fetch(o.url, {
         method: o.method,
         headers: o.headers,
         body: object2string(o.data),

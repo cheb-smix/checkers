@@ -15,11 +15,18 @@ export default class AppHeader extends React.Component{
     }
 
     gameChoice = () => {
+        if (window.gvar.length < 2) return;
+        
         let doptext = "";
         if(this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.props.online) doptext = <h5 className="warning">{Lang("gameCloseWarning")}</h5>;
         if(this.props.searching) doptext = <h5>{Lang("gameCloseWarning")}</h5>;
 
         if (doptext) doptext = <div className="col-md-6 col-12">{doptext}</div>
+
+        let items = {};
+        for (let g in window.gvar) {
+            items[window.gvar[g]] = Lang(`${window.gvar[g]}GameName`);
+        }
 
         window.loft.showModal(
             <div className="container">
@@ -28,7 +35,7 @@ export default class AppHeader extends React.Component{
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="game"
-                            items={{"checkers":Lang("checkersGameName"),"giveaway":Lang("giveawayGameName"),"corners":Lang("cornersGameName"),"checkmates":Lang("chessGameName")}}
+                            items={items}
                             selected={window.loft.usersettings.game}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
@@ -178,7 +185,7 @@ export default class AppHeader extends React.Component{
 
         return (
             <div className="uheader">
-                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice} onMouseDown={() => Noise("menu-click")}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerInfo.color:"white"}}> </i> {window.loft.usersettings.game}</div>
+                <div id="utitle" className="fa-2x" style={{whiteSpace: "nowrap"}} onClick={this.gameChoice} onMouseDown={() => Noise("menu-click")}><i className="fa fa-chess" style={{color: (this.props.online || this.props.searching!==false)?this.props.playerInfo.color:"white"}}> </i> {window.loft.settings.getGame()}</div>
                 {accDiv}
                 <div id="navibut" className="uhicon" onClick={() => this.navigatorClick(null)} onMouseDown={() => Noise("menu-click")}><i className="fa fa-bars fa-2x"></i></div>
             </div>

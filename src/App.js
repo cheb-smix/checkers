@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-
+import React, { Component, Suspense } from 'react';
 import {
     Route,
     Switch,
@@ -8,13 +7,23 @@ import {
 } from "react-router-dom";
 
 import Home from "./Components/Home";
-import Corners from "./Components/Gameslogic/corners";
-import Checkers from "./Components/Gameslogic/checkers";
 import Setting from './Components/Setting';
+
+//import Corners from "./Components/Gameslogic/corners";
+//import Checkers from "./Components/Gameslogic/checkers";
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
 import Noise from './Funcs/Noise';
+import './basic.css';
+
+window.gvar = [
+    'checkers', 
+    'corners',
+];
+
+const Corners  = React.lazy(() => import('./Components/Gameslogic/corners'));
+const Checkers = React.lazy(() => import('./Components/Gameslogic/checkers'));
 
 class App extends Component{
 
@@ -90,16 +99,22 @@ class App extends Component{
 
     render() {  
         return (
-            <React.Fragment>
-            <Switch>
-                <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
-                <Route path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
-                <Route path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
-                <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
-                <Redirect from='/' to='/home'/>
-            </Switch>
+            <Suspense fallback={<div>Loading...</div>}>
+                <Switch>
+                    <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+
+                    {
+                    <Route   path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                    }
+                    {
+                    <Route   path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                    }
+                    
+                    <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
+                    <Redirect from='/' to='/home'/>
+                </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>
-            </React.Fragment>
+            </Suspense>
         );
     }
 

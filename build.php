@@ -46,6 +46,31 @@ $dev_info["cordova_workfolder"] = $cordova_workfolder;
 
 echo "Cordova workfolder initiated at $cordova_workfolder\n";
 
+if (isset($argumentos["app"])) {
+    $app = $argumentos["app"];
+    $className = strtoupper(substr($app, 0, 1)) . substr($app, 1);
+
+    echo "0. Making ReactJS App Split for $app\n";
+    
+    $appFile = file_get_contents('./src/App.js');
+
+    $appFile = preg_replace("/\/*('[a-z]+',)/", "//$1", $appFile);  // Removing old commented with new commenting of all apps
+    $appFile = preg_replace("/\/*('$app',)/", "$1", $appFile);      // Uncomment for app we build
+
+    $appFile = preg_replace("/\/*const /", "//const ", $appFile);   // Removing old commented with new commenting of all apps
+    $appFile = preg_replace("/\/*const $className/", "const $className", $appFile); // Uncomment for app we build
+
+    $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "//$1", $appFile); // Removing old commented with new commenting of all apps
+    $appFile = preg_replace("/\/*(<Route   path='\/$app')/", "$1", $appFile);
+
+    file_put_contents('./src/App.js', $appFile);
+
+    $GLFOLDER = realpath('./src/Components/Gameslogic');
+    $TMPFOLDER = realpath('../');
+    $FILES = scandir($GLFOLDER);
+    foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$app.js") rename("$GLFOLDER/$file", "$TMPFOLDER/$file");
+}
+
 if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "1")) {
     echo "1. Building ReactJS App\n";
     echo `npm run build`;
@@ -121,6 +146,21 @@ if (!isset($argumentos["steps"]) || stristr($argumentos["steps"], "9")) {
 
 file_put_contents($dev_info_file, json_encode($dev_info));
 
+
+if (isset($argumentos["app"])) {
+    echo "0. Returning gamelogic\n";
+    foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$app.js") rename("$TMPFOLDER/$file", "$GLFOLDER/$file");
+
+    $appFile = preg_replace("/\/*('[a-z]+',)/", "$1", $appFile);  
+    $appFile = preg_replace("/\/*const /", "const ", $appFile);  
+    $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "$1", $appFile);
+
+    file_put_contents('./src/App.js', $appFile);
+}
+
+
+echo "NOW YOU CAN SIMULATE YOUR APP USING FOLLOWING CMD:\n";
+echo "simulate --device=Nexus10 --dir=$cordova_workfolder --target=opera\n\n";
 
 
 function getFolderFilesByMask($folder, $mask)

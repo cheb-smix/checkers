@@ -3,16 +3,24 @@ import Button from '../Button';
 import Lang from '../../Funcs/Lang';
 import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
+import './home.css';
 
 export default class Home extends React.Component{
     gameChoice = () => {
+        if (window.gvar.length < 2) return;
+
+        let items = {};
+        for (let g in window.gvar) {
+            items[window.gvar[g]] = Lang(`${window.gvar[g]}GameName`);
+        }
+
         window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-md-6 col-12">
                         <Droplist
                             id="game"
-                            items={{"checkers":Lang("checkersGameName"),"giveaway":Lang("giveawayGameName"),"corners":Lang("cornersGameName"),"checkmates":Lang("chessGameName")}}
+                            items={items}
                             selected={window.loft.usersettings.game}
                             placeholder={Lang("gameText") + "                   "} 
                             onSelect={(k, v)=>{
@@ -29,7 +37,7 @@ export default class Home extends React.Component{
     }
 
     getGame = () => {
-        return window.loft.settings.getSettings("game") ?? "checkers";
+        return window.loft.settings.getGame();
     }
 
     getGameRoute = () => {

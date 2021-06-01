@@ -1,0 +1,121 @@
+/*!
+ * Font Awesome Free 5.0.8 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+ .fa {
+   -moz-osx-font-smoothing: grayscale;
+   -webkit-font-smoothing: antialiased;
+   display: inline-block;
+   font-style: normal;
+   font-variant: normal;
+   text-rendering: auto;
+   line-height: 1; 
+}
+.fa-lg {
+   font-size: 1.33333em;
+   line-height: 0.75em;
+   vertical-align: -.0667em; 
+}
+.fa-xs {
+   font-size: .75em; 
+}
+.fa-sm {
+   font-size: .875em; 
+}
+.fa-2x {
+    font-size: 2em;
+}
+.fa-gamepad:before {
+    content: "\f11b"; 
+}
+.fa-ellipsis-h:before {
+    content: "\f141";
+}
+.fa-stop-circle:before {
+    content: "\f28d"; 
+}
+.fa-id-badge:before {
+    content: "\f2c1"; 
+}
+.fa-times:before {
+    content: "\f00d"; 
+}
+.fa-sign-in-alt:before {
+    content: "\f2f6"; 
+}
+.fa-key:before {
+    content: "\f084"; 
+}
+.fa-home:before {
+    content: "\f015"; 
+}
+.fa-chess:before {
+    content: "\f439"; 
+}
+.fa-bars:before {
+    content: "\f0c9"; 
+}
+.fa-sliders-h:before {
+    content: "\f1de"; 
+}
+.fa-pull-left {
+    float: left; 
+}
+.fa-pull-right {
+    float: right; 
+}
+.fa.fa-pull-left {
+    margin-right: .3em; 
+}
+.fa.fa-pull-right {
+    margin-left: .3em; 
+}
+.fa-spin {
+    -webkit-animation: fa-spin 2s infinite linear;
+            animation: fa-spin 2s infinite linear; 
+}
+.fa-pulse {
+    -webkit-animation: fa-spin 1s infinite steps(8);
+            animation: fa-spin 1s infinite steps(8); 
+}
+.fa-smx-spin{
+    -webkit-animation: a 0.5s infinite ease-in-out;
+    animation: a 0.5s infinite ease-in-out;
+}
+@-webkit-keyframes fa-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg); 
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg); 
+    }      
+}
+@keyframes fa-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+              transform: rotate(0deg); 
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+              transform: rotate(360deg); 
+    } 
+}
+@font-face {
+    font-family: 'Font Awesome 5 Free';
+    font-style: normal;
+    font-weight: 900;
+    src: url("./Fonts/fa-solid-900.ttf") format("truetype")
+}
+    /*
+@font-face {
+    font-family: 'Font Awesome 5 Free';
+    font-style: normal;
+    font-weight: 400;
+    src: url("Fonts/fa-regular-400.ttf") format("truetype"); 
+}*/
+.fa {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900; 
+}

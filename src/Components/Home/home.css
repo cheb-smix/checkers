@@ -1,0 +1,15 @@
+#btnContainer{
+    padding-top: 22vh
+}
+#btnContainer>h5{
+    text-align: center;
+    font-family: ForwardExtra-Light;
+    text-transform: uppercase;
+    color: #cccccc;
+}
+#btnContainer>h5.maintheme{
+  color: var(--theme-main-color);
+}
+#btnContainer>h5.neon{
+  color: var(--neon-border-color);
+}

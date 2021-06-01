@@ -383,7 +383,7 @@ export default class App extends React.Component{
                 success: (res)=>{
                     if (res.success) {
                         if (typeof(res.game) != "undefined") {
-                            this.state.game_id = res.game.game_id;
+                            this.setState({game_id: res.game.game_id});
                         }
                         // nothing to do here
                     }
