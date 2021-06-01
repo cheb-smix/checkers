@@ -1,8 +1,9 @@
 import LocalizedStrings from 'react-localization';
 
-let strings = new LocalizedStrings({
+const strings = new LocalizedStrings({
     en:{
         // Common
+        langName:           "English",
         settingsText:       "Settings",
         returnDefaults:     "Default",
         goBackText:         "Back",
@@ -127,6 +128,7 @@ let strings = new LocalizedStrings({
 
     ru: {
         // Common
+        langName:           "Русский",
         settingsText:       "Настройки",
         returnDefaults:     "По умолчанию",
         goBackText:         "Назад",
@@ -246,6 +248,18 @@ let strings = new LocalizedStrings({
         findAnewGame:       "Найти новую игру?",
     }
 });
+
+export class localization {
+
+    set = (lang) => {
+        strings.setLanguage(lang);
+    }
+
+    getLanguage = () => {
+        return strings.getLanguage();
+    }
+    
+}
 
 export default function Lang(key)
 {

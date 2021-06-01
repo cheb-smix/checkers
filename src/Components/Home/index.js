@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../Button';
+import LangBtn from '../LangBtn';
 import Lang from '../../Funcs/Lang';
 import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
@@ -48,6 +49,7 @@ export default class Home extends React.Component{
         let acc = new Acc(this.props.setAppState);
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated">
+                <LangBtn />
                 <h5 onClick={this.gameChoice}>{Lang(this.getGame() + "GameName")}</h5>
                 <Button 
                     action={()=>window.loft.settings.saveSetting("mode", "bot")} 
