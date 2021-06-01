@@ -60,7 +60,7 @@ if (isset($argumentos["app"])) {
     $appFile = preg_replace("/\/*const /", "//const ", $appFile);   // Removing old commented with new commenting of all apps
     $appFile = preg_replace("/\/*const $className/", "const $className", $appFile); // Uncomment for app we build
 
-    $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "//$1", $appFile);
+    $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "//$1", $appFile); // Removing old commented with new commenting of all apps
     $appFile = preg_replace("/\/*(<Route   path='\/$app')/", "$1", $appFile);
 
     file_put_contents('./src/App.js', $appFile);
@@ -150,6 +150,12 @@ file_put_contents($dev_info_file, json_encode($dev_info));
 if (isset($argumentos["app"])) {
     echo "0. Returning gamelogic\n";
     foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$app.js") rename("$TMPFOLDER/$file", "$GLFOLDER/$file");
+
+    $appFile = preg_replace("/\/*('[a-z]+',)/", "$1", $appFile);  
+    $appFile = preg_replace("/\/*const /", "const ", $appFile);  
+    $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "$1", $appFile);
+
+    file_put_contents('./src/App.js', $appFile);
 }
 
 

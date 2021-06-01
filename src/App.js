@@ -18,12 +18,12 @@ import Noise from './Funcs/Noise';
 import './basic.css';
 
 window.gvar = [
-    //'checkers', 
+    'checkers', 
     'corners',
 ];
 
 const Corners  = React.lazy(() => import('./Components/Gameslogic/corners'));
-//const Checkers = React.lazy(() => import('./Components/Gameslogic/checkers'));
+const Checkers = React.lazy(() => import('./Components/Gameslogic/checkers'));
 
 class App extends Component{
 
@@ -104,7 +104,7 @@ class App extends Component{
                     <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
 
                     {
-                    //<Route   path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                    <Route   path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
                     }
                     {
                     <Route   path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
