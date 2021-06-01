@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../Button';
 import LangBtn from '../LangBtn';
-import Lang from '../../Funcs/Lang';
+import Lang from '../Localization';
 import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';

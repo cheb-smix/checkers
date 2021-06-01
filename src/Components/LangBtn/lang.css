@@ -1,6 +1,6 @@
 :root {
     --flag-size: 3em;
-    --flag-cnt: 3;
+    --flag-cnt: 4;
 }
 #langChooser {
     text-align: right;
@@ -58,4 +58,7 @@
 }
 #langChooser > ul > li[lkey=es]::after, #langChooser > .current[lkey=es] {
     background-image: url('./es.png');
+}
+#langChooser > ul > li[lkey=pt]::after, #langChooser > .current[lkey=pt] {
+    background-image: url('./pt.png');
 }

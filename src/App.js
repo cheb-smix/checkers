@@ -97,7 +97,7 @@ class App extends Component{
         window.loft.musicEnabled = this.state.playlist.length > 0;
     }
 
-    render() {  
+    render() { 
         return (
             <Suspense fallback={<div>Loading...</div>}>
                 <Switch>

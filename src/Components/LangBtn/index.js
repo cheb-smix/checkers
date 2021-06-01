@@ -1,6 +1,5 @@
 import React from 'react';
 import './lang.css';
-import {localization} from '../../Funcs/Lang';
 
 export default class LangBtn extends React.Component {
     state = {
@@ -16,12 +15,16 @@ export default class LangBtn extends React.Component {
                 lkey: "ru",
             },
             {
-                title: "Española",
+                title: "Español",
                 code: "es-ES",
                 lkey: "es",
             },
+            {
+                title: "Português",
+                code: "pt-PT",
+                lkey: "pt",
+            },
         ],
-        loc: new localization(),
     }
 
     toggle = () => {
@@ -29,7 +32,7 @@ export default class LangBtn extends React.Component {
     }
 
     setLng = (e) => {
-        this.state.loc.set(e.target.code);
+        window.loft.localization.set(e.target.getAttribute('code'), false);
     }
 
     render(){
@@ -39,7 +42,7 @@ export default class LangBtn extends React.Component {
 
         return (
             <div id="langChooser" className="closed">
-                <div className='current' lkey={this.state.loc.getLanguage()} onClick={this.toggle}></div>
+                <div className='current' lkey={window.loft.localization.getLanguage()} onClick={this.toggle}></div>
                 <ul>{availableLangs}</ul>
             </div>
         );

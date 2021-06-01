@@ -1,5 +1,5 @@
 import Button from "../Components/Button";
-import Lang from "./Lang";
+import Lang from '../Components/Localization';
 import postData from "./PostDataFuncs";
 import sha1 from "./Sha1";
 

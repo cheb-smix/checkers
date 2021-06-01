@@ -1,4 +1,4 @@
-import Lang from "./Lang";
+import Lang from '../Components/Localization';
 
 export default class Socket
 {
