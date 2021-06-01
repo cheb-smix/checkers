@@ -89,7 +89,9 @@ export default class Setting extends React.Component{
     state = {
         modal: (typeof(this.props.modal) === "undefined" || this.props.modal !== false)
     }
+    
     render(){
+        console.log(this.state);
         return (
             <div className="container" id={this.state.modal === false ? 'btnContainer' : 'modalSettingsContainer'} >
                 {this.state.modal === false ? <h5 className="neon">{Lang("settingsText")}</h5> : ""}
