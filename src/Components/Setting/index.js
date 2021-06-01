@@ -32,6 +32,12 @@ export class Settings{
         };
     }
 
+    getGame = () => {
+        let g = this.getSettings("game");
+        if (!g || window.gvar.indexOf(g) < 0) g = window.gvar[0];
+        return g;
+    }
+
     dropSettings = () => {
         for(let i in this.defaultusersettings){
             this.saveSetting(i, this.defaultusersettings[i]);

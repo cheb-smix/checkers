@@ -78,6 +78,10 @@
     -webkit-animation: fa-spin 1s infinite steps(8);
             animation: fa-spin 1s infinite steps(8); 
 }
+.fa-smx-spin{
+    -webkit-animation: a 0.5s infinite ease-in-out;
+    animation: a 0.5s infinite ease-in-out;
+}
 @-webkit-keyframes fa-spin {
     0% {
       -webkit-transform: rotate(0deg);
