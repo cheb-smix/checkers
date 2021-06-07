@@ -55,13 +55,16 @@ if (isset($argumentos["app"])) {
     $appFile = file_get_contents('./src/App.js');
 
     $appFile = preg_replace("/\/*('[a-z]+',)/", "//$1", $appFile);  // Removing old commented with new commenting of all apps
-    $appFile = preg_replace("/\/*('$app',)/", "$1", $appFile);      // Uncomment for app we build
+    $appFile = preg_replace("/\/*('$app',)/", "$1", $appFile, 1);      // Uncomment for app we build
 
-    $appFile = preg_replace("/\/*const /", "//const ", $appFile);   // Removing old commented with new commenting of all apps
-    $appFile = preg_replace("/\/*const $className/", "const $className", $appFile); // Uncomment for app we build
+    $appFile = preg_replace("/\/*import ([a-zA-Z]+ from \"\.\/Components\/Gameslogic\/[a-z]+\";)/", "//import $1", $appFile);   // Removing old commented with new commenting of all apps
+    $appFile = preg_replace("/\/*import ($className from \"\.\/Components\/Gameslogic\/$app\";)/", "import $1", $appFile, 1); // Uncomment for app we build
+
+    // $appFile = preg_replace("/\/*const /", "//const ", $appFile);   // Removing old commented with new commenting of all apps
+    // $appFile = preg_replace("/\/*const $className/", "const $className", $appFile); // Uncomment for app we build
 
     $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "//$1", $appFile); // Removing old commented with new commenting of all apps
-    $appFile = preg_replace("/\/*(<Route   path='\/$app')/", "$1", $appFile);
+    $appFile = preg_replace("/\/*(<Route   path='\/$app')/", "$1", $appFile, 1);
 
     file_put_contents('./src/App.js', $appFile);
 
@@ -152,7 +155,8 @@ if (isset($argumentos["app"])) {
     foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$app.js") rename("$TMPFOLDER/$file", "$GLFOLDER/$file");
 
     $appFile = preg_replace("/\/*('[a-z]+',)/", "$1", $appFile);  
-    $appFile = preg_replace("/\/*const /", "const ", $appFile);  
+    //$appFile = preg_replace("/\/*const /", "const ", $appFile);  
+    $appFile = preg_replace("/\/*import ([a-zA-Z]+ from \"\.\/Components\/Gameslogic\/[a-z]+\";)/", "import $1", $appFile);
     $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "$1", $appFile);
 
     file_put_contents('./src/App.js', $appFile);

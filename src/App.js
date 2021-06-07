@@ -9,10 +9,8 @@ import {
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
 
-// GAMELOGIC BEGIN
 import Corners from "./Components/Gameslogic/corners";
 import Checkers from "./Components/Gameslogic/checkers";
-// GAMELOGIC END
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
