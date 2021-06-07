@@ -26,11 +26,11 @@
 9. cordova build
 
 # Запуск автобубилдера (При первом запуске запросит рабочую папку cordova)
-php build.php (workfolder=...) (steps=1234567)
+php build.php (workfolder=...) (steps=1234567) (app=corners)
 ## Варианты запуска автобубилдера:
 - php build.php steps=12348   # Сборка реакта и копирование в cordova без удаления старых файлов с заменой на новые без билда cordova для дебага в cordova-simulate
 - php build.php steps=9       # Сборка только в cordova уже имеющегося в рабочей папке проекта
-
+- php build.php app=corners   # Сборка отдельного приложения (тут corners)
 
 # TODO
 0. Разделение способов подключения к онлайну и наследование Connection -> Ajax , Socket , Bluetooth

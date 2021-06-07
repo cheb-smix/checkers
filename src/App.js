@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 import {
     Route,
     Switch,
@@ -9,8 +9,8 @@ import {
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
 
-//import Corners from "./Components/Gameslogic/corners";
-//import Checkers from "./Components/Gameslogic/checkers";
+import Corners from "./Components/Gameslogic/corners";
+import Checkers from "./Components/Gameslogic/checkers";
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
@@ -22,8 +22,6 @@ window.gvar = [
     'corners',
 ];
 
-const Corners  = React.lazy(() => import('./Components/Gameslogic/corners'));
-const Checkers = React.lazy(() => import('./Components/Gameslogic/checkers'));
 
 class App extends Component{
 
@@ -37,6 +35,7 @@ class App extends Component{
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
         },
+        language: "en",
         isGuest: window.loft.isGuest,
     }
 
@@ -95,11 +94,13 @@ class App extends Component{
         window.loft.showModal = this.showModal;
         window.loft.nextTrack = this.setNewTrack;
         window.loft.musicEnabled = this.state.playlist.length > 0;
+
+        window.loft.localization.setStater(this.setAppState);
     }
 
     render() { 
         return (
-            <Suspense fallback={<div>Loading...</div>}>
+            <React.Fragment>
                 <Switch>
                     <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
 
@@ -114,7 +115,7 @@ class App extends Component{
                     <Redirect from='/' to='/home'/>
                 </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>
-            </Suspense>
+            </React.Fragment>
         );
     }
 

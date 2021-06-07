@@ -22,6 +22,21 @@
     --checker-size: 4.5vw;
     --regular-text-size: 16px;
 }
+@media (orientation: portrait), (min-aspect-ratio: 10/6){
+  :root{
+      --field-size: 80vh;
+      --cell-size: 10vh;
+      --checker-size: 8.5vh;
+  }
+}
+@media (orientation: portrait), (max-aspect-ratio: 10/13){
+  :root{
+      --field-size: 100vw;
+      --cell-size: 12.5vw;
+      --checker-size: 10.5vw;
+      --regular-text-size: 12px;
+  }
+}
 html, body {
     overflow-x: hidden;
 }

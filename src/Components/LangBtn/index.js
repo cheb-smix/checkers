@@ -33,6 +33,7 @@ export default class LangBtn extends React.Component {
 
     setLng = (e) => {
         window.loft.localization.set(e.target.getAttribute('code'), false);
+        this.toggle();
     }
 
     render(){
