@@ -1,5 +1,3 @@
-import LocalizedStrings from 'react-localization';
-
 export class Localization
 {
     react = null;
@@ -13,7 +11,7 @@ export class Localization
         "pt": ["pt"],
     };
 
-    langpack = new LocalizedStrings({
+    langpack = {
         en:{
             // Common
             langName:           "English",
@@ -508,7 +506,11 @@ export class Localization
             serversUnavailable: "servidores não disponíveis",
             findAnewGame: "encontrar um novo jogo?",
         }
-    });
+    };
+
+    stater = () => {
+
+    }
 
     constructor()
     {
@@ -525,6 +527,10 @@ export class Localization
         }
     }
 
+    setStater = (stater = () => {}) => {
+        this.stater = stater;
+    }
+
     set = (code = "en-US", auto = true) => {
         code = code.split('-').shift();
         for (let lang in this.languages) {
@@ -533,15 +539,13 @@ export class Localization
                 this.language = lang;
                 window.loft.settings.saveSetting("language", this.language);
 
-                this.langpack.setLanguage(lang);
-
-                if (!auto) window.location.reload();
+                //if (!auto) window.location.reload();
+                this.stater({
+                    language: this.language
+                })
                 return true;
             }
         }
-
-        console.log("Failed to set", code);
-
         return false;
     }
 
@@ -550,7 +554,9 @@ export class Localization
     }
 
     get = (key) => {
-        return this.langpack[key] ?? key;
+        let lng = typeof(this.langpack[this.language]) === "undefined" ? "en" : this.language;
+
+        return typeof(this.langpack[lng][key]) === "undefined" ? key : this.langpack[lng][key];
     }
 }
 

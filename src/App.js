@@ -37,6 +37,7 @@ class App extends Component{
         modal: {
             code: "", header: "", bg: true, panel: true, autoclose: false
         },
+        language: "en",
         isGuest: window.loft.isGuest,
     }
 
@@ -95,6 +96,8 @@ class App extends Component{
         window.loft.showModal = this.showModal;
         window.loft.nextTrack = this.setNewTrack;
         window.loft.musicEnabled = this.state.playlist.length > 0;
+
+        window.loft.localization.setStater(this.setAppState);
     }
 
     render() { 

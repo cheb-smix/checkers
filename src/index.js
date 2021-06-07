@@ -107,7 +107,6 @@ function onDeviceReady()
     document.addEventListener("online", onOnline, false);
     document.addEventListener("offline", onOffline, false);
     window.loft.device = {};
-    console.log(window.loft);
     DOMLoaded();
 }
 
