@@ -1,4 +1,4 @@
-import React, { Component, Suspense } from 'react';
+import React, { Component } from 'react';
 import {
     Route,
     Switch,
@@ -9,8 +9,10 @@ import {
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
 
-//import Corners from "./Components/Gameslogic/corners";
-//import Checkers from "./Components/Gameslogic/checkers";
+// GAMELOGIC BEGIN
+import Corners from "./Components/Gameslogic/corners";
+import Checkers from "./Components/Gameslogic/checkers";
+// GAMELOGIC END
 
 import './Funcs/fps';
 import Modal from './Components/Modal';
@@ -22,8 +24,6 @@ window.gvar = [
     'corners',
 ];
 
-const Corners  = React.lazy(() => import('./Components/Gameslogic/corners'));
-const Checkers = React.lazy(() => import('./Components/Gameslogic/checkers'));
 
 class App extends Component{
 
@@ -99,7 +99,7 @@ class App extends Component{
 
     render() { 
         return (
-            <Suspense fallback={<div>Loading...</div>}>
+            <React.Fragment>
                 <Switch>
                     <Route path='/home' render={(props) => <Home {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
 
@@ -114,7 +114,7 @@ class App extends Component{
                     <Redirect from='/' to='/home'/>
                 </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>
-            </Suspense>
+            </React.Fragment>
         );
     }
 
