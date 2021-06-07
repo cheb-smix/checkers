@@ -1,5 +1,5 @@
 import React from 'react';
-import Lang from '../../Funcs/Lang';
+import Lang from '../Localization';
 import './console.css';
 
 export default class Console extends React.Component{

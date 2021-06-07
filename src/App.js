@@ -97,7 +97,7 @@ class App extends Component{
         window.loft.musicEnabled = this.state.playlist.length > 0;
     }
 
-    render() {  
+    render() { 
         return (
             <Suspense fallback={<div>Loading...</div>}>
                 <Switch>
@@ -110,7 +110,7 @@ class App extends Component{
                     <Route   path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
                     }
                     
-                    <Route path='/settings' render={(props) => <Setting {...props} modal="false" />} />
+                    <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />
                     <Redirect from='/' to='/home'/>
                 </Switch>
             <Modal closer={this.hideModal} modal={this.state.modal}/>

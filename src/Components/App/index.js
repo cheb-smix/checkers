@@ -6,7 +6,7 @@ import Console from '../Console/';
 import Fanfara from '../Fanfaras';
 import Rampage from '../Rampage';
 import Button from '../Button';
-import Lang from '../../Funcs/Lang';
+import Lang from '../Localization';
 import postData from '../../Funcs/PostDataFuncs';
 import Noise from '../../Funcs/Noise';
 

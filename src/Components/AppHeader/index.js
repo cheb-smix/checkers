@@ -2,7 +2,7 @@ import React from 'react';
 import "./appheader.css";
 import Droplist from "../Droplist";
 import Button from '../Button';
-import Lang from '../../Funcs/Lang';
+import Lang from '../Localization';
 import Routing from '../../Funcs/Routing';
 import Noise from '../../Funcs/Noise';
 import Setting from '../Setting';

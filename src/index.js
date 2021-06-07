@@ -7,13 +7,15 @@ import App from './App.js';
 
 import './FontAwesome.css';
 import "animate.css/animate.css";
-import { Settings } from './Components/Setting/index.js';
+import Settings from './Components/Setting/settings';
 import postData from './Funcs/PostDataFuncs';
+import { Localization } from './Components/Localization';
 
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
     apiserver: "https://smix-soft.ru/api/v2/game/",
     settings: new Settings(),
+    localization: null,
     device: {},
     devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
@@ -53,6 +55,7 @@ if (["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hos
 }
 
 window.loft.usersettings = window.loft.settings.getSettings();
+window.loft.localization = new Localization();
 window.loft.isCheckers = ["checkers", "giveaway"].indexOf(window.loft.usersettings.game) >= 0;
 
 window.loft.addListener = (node, event, handler, capture = false) => {
