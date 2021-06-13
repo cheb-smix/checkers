@@ -40,9 +40,13 @@ window.loft = {
         STATUS_DRAW    : "X",
     },
     //timezoneOffset: new Date().getTimezoneOffset(),
+    connectionType: "unknown",
     _eventHandlers: {},
     user_info: {},
-    serverInfo: {},
+    serverInfo: {
+        avgwaittime: {cnt: 0, ttl: 0, avg: 0},
+        playersstat: {total: 0, searching: 0, in_game: 0},
+    },
     atoken: localStorage.getItem("atoken"),
     isGuest: true,
     AjaxAvailable: null,
@@ -115,10 +119,14 @@ function onDeviceReady()
 async function checkConnection()
 {
     if (typeof(navigator.connection) !== "undefined") {
-        window.loft.connectionType = typeof(navigator.connection.type) === "undefined" ? navigator.connection.effectiveType : navigator.connection.type;
-    } else {
-        window.loft.connectionType = "unknown";
+        window.loft.connectionType = navigator.connection.type || navigator.connection.effectiveType;
+    } 
+
+    if (["none", "unknown"].indexOf(window.loft.connectionType) >= 0) {
+        document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
+        return;
     }
+
     let res = await postData({url: window.loft.apiserver + "config"});
     
     if (res) {
@@ -129,8 +137,6 @@ async function checkConnection()
         window.loft.devInfo = res.devInfo;
         window.loft.serverInfo = res.serverInfo;
     }
-
-    console.log(res, window.loft.config);
 }
 
 async function onOnline()
