@@ -246,7 +246,7 @@ export default class App extends React.Component{
 
     startGame = (game) => {
         let playersStep = game.players["player"].color === "white";
-        let newStateObject = {
+        this.setMazafuckinState({
             playersStep: playersStep,
             opponentInfo: game.players["opponent"],
             playerInfo: game.players["player"],
@@ -257,13 +257,15 @@ export default class App extends React.Component{
             searchingOnlineOpponent: false,
             searchingOnlineCounter: 0,
             game_id: game.game_id,
+        });
+        this.setMazafuckinState({
             timeoutCheckInterval: setInterval(()=>{
                 if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
                     let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                    if (!this.state.playersStep && !window.loft.socket && r%5===0) {
+                    if (!this.state.playersStep && !window.loft.socket.socketOpened && r%5===0) {
                         this.checkStep("check-step");
                     }
-                    if (this.state.playersStep && !window.loft.socket && r%10===0) {
+                    if (this.state.playersStep && !window.loft.socket.socketOpened && r%10===0) {
                         this.checkStep("game-status");
                     }
                     if (window.loft.socket && window.loft.socket.socketOpened) {
@@ -271,8 +273,7 @@ export default class App extends React.Component{
                     }
                 }
             },1000)
-        }
-        this.setMazafuckinState(newStateObject);
+        });
     }
 
     checkTOI = () => {
@@ -292,6 +293,7 @@ export default class App extends React.Component{
     }
 
     checkStep = (action) => {
+        console.log(action);
         this.act({
             action: action,
             data: {game_id: this.state.game_id},
@@ -965,7 +967,7 @@ export default class App extends React.Component{
                         if(typeof(cells[this.state.selectedChecker].possibilities[koords]) !== "undefined"){
                             //If we have such step as possible
                             this.doStep(koords);
-                            /*if (this.state.online) {
+                            if (this.state.online) {
                                 let param = {
                                     action:"THESTEP",
                                     from:this.state.selectedChecker,
@@ -975,10 +977,10 @@ export default class App extends React.Component{
                                     effectivity: cells[this.state.selectedChecker].possibilities[koords].effectivity
                                 };
                                 if(this.state.playerInfo.done>9) param.checkdone = 1;
-                                //if(this.state.socketOpened) this.socketSend(param);
+                                if(this.state.socketOpened) this.socketSend(param);
                             }else{
                                 this.doStep(koords);
-                            }*/
+                            }
                         }else{
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;

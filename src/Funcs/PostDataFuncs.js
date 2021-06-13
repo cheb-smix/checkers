@@ -1,9 +1,9 @@
 import custom_fetch from './fetch';
 
-let type = "fatch";
+//let type = "xhr";
 let timeout = 5000;
 
-export default function postData(obj = {})
+export default async function postData(obj = {})
 {
     let o = {url: "", data: {}, success: () => {}, error: () => {}, dataType: "json", method: "POST", headers: {}};
     for (let k in obj) o[k] = obj[k];
@@ -12,51 +12,83 @@ export default function postData(obj = {})
     if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
     if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
-    console.log("using", type, o);
+    console.log("using", window.loft.reqtype, o);
 
-    if (type === "fatch") {
+    if (window.loft.reqtype === "fatch") {
         return fatch(o); 
-    } else if (type === "xhr") {
+    } else if (window.loft.reqtype === "xhr") {
         return xhr(o);
     } 
 }
 
-function xhr(o = {})
+async function xhr(o = {})
 {
-    let xhr = new XMLHttpRequest();
-    xhr.open(o.method, o.url, true);
+    return Promise.race([
+        new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open(o.method, o.url, true);
 
-    xhr.timeout = timeout;
+            xhr.timeout = timeout;
 
-    for (let h in o.headers) xhr.setRequestHeader(h, o.headers[h]);
+            for (let h in o.headers) xhr.setRequestHeader(h, o.headers[h]);
 
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState !== 4) return false;
-        
-        if (xhr.status !== 200 && xhr.status !== 0) {
+            xhr.onload = () => {
+                resolve(xhr.response);
+            }
+            xhr.onerror = () => {
+                reject(new Error('Request failed'));
+            }
 
-            console.log(xhr.status + ': ' + xhr.statusText);
-            alert(o.url + '. ' + xhr.status + ': ' + xhr.statusText);
-            o.error();
+            // xhr.onreadystatechange = () => {
+            //     if (xhr.readyState !== 4) return false;
+                
+            //     if (xhr.status !== 200 && xhr.status !== 0) {
 
-        } else {
+            //         console.log(xhr.status + ': ' + xhr.statusText);
+            //         alert(o.url + '. ' + xhr.status + ': ' + xhr.statusText);
+            //         o.error();
+
+            //     } else {
+                    
+            //         let data = xhr.responseText;
+            //         if(o.dataType==="json"){
+            //             try {
+            //                 data = JSON.parse(data);
+            //             } catch(e) {
+            //                 console.log(e);
+            //             }
+            //         }
+            //         console.log(data);
+            //         o.success(data);
+            //     }
+            //     resolve(xhr.response);
+            // }
+
+            if(typeof(o.data) === "object") o.data = object2string(o.data);
+            xhr.send(o.data);
+
+        }).then((data) => {
             
-            let data = xhr.responseText;
             if(o.dataType==="json"){
                 try {
                     data = JSON.parse(data);
-                    //console.log(data);
                 } catch(e) {
-                    console.log(e,data);
+                    console.log(e);
                 }
             }
+            console.log(data);
             o.success(data);
+            return data;
 
-        }
-    }
-    if(typeof(o.data) === "object") o.data = object2string(o.data);
-    //console.log(data);
-    xhr.send(o.data);
+        }).catch(() => {
+
+            return false;
+            
+        }), 
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), timeout)
+        )
+    ]);
 }
 
 async function fatch(o = {})
@@ -66,6 +98,7 @@ async function fatch(o = {})
         headers: o.headers,
         body: object2string(o.data),
     }, timeout).catch((e) => {
+        alert(e);
         return false;
     });
 
