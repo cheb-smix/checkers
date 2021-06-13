@@ -5,7 +5,7 @@ import './console.css';
 export default class Console extends React.Component{
 
     state = {
-        isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
+        isMobile: (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)),
     }
 
     render(){
@@ -13,13 +13,13 @@ export default class Console extends React.Component{
         
         if(this.state.isMobile) consoleClassName = "console altneonconsole";
         
-        let avgtime = window.loft.serverInfo.avgwaittime;
+        let avgtime = window.loft.serverInfo.avgwaittime.avg;
         if(avgtime === 0){
             avgtime = "∞";
         }
         let serverInfo = <span></span>;
         if(this.props.searching){
-            serverInfo = <span>{Lang("searchingTheEnemy")} {this.props.count}<br />{Lang("approxWaitTime").replace("$", avgtime)}<br />{Lang("playersOnServers").replace("$", window.loft.serverInfo.total_players)}<br />{Lang("playersInSearch").replace("$", window.loft.serverInfo.in_search)}</span>
+            serverInfo = <span>{Lang("searchingTheEnemy")} {this.props.count}<br />{Lang("approxWaitTime").replace("$", avgtime)}<br />{Lang("playersOnServers").replace("$", window.loft.serverInfo.playersstat.total)}<br />{Lang("playersInSearch").replace("$", window.loft.serverInfo.playersstat.searching)}</span>
         }
         let consoleText = this.props.rampageCode === "" ? this.props.text : "";
         let writeStepsBlock = "";

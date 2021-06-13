@@ -6,3 +6,7 @@ export default function custom_fetch(url, options, timeout = 7000) {
         )
     ]);
 }
+
+// export default function custom_fetch(url, options, timeout = 7000) {
+//     return fetch(url, options);
+// }

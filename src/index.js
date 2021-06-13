@@ -47,9 +47,10 @@ window.loft = {
     isGuest: true,
     AjaxAvailable: null,
     socket: null,
+    reqtype: "xhr",
 };
 
-if (["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
+if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
     window.loft.wsserver = "ws://192.168.31.168:1988";
     window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
@@ -89,6 +90,7 @@ if (window.cordova) {
 async function DOMLoaded()
 {
     document.getElementById("version").style.display = 'block';
+    document.getElementById("version").innerHTML = window.loft.apiserver + '<br>' + document.getElementById("version").innerHTML;
     await checkConnection();
     ReactDOM.render(
         <Router history={window.loft.history}>
@@ -127,6 +129,8 @@ async function checkConnection()
         window.loft.devInfo = res.devInfo;
         window.loft.serverInfo = res.serverInfo;
     }
+
+    console.log(res, window.loft.config);
 }
 
 async function onOnline()
