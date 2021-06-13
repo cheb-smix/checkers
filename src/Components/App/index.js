@@ -425,10 +425,10 @@ export default class App extends React.Component{
                 timeoutCheckInterval: setInterval(()=>{
                     if(this.state.online && this.state.playerInfo.status === "in_game" && this.state.lastStepTime>0){
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                        if(r > this.state.serverInfo.steptimelimit * 2 / 3){
-                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(this.state.serverInfo.steptimelimit - r));
+                        if(r > window.loft.config.StepTimeLimit * 2 / 3){
+                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
                         }
-                        if(r > this.state.serverInfo.steptimelimit){
+                        if(r > window.loft.config.StepTimeLimit){
                             if(!this.state.playersStep){
                                 this.socketSend({action:"TIMEOUTOPPO"});
                                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
@@ -978,9 +978,9 @@ export default class App extends React.Component{
                                 };
                                 if(this.state.playerInfo.done>9) param.checkdone = 1;
                                 if(this.state.socketOpened) this.socketSend(param);
-                            }else{
+                            }/*else{
                                 this.doStep(koords);
-                            }
+                            }*/
                         }else{
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;
