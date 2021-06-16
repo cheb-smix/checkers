@@ -539,7 +539,6 @@ export class Localization
                 this.language = lang;
                 window.loft.settings.saveSetting("language", this.language);
 
-                //if (!auto) window.location.reload();
                 this.stater({
                     language: this.language
                 })

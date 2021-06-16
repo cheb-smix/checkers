@@ -84,11 +84,13 @@ class App extends Component{
         document.querySelector(".App-logo").style.top = "15vh";
 
         if (window.cordova) {
+            alert('main app');
             window.loft.removeAllListeners(document, "backbutton");
             window.loft.addListener(document, "backbutton", () => {
-                this.hideModal();
-                if (document.location.href.indexOf('/home') > 0) navigator.app.exitApp();
-                else navigator.app.backHistory();
+                alert(document.location.href);
+                // this.hideModal();
+                // if (document.location.href.indexOf('home') > 0) navigator.app.exitApp();
+                // else navigator.app.backHistory();
             }, false);
         }
         window.loft.showModal = this.showModal;
@@ -114,7 +116,7 @@ class App extends Component{
                     <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />
                     <Redirect from='/' to='/home'/>
                 </Switch>
-            <Modal closer={this.hideModal} modal={this.state.modal}/>
+                <Modal closer={this.hideModal} modal={this.state.modal}/>
             </React.Fragment>
         );
     }
