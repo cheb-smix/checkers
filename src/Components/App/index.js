@@ -85,10 +85,7 @@ export default class App extends React.Component{
         timeoutCheckInterval: false,
         
         /* DEV FIELDS */
-        debug: window.loft.config.Debug,
         autochess: false,
-        writesteps: window.loft.config.WriteSteps,
-        writestats: window.loft.config.WriteStats,
         game_id: 0,
     };
 
@@ -163,12 +160,7 @@ export default class App extends React.Component{
     act = (o = {}) => {
         if (window.loft.socket && window.loft.socket.socketOpened) {
             console.log("socket!");
-            this.INT = setInterval(() => {
-                this.setState({
-                    searchingOnlineOpponent: true,
-                    searchingOnlineCounter: this.state.searchingOnlineCounter + 1,
-                });
-            }, 1000);
+            // window.loft.socket.send(JSON.stringify(o.data), o.success);
         } else if (window.loft.AjaxAvailable) {
             postData({
                 url: window.loft.apiserver + o.action + (typeof(o.id) !== "undefined" ? `/${o.id}` : ""),
@@ -178,38 +170,6 @@ export default class App extends React.Component{
         }
     }
 
-    checkFor = (target = "check-search") => {
-        if (window.loft.socket && window.loft.socket.socketOpened) {
-            console.log("socket!");
-            
-        } else {
-            clearInterval(this.INT);
-            this.INT = setInterval(() => {
-                this.setState({
-                    searchingOnlineOpponent: true,
-                    searchingOnlineCounter: this.state.searchingOnlineCounter + 1,
-                });
-                if (this.state.searchingOnlineCounter % 4 === 0) {
-                    postData({
-                        url: window.loft.apiserver + target,
-                        success: (res) => {
-                            if (res.success && res.game) {
-                                clearInterval(this.INT);
-                                this.startGame(res.game);
-                                this.setState({
-                                    searchingOnlineOpponent: false,
-                                    searchingOnlineCounter: 0,
-                                });
-                            }
-                        }
-                    });
-                }
-            }, 1000)
-        }
-    }
-
-    // Funcs
-
     startNewSearch = () => {
         this.act({
             action: 'search/' + window.loft.usersettings.game,
@@ -217,23 +177,51 @@ export default class App extends React.Component{
                 if (res.success && res.game) {
                     this.startGame(res.game);
                 } else {
-                    this.checkFor("check-search");
+                    this.startCheckingSearchInterval();
                 }
                 window.loft.showModal(false);
             }
         });
     }
 
-    stopTheSearch = () => {
+    startCheckingSearchInterval = () => {
+        clearInterval(this.INT);
+        this.INT = setInterval(() => {
+            this.setState({
+                searchingOnlineOpponent: true,
+                searchingOnlineCounter: this.state.searchingOnlineCounter + 1,
+            });
+
+            if (window.loft.socket && window.loft.socket.socketOpened) {
+                console.log("waiting for enemy by socket!");
+            } else {
+                if (this.state.searchingOnlineCounter % 4 === 0) {
+                    postData({
+                        url: window.loft.apiserver + target,
+                        success: (res) => {
+                            if (res.success && res.game) {
+                                this.stopCheckingSearchInterval();
+                                this.startGame(res.game);
+                            }
+                        }
+                    });
+                }
+            }
+        }, 1000)
+    }
+
+    stopCheckingSearchInterval = () => {
+        clearInterval(this.INT);
         this.setState({
             searchingOnlineOpponent: false,
             searchingOnlineCounter: 0,
         });
+    }
+
+    stopTheSearch = () => {
+        this.stopCheckingSearchInterval();
         this.act({
-            action: 'stop-search',
-            success: () => {
-                clearInterval(this.INT);
-            }
+            action: 'stop-search'
         });
     }
 
@@ -246,7 +234,8 @@ export default class App extends React.Component{
 
     startGame = (game) => {
         let playersStep = game.players["player"].color === "white";
-        this.setMazafuckinState({
+
+        this.setState({
             playersStep: playersStep,
             opponentInfo: game.players["opponent"],
             playerInfo: game.players["player"],
@@ -258,42 +247,46 @@ export default class App extends React.Component{
             searchingOnlineCounter: 0,
             game_id: game.game_id,
         });
-        this.setMazafuckinState({
-            timeoutCheckInterval: setInterval(()=>{
-                if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
-                    let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                    if (!this.state.playersStep && !window.loft.socket.socketOpened && r%5===0) {
-                        this.checkStep("check-step");
+
+        clearInterval(this.INT);
+
+        this.INT =  setInterval(()=>{
+            if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
+
+                let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
+
+                if (window.loft.socket && window.loft.socket.socketOpened) {
+                    if (r > window.loft.config.StepTimeLimit) {
+                        this.checkStep(this.state.playersStep ? "game-status" : "check-step", r);
+                    } else {
+                        this.checkTOI(r);
                     }
-                    if (this.state.playersStep && !window.loft.socket.socketOpened && r%10===0) {
-                        this.checkStep("game-status");
-                    }
-                    if (window.loft.socket && window.loft.socket.socketOpened) {
-                        this.checkTOI();
+                } else {
+                    if (r % 5 === 0) {
+                        this.checkStep(this.state.playersStep ? "game-status" : "check-step", r);
+                    } else {
+                        this.checkTOI(r);
                     }
                 }
-            },1000)
-        });
+
+            }
+        }, 1000);
     }
 
-    checkTOI = () => {
-        let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-        
-        if(r > window.loft.config.StepTimeLimit * 2 / 3){
+    checkTOI = (r) => {        
+        if (r > window.loft.config.StepTimeLimit * 2 / 3) {
             this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
         }
-        if(r > window.loft.config.StepTimeLimit){
-            if(!this.state.playersStep){
-                //this.socketSend({action:"TIMEOUTOPPO"}); // one more check on server side by socket
+        if (r > window.loft.config.StepTimeLimit) {
+            if(!this.state.playersStep) {
                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
             }
             this.consoleLog(Lang("gameOverByTimeout"));
-            clearInterval(this.state.timeoutCheckInterval);
+            clearInterval(this.INT);
         }
     }
 
-    checkStep = (action) => {
-        console.log(action);
+    checkStep = (action, r) => {
         this.act({
             action: action,
             data: {game_id: this.state.game_id},
@@ -303,21 +296,26 @@ export default class App extends React.Component{
                 } else {
                     console.log(res);
                 }
-                this.checkTOI();
+                this.checkTOI(r);
             }
         });
     }
 
     procedureStepData = (stepData) => {
         if (typeof(stepData.game_results) !== "undefined") {
+
             console.log(stepData.game_results, window.loft.constants);
+
             if (stepData.game_results.status === window.loft.constants.STATUS_NOMANS) {
+
                 let {playerInfo, opponentInfo} = this.state;
                 playerInfo.status = window.loft.constants.STATUS_DRAW;
                 opponentInfo.status = window.loft.constants.STATUS_DRAW;
                 this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
-                clearInterval(this.state.timeoutCheckInterval);
+                clearInterval(this.INT);
+
             } else if (stepData.game_results.status === window.loft.constants.STATUS_FINISHED) {
+
                 let {playerInfo, opponentInfo} = this.state;
                 if (typeof(stepData.game_results.winner) !== "undefined") {
                     playerInfo.status = window.loft.constants.STATUS_WON;
@@ -327,11 +325,16 @@ export default class App extends React.Component{
                     opponentInfo.status = window.loft.constants.STATUS_WON;
                 }
                 this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
-                clearInterval(this.state.timeoutCheckInterval);
+                clearInterval(this.INT);
+
             }
+
             return;
+
         }
+
         if (typeof(stepData.lastStep) !== "undefined") {
+
             this.setState({
                 lastStepTime: stepData.lastStep.timestamp,
             });
@@ -343,6 +346,7 @@ export default class App extends React.Component{
                 false
             );
             return;
+
         }
     }
 
@@ -350,7 +354,7 @@ export default class App extends React.Component{
         this.act({
             action: 'get-bot-step',
             data: {
-                playstage: this.state.debug ? 3 : this.state.playstage,
+                playstage: window.loft.config.Debug ? 3 : this.state.playstage,
                 mask: this.getDeskMask(),
                 color: color
             },
@@ -384,10 +388,9 @@ export default class App extends React.Component{
                 },
                 success: (res)=>{
                     if (res.success) {
-                        if (typeof(res.game) != "undefined") {
+                        if (typeof(res.game) !== "undefined") {
                             this.setState({game_id: res.game.game_id});
                         }
-                        // nothing to do here
                     }
                 }
             });
@@ -577,7 +580,7 @@ export default class App extends React.Component{
     }
 
     doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, pflag = true, write = true) => {
-        if (write) if(this.state.writesteps || this.state.online) this.saveStepResults(koordsto,koordsfrom,pflag);
+        if (write) if(window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto,koordsfrom,pflag);
         
         if(window.loft.usersettings.animation==='0'){
             this.theStep(koordsto,koordsfrom,newPlayersStep);
@@ -1087,8 +1090,7 @@ export default class App extends React.Component{
                         player={this.state.playerInfo.user.display_name}
                         opponent={this.state.opponentInfo.user.display_name}
                         searching={this.state.searchingOnlineOpponent} 
-                        count={this.state.searchingOnlineCounter} 
-                        rec={this.state.writesteps}
+                        count={this.state.searchingOnlineCounter}
                     />
                 </div>
         </div>

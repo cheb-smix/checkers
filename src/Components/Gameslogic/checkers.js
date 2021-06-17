@@ -437,7 +437,7 @@ export default class Checkers extends App{
             opponentInfo.status = window.loft.constants.STATUS_WON;
         }
         
-        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && (this.state.writesteps || this.state.writestats)){
+        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && (window.loft.config.WriteSteps || window.loft.config.WriteStats)){
             let postdata = {
                 action: "saveGameEnding",
                 game_id: this.state.game_id,
