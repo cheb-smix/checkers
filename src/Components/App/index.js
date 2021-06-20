@@ -197,7 +197,7 @@ export default class App extends React.Component{
             } else {
                 if (this.state.searchingOnlineCounter % 4 === 0) {
                     postData({
-                        url: window.loft.apiserver + target,
+                        url: window.loft.apiserver + "check-search",
                         success: (res) => {
                             if (res.success && res.game) {
                                 this.stopCheckingSearchInterval();
@@ -381,16 +381,19 @@ export default class App extends React.Component{
                     mask:   this.getDeskMask(),
                     from:   koordsfrom,
                     to:     koordsto,
-                    kills:  cells[koordsfrom].possibilities[koordsto].kills ?? [],
+                    kills:  cells[koordsfrom].possibilities[koordsto].kills.join('-') ?? '',
                     effectivity: cells[koordsfrom].possibilities[koordsto].effectivity,
-                    ep:     this.state.opponentInfo.possibilities,
+                    //ep:     this.state.opponentInfo.possibilities,
                     game_id: this.state.game_id,
                 },
+                
                 success: (res)=>{
                     if (res.success) {
                         if (typeof(res.game) !== "undefined") {
                             this.setState({game_id: res.game.game_id});
                         }
+                    } else {
+                        alert(res.errors.shift());
                     }
                 }
             });

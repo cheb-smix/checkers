@@ -9,6 +9,7 @@ export default async function postData(obj = {})
     for (let k in obj) o[k] = obj[k];
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
+    // o.headers["Content-Type"] = 'application/json';
     if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
     if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
@@ -64,7 +65,10 @@ async function xhr(o = {})
             //     resolve(xhr.response);
             // }
 
-            if(typeof(o.data) === "object") o.data = object2string(o.data);
+            if(typeof(o.data) === "object") {
+                o.data = object2string(o.data);
+                //o.data = JSON.stringify(o.data);
+            }
             xhr.send(o.data);
 
         }).then((data) => {
