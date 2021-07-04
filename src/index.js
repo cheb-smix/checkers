@@ -23,7 +23,6 @@ window.loft = {
     musicEnabled: false,
     config: { 
         WriteSteps: false, 
-        WriteStats: false, 
         Debug: false,
         StepTimeLimit: 30,
         AnimationSpeed: 45,
@@ -136,6 +135,8 @@ async function checkConnection()
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;
         window.loft.serverInfo = res.serverInfo;
+    } else {
+        document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
     }
 }
 

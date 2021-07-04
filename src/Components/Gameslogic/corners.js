@@ -392,7 +392,7 @@ export default class Corners extends App{
             opponentInfo.status = window.loft.constants.STATUS_WON;
         }
         
-        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && (window.loft.config.WriteSteps || window.loft.config.WriteStats)){
+        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && window.loft.config.WriteSteps){
             let postdata = {
                 action: "saveGameEnding",
                 game_id: this.state.game_id,
