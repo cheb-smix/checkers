@@ -23,7 +23,7 @@ export default class Console extends React.Component{
         }
         let consoleText = this.props.rampageCode === "" ? this.props.text : "";
         let writeStepsBlock = "";
-        if(this.props.rec) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
+        if(window.loft.config.WriteSteps) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
         return (
             <div id="consoleParentino">
             <div className={consoleClassName} data-text={this.props.text}><p>{consoleText}</p></div>

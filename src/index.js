@@ -23,7 +23,6 @@ window.loft = {
     musicEnabled: false,
     config: { 
         WriteSteps: false, 
-        WriteStats: false, 
         Debug: false,
         StepTimeLimit: 30,
         AnimationSpeed: 45,
@@ -54,7 +53,7 @@ window.loft = {
     reqtype: "xhr",
 };
 
-if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
+if (/*!window.cordova &&*/ ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
     window.loft.wsserver = "ws://192.168.31.168:1988";
     window.loft.apiserver = "http://192.168.31.168:3333/game/";
 }
@@ -136,6 +135,8 @@ async function checkConnection()
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;
         window.loft.serverInfo = res.serverInfo;
+    } else {
+        document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
     }
 }
 

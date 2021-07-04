@@ -9,16 +9,21 @@ export default async function postData(obj = {})
     for (let k in obj) o[k] = obj[k];
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
+    // o.headers["Content-Type"] = 'application/json';
     if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
     if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
     console.log("using", window.loft.reqtype, o);
 
-    if (window.loft.reqtype === "fatch") {
-        return fatch(o); 
-    } else if (window.loft.reqtype === "xhr") {
-        return xhr(o);
-    } 
+    try {
+        if (window.loft.reqtype === "fatch") {
+            return await fatch(o); 
+        } else if (window.loft.reqtype === "xhr") {
+            return await xhr(o);
+        } 
+    } catch (e) {
+        return false;
+    }
 }
 
 async function xhr(o = {})
@@ -39,32 +44,10 @@ async function xhr(o = {})
                 reject(new Error('Request failed'));
             }
 
-            // xhr.onreadystatechange = () => {
-            //     if (xhr.readyState !== 4) return false;
-                
-            //     if (xhr.status !== 200 && xhr.status !== 0) {
-
-            //         console.log(xhr.status + ': ' + xhr.statusText);
-            //         alert(o.url + '. ' + xhr.status + ': ' + xhr.statusText);
-            //         o.error();
-
-            //     } else {
-                    
-            //         let data = xhr.responseText;
-            //         if(o.dataType==="json"){
-            //             try {
-            //                 data = JSON.parse(data);
-            //             } catch(e) {
-            //                 console.log(e);
-            //             }
-            //         }
-            //         console.log(data);
-            //         o.success(data);
-            //     }
-            //     resolve(xhr.response);
-            // }
-
-            if(typeof(o.data) === "object") o.data = object2string(o.data);
+            if(typeof(o.data) === "object") {
+                o.data = object2string(o.data);
+                //o.data = JSON.stringify(o.data);
+            }
             xhr.send(o.data);
 
         }).then((data) => {
@@ -80,10 +63,8 @@ async function xhr(o = {})
             o.success(data);
             return data;
 
-        }).catch(() => {
-
+        }).catch((e) => {
             return false;
-            
         }), 
         new Promise((_, reject) =>
             setTimeout(() => reject(new Error('timeout')), timeout)
@@ -98,7 +79,6 @@ async function fatch(o = {})
         headers: o.headers,
         body: object2string(o.data),
     }, timeout).catch((e) => {
-        alert(e);
         return false;
     });
 

@@ -1,7 +1,5 @@
 export class Localization
 {
-    react = null;
-
     language = 'auto';
     
     languages = {

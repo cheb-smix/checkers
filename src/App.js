@@ -84,13 +84,11 @@ class App extends Component{
         document.querySelector(".App-logo").style.top = "15vh";
 
         if (window.cordova) {
-            alert('main app');
             window.loft.removeAllListeners(document, "backbutton");
             window.loft.addListener(document, "backbutton", () => {
-                alert(document.location.href);
-                // this.hideModal();
-                // if (document.location.href.indexOf('home') > 0) navigator.app.exitApp();
-                // else navigator.app.backHistory();
+                this.hideModal();
+                if (document.location.href.indexOf('home') > 0) navigator.app.exitApp();
+                else navigator.app.backHistory();
             }, false);
         }
         window.loft.showModal = this.showModal;
