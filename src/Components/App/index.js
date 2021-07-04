@@ -378,7 +378,7 @@ export default class App extends React.Component{
             action: 'get-bot-step',
             data: {
                 playstage: window.loft.config.Debug ? 3 : this.state.playstage,
-                mask: this.getDeskMask(),
+                mask: this.getDeskMask(this.state.cells, true),
                 color: color
             },
             success: (res) => {
@@ -401,7 +401,7 @@ export default class App extends React.Component{
             this.act({
                 action: 'set-step',
                 data: {
-                    mask:        this.getDeskMask(),
+                    mask:        this.getDeskMask(this.state.cells, true),
                     from:        koordsfrom,
                     to:          koordsto,
                     kills:       cells[koordsfrom].possibilities[koordsto].kills.join('-') ?? '',
@@ -626,7 +626,7 @@ export default class App extends React.Component{
         
         if(bestMove===null || bestMove.hops<hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity){
             bestMove = {
-                mask: this.getDeskMask(this.state.cells,true),
+                mask: this.getDeskMask(this.state.cells, true),
                 from:koordsfrom,
                 to:koordsto,
                 hops:hops,
@@ -712,13 +712,13 @@ export default class App extends React.Component{
         setTimeout(() => this.botStep(color), 300);
     }
 
-    getDeskMask = (cells = this.state.cells, colors=false) => {
+    getDeskMask = (cells = this.state.cells, colors = false) => {
         let mask = "";
         for(let y=1;y<9;y++){
             for(let x=1;x<9;x++){
                 let k = x+":"+y;
-                if(colors) mask += cells[k].color===false ? "_":(cells[k].color==="black"?"0" : "1");
-                else mask += cells[k].color===false ? "0" : "1";
+                if (colors) mask += cells[k].color ? (cells[k].color === "black" ? "0" : "1") : "_";
+                else mask += cells[k].color ? "1" : "0";
             }
         }
         return mask;
