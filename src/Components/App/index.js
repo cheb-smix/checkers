@@ -29,8 +29,8 @@ export default class App extends React.Component{
         bestMove: null,
         playerInfo: {
             user: {
-                display_name: "player" + Math.round(Math.random() * 1000 + 1000), 
-                username: false,
+                display_name: window.loft.user_info.display_name, 
+                username: window.loft.user_info.username,
             },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "white",
@@ -46,8 +46,16 @@ export default class App extends React.Component{
                 total_draws:    0,
                 total_steps:    0,
                 total_hops:     0,
+                total_kills:    0,
                 experience:     0,
                 level:          1,
+            },
+            lastGameStat: {
+                kills: 0,
+                steps: 0,
+                hops: 0,
+                points: 0,
+                newlevels: 0,
             }
         },
         opponentInfo: {
@@ -85,11 +93,13 @@ export default class App extends React.Component{
         timeoutCheckInterval: false,
         
         /* DEV FIELDS */
+        botStepBuffer: {},
         autochess: false,
         game_id: 0,
     };
 
     componentDidMount() {
+        console.log(this.state);
         if (window.cordova) {
             window.loft.removeAllListeners(document, "backbutton");
             window.loft.addListener(document, "backbutton", () => {
@@ -117,11 +127,9 @@ export default class App extends React.Component{
     initiation = (state) => {
         let {playerInfo, opponentInfo} = this.state;
         
-        if(!window.loft.isGuest){
-            playerInfo.user.display_name = window.loft.user_info.display_name;
-            playerInfo.user.username = window.loft.user_info.username;
-            playerInfo.stat = window.loft.user_info.stat;
-        }
+        playerInfo.user.display_name = window.loft.user_info.display_name;
+        playerInfo.user.username = window.loft.user_info.username;
+        if (typeof(window.loft.user_info.stat) !== "undefined") playerInfo.stat = window.loft.user_info.stat;
 
         if(this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
 
@@ -146,17 +154,21 @@ export default class App extends React.Component{
         this.setMazafuckinState(state);
 
         if (window.loft.usersettings.mode === "bot") {
-            postData({
-                url: window.loft.apiserver + "start-bot-game",
-                success: (res) => {
-                    if (res.success && res.game) {
-                        this.startGame(res.game);
+            if (window.loft.AjaxAvailable) {
+                postData({
+                    url: window.loft.apiserver + "start-bot-game",
+                    success: (res) => {
+                        if (res.success && res.game) {
+                            this.startGame(res.game);
+                        }
+                    },
+                    error: () => {
+                        if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
                     }
-                },
-                error: () => {
-                    if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
-                }
-            });
+                });
+            } else {
+                if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
+            }
         }
         
         
@@ -249,6 +261,8 @@ export default class App extends React.Component{
     startGame = (game) => {
         let playersStep = game.players.player.color === "white";
 
+        let {opponentInfo} = this.state;
+
         let newState = {
             playersStep: playersStep,
             playerInfo: game.players.player,
@@ -264,6 +278,9 @@ export default class App extends React.Component{
         if (game.players.opponent.device_id > 0) {
             newState.online = true;
             newState.opponentInfo = game.players.opponent;
+        } else {
+            opponentInfo.color = playersStep ? "black" : "white";
+            newState.opponentInfo = opponentInfo;
         }
 
         this.setState(newState);
@@ -385,8 +402,8 @@ export default class App extends React.Component{
                 if(!res.success){
                     this.iiStep(color);
                 }else{
-                    if(this.state.cells[res.data.from].color===color && typeof(this.state.cells[res.data.from].possibilities[res.data.to])!=="undefined"){
-                        this.doStep(res.data.to, res.data.from, true);
+                    if(this.state.cells[res.botstep.from].color === color && typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined"){
+                        this.doStep(res.botstep.to, res.botstep.from, true, false);
                     }else{
                         this.iiStep(color);
                     }
@@ -395,24 +412,36 @@ export default class App extends React.Component{
         });
     }
 
-    saveStepResults = (koordsto, koordsfrom, write) => {
+    saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
         let {cells} = this.state;
         if (this.state.game_id) {
             this.act({
                 action: 'set-step',
                 data: {
-                    mask:        this.getDeskMask(this.state.cells, true),
-                    from:        koordsfrom,
-                    to:          koordsto,
-                    kills:       cells[koordsfrom].possibilities[koordsto].kills.join('-') ?? '',
-                    effectivity: cells[koordsfrom].possibilities[koordsto].effectivity,
-                    game_id:     this.state.game_id,
-                    write:       write,
+                    mask:       this.getDeskMask(this.state.cells, true),
+                    from:       koordsfrom,
+                    to:         koordsto,
+                    kills:      cells[koordsfrom].possibilities[koordsto].kills.join('-') ?? '',
+                    path:       cells[koordsfrom].possibilities[koordsto].path.join('-') ?? '',
+                    game_id:    this.state.game_id,
+                    write:      write,
                 },
                 
                 success: (res)=>{
                     if (!res.success) {
                         alert(res.errors.shift());
+                    } else {
+                        if (typeof(res.botstep) !== "undefined") {
+                            if (typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined") {
+                                console.log("GOT BOTSTEP!");
+                                this.setState({botStepBuffer: res.botstep});
+                            }
+                        }
+                        if (typeof(res.stat) !== "undefined") {
+                            let {playerInfo} = this.state;
+                            playerInfo.lastGameStat = res.stat;
+                            this.setState({playerInfo: playerInfo});
+                        }
                     }
                 }
             });
@@ -448,7 +477,7 @@ export default class App extends React.Component{
                 searchingOnlineOpponent: false,
                 searchingOnlineCounter: 0,
                 timeoutCheckInterval: setInterval(()=>{
-                    if(this.state.online && this.state.playerInfo.status === "in_game" && this.state.lastStepTime>0){
+                    if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
                         if(r > window.loft.config.StepTimeLimit * 2 / 3){
                             this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
@@ -735,7 +764,12 @@ export default class App extends React.Component{
                 let rndBOOL = 3.5 - window.loft.usersettings.difficulty < Math.random() * 3;
 
                 if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
-                    this.getBotStep(color);
+                    if (typeof(this.state.botStepBuffer.from) !== "undefined") {
+                        this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false);
+                        this.setState({botStepBuffer: {}});
+                    } else {
+                        this.getBotStep(color);
+                    }
                 } else {
                     this.iiStep(color);
                 }
@@ -882,6 +916,13 @@ export default class App extends React.Component{
         playerInfo.steps = 0;
         playerInfo.done = 0;
         playerInfo.possibilities = 0;
+        playerInfo.lastGameStat = {
+            kills: 0,
+            steps: 0,
+            hops: 0,
+            points: 0,
+            newlevels: 0,
+        };
 
         this.setMazafuckinState({
             playersStep: true,
@@ -908,11 +949,11 @@ export default class App extends React.Component{
         window.loft.showModal(false);
     }
 
-    updatePI = (data) => {
+    updatePI = () => {
         let {playerInfo: pi} = this.state;
-        for(let k in data){
-            if(typeof(pi.statistics[k])!=="undefined") pi.statistics[k] = data[k];
-        }
+        pi.stat.experience += pi.lastGameStat.points;
+        pi.stat.level += pi.lastGameStat.newlevels;
+        for (let k in pi.lastGameStat) pi.lastGameStat[k] = 0;
         this.setMazafuckinState({playerInfo: pi});
     }
 
@@ -971,12 +1012,13 @@ export default class App extends React.Component{
 
     onCheckerClick = (koords) => {
         let {cells} = this.state;
+        
         if (typeof(cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status===window.loft.constants.STATUS_IN_GAME)
         {
             //Cell exists and it is a players turn to do a step
             if (cells[koords].color !== this.state.opponentInfo.color) {
                 //If checker is player`s one or empty cell
-                if(cells[koords].checker !== false){
+                if (cells[koords].checker !== false) {
                     //New checker click
                     let newselectedChecker = false;
                     if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
@@ -984,7 +1026,7 @@ export default class App extends React.Component{
                     }
                     Noise("checker-take");
                     this.setMazafuckinState({selectedChecker: newselectedChecker});
-                }else{
+                } else {
                     //Trying to do a step
                     if (this.state.selectedChecker !== false) {
                         //If we have an active checker

@@ -437,28 +437,28 @@ export default class Checkers extends App{
             opponentInfo.status = window.loft.constants.STATUS_WON;
         }
         
-        if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && window.loft.config.WriteSteps){
-            let postdata = {
-                action: "saveGameEnding",
-                game_id: this.state.game_id,
-            }
-            for(let n in playerInfo){
-                postdata[n+playerInfo.color[0]] = playerInfo[n];
-            }
-            for(let n in opponentInfo){
-                postdata[n+opponentInfo.color[0]] = opponentInfo[n];
-            }
-            if(this.state.XMLHRAvailable){
-                this.XMLHR(postdata,(data)=>{
-                    if(changes) this.setMazafuckinState({playerInfo:playerInfo,opponentInfo:opponentInfo});
-                    if(this.state.autochess){
-                        setTimeout(()=>{
-                            window.location.reload();
-                        },5000);
-                    }
-                });
-            }
-        }
+        // if((opponentInfo.status===window.loft.constants.STATUS_WON || playerInfo.status===window.loft.constants.STATUS_WON) && window.loft.config.WriteSteps){
+        //     let postdata = {
+        //         action: "saveGameEnding",
+        //         game_id: this.state.game_id,
+        //     }
+        //     for(let n in playerInfo){
+        //         postdata[n+playerInfo.color[0]] = playerInfo[n];
+        //     }
+        //     for(let n in opponentInfo){
+        //         postdata[n+opponentInfo.color[0]] = opponentInfo[n];
+        //     }
+        //     if(this.state.XMLHRAvailable){
+        //         this.XMLHR(postdata,(data)=>{
+        //             if(changes) this.setMazafuckinState({playerInfo:playerInfo,opponentInfo:opponentInfo});
+        //             if(this.state.autochess){
+        //                 setTimeout(()=>{
+        //                     window.location.reload();
+        //                 },5000);
+        //             }
+        //         });
+        //     }
+        // }
         if(changes && !this.state.XMLHRAvailable) return {playerInfo:playerInfo,opponentInfo:opponentInfo};
         return false;
     }
