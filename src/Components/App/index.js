@@ -39,7 +39,7 @@ export default class App extends React.Component{
             cells: 12,
             done: 0,
             possibilities: 10,
-            stat: {
+            statistics: {
                 total_games:    0,
                 total_wins:     0,
                 total_failes:   0, 
@@ -51,11 +51,11 @@ export default class App extends React.Component{
                 level:          1,
             },
             lastGameStat: {
-                kills: 0,
-                steps: 0,
-                hops: 0,
+                kills:  0,
+                steps:  0,
+                hops:   0,
                 points: 0,
-                newlevels: 0,
+                level:  1,
             }
         },
         opponentInfo: {
@@ -129,7 +129,7 @@ export default class App extends React.Component{
         
         playerInfo.user.display_name = window.loft.user_info.display_name;
         playerInfo.user.username = window.loft.user_info.username;
-        if (typeof(window.loft.user_info.stat) !== "undefined") playerInfo.stat = window.loft.user_info.stat;
+        if (typeof(window.loft.user_info.stat) !== "undefined") playerInfo.statistics = window.loft.user_info.stat;
 
         if(this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
 
@@ -261,11 +261,13 @@ export default class App extends React.Component{
     startGame = (game) => {
         let playersStep = game.players.player.color === "white";
 
-        let {opponentInfo} = this.state;
+        let {playerInfo, opponentInfo} = this.state;
+
+        for (let k in game.players.player) if (typeof(playerInfo[k]) !== 'undefined') playerInfo[k] = game.players.player[k];
 
         let newState = {
             playersStep: playersStep,
-            playerInfo: game.players.player,
+            playerInfo: playerInfo,
             lastStepTime: game.lastStepTime,
             consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")),
             online: false,
@@ -415,14 +417,20 @@ export default class App extends React.Component{
     saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
         let {cells} = this.state;
         if (this.state.game_id) {
+            let kills = [];
+            if (typeof(cells[koordsfrom].possibilities[koordsto]) === 'undefined') {
+                console("WARNING!!! NO POSSIBILITY OR WHAT?", koordsto, cells[koordsfrom].possibilities);
+            } else {
+                kills = cells[koordsfrom].possibilities[koordsto].kills;
+            }
             this.act({
                 action: 'set-step',
                 data: {
                     mask:       this.getDeskMask(this.state.cells, true),
                     from:       koordsfrom,
                     to:         koordsto,
-                    kills:      cells[koordsfrom].possibilities[koordsto].kills.join('-') ?? '',
-                    path:       cells[koordsfrom].possibilities[koordsto].path.join('-') ?? '',
+                    kills:      kills.join('-'),
+                    path:       cells[koordsfrom].possibilities[koordsto].path.join('-'),
                     game_id:    this.state.game_id,
                     write:      write,
                 },
@@ -437,9 +445,9 @@ export default class App extends React.Component{
                                 this.setState({botStepBuffer: res.botstep});
                             }
                         }
-                        if (typeof(res.stat) !== "undefined") {
+                        if (typeof(res.lastGameStat) !== "undefined") {
                             let {playerInfo} = this.state;
-                            playerInfo.lastGameStat = res.stat;
+                            playerInfo.lastGameStat = res.lastGameStat;
                             this.setState({playerInfo: playerInfo});
                         }
                     }
@@ -951,9 +959,9 @@ export default class App extends React.Component{
 
     updatePI = () => {
         let {playerInfo: pi} = this.state;
-        pi.stat.experience += pi.lastGameStat.points;
-        pi.stat.level += pi.lastGameStat.newlevels;
-        for (let k in pi.lastGameStat) pi.lastGameStat[k] = 0;
+        pi.statistics.experience += pi.lastGameStat.points;
+        pi.statistics.level = pi.lastGameStat.level;
+        for (let k in pi.lastGameStat) if (k !== "level") pi.lastGameStat[k] = 0;
         this.setMazafuckinState({playerInfo: pi});
     }
 

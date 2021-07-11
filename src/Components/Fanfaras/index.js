@@ -17,11 +17,14 @@ export default class Fanfara extends React.Component {
 
         let pdiv = document.querySelector(".progress");
 
-        let newEXP = this.props.playerInfo.stat.experience + this.props.playerInfo.lastGameStat.points;
+        // this.props.playerInfo.lastGameStat.points += 5000;
+        // this.props.playerInfo.lastGameStat.level += 2;
+
+        let newEXP = this.props.playerInfo.statistics.experience + this.props.playerInfo.lastGameStat.points;
         let expDIF = this.props.playerInfo.lastGameStat.points;
-        let newLVL = newEXP < 61 ? 1 : Math.floor((10 * Math.log(newEXP / 50)) / (3 * Math.log(2)));
-        let curLVL = this.props.playerInfo.stat.level;
-        let lvlDIF = this.props.playerInfo.lastGameStat.newlevels;
+        let newLVL = this.props.playerInfo.lastGameStat.level;
+        let curLVL = this.props.playerInfo.statistics.level;
+        let lvlDIF = this.props.playerInfo.lastGameStat.level - this.props.playerInfo.statistics.level;
 
 
         document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML + "<br>" + (expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
@@ -33,12 +36,13 @@ export default class Fanfara extends React.Component {
                     pdiv.style.left = "0%";
                     lvlDIF--;
                     curLVL++;
+                    document.querySelector(".exp").className = 'exp animate__tada';
                     setTimeout(() => {
-                        let startexp = (curLVL > 1) ? (50 * (Math.pow(2, (curLVL - 1) * 0.3))) : 0;
-                        let endexp = 50 * (Math.pow(2, curLVL * 0.3));
+                        let startexp = (curLVL > 1) ? Math.floor(50 * (Math.pow(2, (curLVL) * 0.3))) : 0;
+                        let endexp = Math.floor(50 * (Math.pow(2, (curLVL + 1) * 0.3)));
                         document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
                         document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
-                        document.querySelector(".exp").className = 'exp tada animated';
+                        document.querySelector(".exp").classList.toggle('animate__animated');
                         pdiv.style.transition = "none";
                         pdiv.style.width = "0%";
                         pdiv.style.left = "50%";
@@ -47,8 +51,8 @@ export default class Fanfara extends React.Component {
                         }, 30);
                     }, 500);
                 } else {
-                    let startexp = (newLVL > 1) ? (50 * (Math.pow(2, (newLVL - 1) * 0.3))) : 0;
-                    let endexp = 50 * (Math.pow(2, newLVL * 0.3));
+                    let startexp = (newLVL > 1) ? Math.floor(50 * (Math.pow(2, (newLVL) * 0.3))) : 0;
+                    let endexp = Math.floor(50 * (Math.pow(2, (newLVL + 1) * 0.3)));
                     let progress = Math.percent(newEXP - startexp, endexp - startexp);
                     pdiv.style.width = progress;
                     pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
@@ -59,21 +63,22 @@ export default class Fanfara extends React.Component {
                 }
             }, 600)
         } else {
-            let startexp = (curLVL > 1) ? (50 * (Math.pow(2, (curLVL - 1) * 0.3))) : 0;
-            let endexp = 50 * (Math.pow(2, curLVL * 0.3));
+            let startexp = (curLVL > 1) ? Math.floor(50 * (Math.pow(2, (curLVL) * 0.3))) : 0;
+            let endexp = Math.floor(50 * (Math.pow(2, (curLVL + 1) * 0.3)));
             let progress = Math.percent(newEXP - startexp, endexp - startexp);
+            pdiv.style.transition = "all 0.5s ease";
             pdiv.style.width = progress;
             pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
             pdiv.innerHTML = newEXP;
             this.props.updatePI();
         }
-        this.props.showBestMove();
+        //this.props.showBestMove();
     }
 
     componentDidMount = () => {
         let f = document.getElementById("fanfara");
         let u = document.getElementById("ufield");
-        f.style.top = u.offsetTop + "px";
+        f.style.top = 0 + "px";
         f.style.left = u.offsetLeft + "px";
     }
 
@@ -163,7 +168,7 @@ export default class Fanfara extends React.Component {
 
             Noise("fail");
         }
-        if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status === window.loft.constants.STATUS_DONE /*&& playerInfo.done === 12 && opponentInfo.done === 12*/) {
+        if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status === window.loft.constants.STATUS_DONE) {
             header = Lang("noBadText");
             podtext = Lang("betterThanNothing");
             gonnashow = true;
@@ -178,13 +183,13 @@ export default class Fanfara extends React.Component {
         }
 
         let expdiv = '';
-
-        console.log(playerInfo);
         
-        if (gonnashow && typeof (playerInfo.stat) !== "undefined") {
-            let { stat: s } = playerInfo;
-            let startexp = (s.level > 1) ? (50 * (Math.pow(2, (s.level - 1) * 0.3))) : 0;
-            let endexp = 50 * (Math.pow(2, s.level * 0.3));
+    
+        if (gonnashow && typeof (playerInfo.statistics) !== "undefined") {
+            let { statistics: s } = playerInfo;
+            
+            let startexp = (s.level > 1) ? Math.floor(50 * (Math.pow(2, (s.level) * 0.3))) : 0;
+            let endexp = Math.floor(50 * (Math.pow(2, (s.level + 1) * 0.3)));
             let progress = Math.percent(s.experience - startexp, endexp - startexp);
             let left = 50 - parseInt(progress, 10) / 2;
             if (this.state.animated === false) setTimeout(() => { this.animate() }, 1000);
