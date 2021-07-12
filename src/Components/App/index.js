@@ -93,7 +93,7 @@ export default class App extends React.Component{
         timeoutCheckInterval: false,
         
         /* DEV FIELDS */
-        botStepBuffer: {},
+        botStepBuffer: null,
         autochess: false,
         game_id: 0,
     };
@@ -416,6 +416,7 @@ export default class App extends React.Component{
 
     saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
         let {cells} = this.state;
+        console.log(this.state.botStepBuffer);
         if (this.state.game_id) {
             let kills = [];
             if (typeof(cells[koordsfrom].possibilities[koordsto]) === 'undefined') {
@@ -439,7 +440,7 @@ export default class App extends React.Component{
                     if (!res.success) {
                         alert(res.errors.shift());
                     } else {
-                        if (typeof(res.botstep) !== "undefined") {
+                        if (typeof(res.botstep) !== "undefined" && res.botstep) {
                             if (typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined") {
                                 console.log("GOT BOTSTEP!");
                                 this.setState({botStepBuffer: res.botstep});
@@ -769,12 +770,14 @@ export default class App extends React.Component{
         if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
             setTimeout(() => {
 
-                let rndBOOL = 3.5 - window.loft.usersettings.difficulty < Math.random() * 3;
+                let rndBOOL = true;//3.5 - window.loft.usersettings.difficulty < Math.random() * 3;
 
                 if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
-                    if (typeof(this.state.botStepBuffer.from) !== "undefined") {
+                    if (this.state.botStepBuffer && typeof(this.state.botStepBuffer.from) !== "undefined") {
                         this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false);
-                        this.setState({botStepBuffer: {}});
+                        this.setState({botStepBuffer: null});
+                    } else if (this.state.botStepBuffer === null) {
+                        this.iiStep(color);
                     } else {
                         this.getBotStep(color);
                     }

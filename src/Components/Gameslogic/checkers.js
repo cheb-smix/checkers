@@ -233,7 +233,7 @@ export default class Checkers extends App{
         }
 
         // prededicate kills
-        if (window.loft.usersettings.difficulty > 1) { 
+        if (window.loft.usersettings.difficulty > 3) { 
             for (let c in iicells) {
                 for(let k in cells){
                     if(cells[k].color && cells[k].color!==color){                   
@@ -332,7 +332,7 @@ export default class Checkers extends App{
     }
 
     watchFutureRecoursive = (cells = this.state.cells, possibility, FE = 0, iteration = 0) => {
-        if (iteration === window.loft.usersettings.difficulty * 2) return 0;
+        if (iteration === window.loft.usersettings.difficulty) return 0;
         let kek = this.deepCopy(cells);
         let watchEnemy = iteration % 2 === 0;
         kek[possibility.to].checker = kek[possibility.from].checker;
@@ -386,7 +386,7 @@ export default class Checkers extends App{
      
             let futureSteps = [];
             if (c) futureSteps.push(c);
-            for (let iteration = 0; iteration < window.loft.usersettings.difficulty * 2; iteration++) {
+            for (let iteration = 0; iteration < window.loft.usersettings.difficulty; iteration++) {
                 let l = futureSteps.length;
                 if (!futureSteps[l - 1]) break;
                 futureSteps.push(this.oneMoreFutureStep(kek, futureSteps[l - 1], iteration));
