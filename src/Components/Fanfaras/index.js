@@ -17,7 +17,7 @@ export default class Fanfara extends React.Component {
 
         let pdiv = document.querySelector(".progress");
 
-        // this.props.playerInfo.lastGameStat.points += 5000;
+        // this.props.playerInfo.lastGameStat.points += 200;
         // this.props.playerInfo.lastGameStat.level += 2;
 
         let newEXP = this.props.playerInfo.statistics.experience + this.props.playerInfo.lastGameStat.points;
@@ -25,10 +25,27 @@ export default class Fanfara extends React.Component {
         let newLVL = this.props.playerInfo.lastGameStat.level;
         let curLVL = this.props.playerInfo.statistics.level;
         let lvlDIF = this.props.playerInfo.lastGameStat.level - this.props.playerInfo.statistics.level;
-
+        let lvlAnimationInterval = 600;
+        let lvlAnimationTtlTime = lvlAnimationInterval * lvlDIF;
+        let cntEXP = this.props.playerInfo.statistics.experience;
 
         document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML + "<br>" + (expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
         if (lvlDIF > 0) {
+
+            let t = setInterval(() => {}, 1000);
+            clearInterval(t);
+
+            setTimeout(() => {
+                t = setInterval(() => {
+                    pdiv.innerHTML = cntEXP;
+                    cntEXP++;
+                    if (cntEXP === newEXP) {
+                        pdiv.innerHTML = newEXP;
+                        clearInterval(t);
+                    }
+                }, lvlAnimationTtlTime / expDIF);
+            }, lvlAnimationInterval);
+
             let s = setInterval(() => {
                 if (lvlDIF > 0) {
                     pdiv.style.transition = "all 0.5s ease";
@@ -49,7 +66,7 @@ export default class Fanfara extends React.Component {
                         setTimeout(() => {
                             pdiv.style.transition = "all 0.5s ease";
                         }, 30);
-                    }, 500);
+                    }, lvlAnimationInterval / 6 * 5);
                 } else {
                     let startexp = (newLVL > 1) ? Math.floor(50 * (Math.pow(2, (newLVL) * 0.3))) : 0;
                     let endexp = Math.floor(50 * (Math.pow(2, (newLVL + 1) * 0.3)));
@@ -59,9 +76,10 @@ export default class Fanfara extends React.Component {
                     this.props.rampage(0, "NEW LEVEL " + newLVL + "!");
                     pdiv.innerHTML = newEXP;
                     clearInterval(s);
+                    clearInterval(t);
                     this.props.updatePI();
                 }
-            }, 600)
+            }, lvlAnimationInterval)
         } else {
             let startexp = (curLVL > 1) ? Math.floor(50 * (Math.pow(2, (curLVL) * 0.3))) : 0;
             let endexp = Math.floor(50 * (Math.pow(2, (curLVL + 1) * 0.3)));
