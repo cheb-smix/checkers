@@ -27,6 +27,9 @@ window.loft = {
         StepTimeLimit: 30,
         AnimationSpeed: 45,
         EpicStepNum: 4,
+        BASE: 2,
+        MLTPLR: 150,
+        INC: 0.3
     },
     constants: {
         STATUS_ACTIVE  : "A",
@@ -129,7 +132,7 @@ async function checkConnection()
     let res = await postData({url: window.loft.apiserver + "config"});
     
     if (res) {
-        window.loft.config = res.config;
+        for (let k in res.config) window.loft.config[k] = res.config[k];
         window.loft.user_info = res.user_info;
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;

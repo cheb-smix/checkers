@@ -6,8 +6,13 @@ import Noise from '../../Funcs/Noise';
 
 export default class Fanfara extends React.Component {
 
+
     state = {
         animated: false
+    }
+
+    calcExpForLevel = (LVL = 1) => {
+        return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
     }
 
     animate = () => {
@@ -55,8 +60,8 @@ export default class Fanfara extends React.Component {
                     curLVL++;
                     document.querySelector(".exp").className = 'exp animate__tada';
                     setTimeout(() => {
-                        let startexp = (curLVL > 1) ? Math.floor(50 * (Math.pow(2, (curLVL) * 0.3))) : 0;
-                        let endexp = Math.floor(50 * (Math.pow(2, (curLVL + 1) * 0.3)));
+                        let startexp = this.calcExpForLevel(curLVL);
+                        let endexp = this.calcExpForLevel(curLVL + 1);
                         document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
                         document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
                         document.querySelector(".exp").classList.toggle('animate__animated');
@@ -68,8 +73,8 @@ export default class Fanfara extends React.Component {
                         }, 30);
                     }, lvlAnimationInterval / 6 * 5);
                 } else {
-                    let startexp = (newLVL > 1) ? Math.floor(50 * (Math.pow(2, (newLVL) * 0.3))) : 0;
-                    let endexp = Math.floor(50 * (Math.pow(2, (newLVL + 1) * 0.3)));
+                    let startexp = this.calcExpForLevel(newLVL);
+                    let endexp = this.calcExpForLevel(newLVL + 1);
                     let progress = Math.percent(newEXP - startexp, endexp - startexp);
                     pdiv.style.width = progress;
                     pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
@@ -81,8 +86,8 @@ export default class Fanfara extends React.Component {
                 }
             }, lvlAnimationInterval)
         } else {
-            let startexp = (curLVL > 1) ? Math.floor(50 * (Math.pow(2, (curLVL) * 0.3))) : 0;
-            let endexp = Math.floor(50 * (Math.pow(2, (curLVL + 1) * 0.3)));
+            let startexp = this.calcExpForLevel(curLVL);
+            let endexp = this.calcExpForLevel(curLVL + 1);
             let progress = Math.percent(newEXP - startexp, endexp - startexp);
             pdiv.style.transition = "all 0.5s ease";
             pdiv.style.width = progress;
@@ -205,9 +210,10 @@ export default class Fanfara extends React.Component {
     
         if (gonnashow && typeof (playerInfo.statistics) !== "undefined") {
             let { statistics: s } = playerInfo;
-            
-            let startexp = (s.level > 1) ? Math.floor(50 * (Math.pow(2, (s.level) * 0.3))) : 0;
-            let endexp = Math.floor(50 * (Math.pow(2, (s.level + 1) * 0.3)));
+
+            let startexp = this.calcExpForLevel(s.level);
+            let endexp = this.calcExpForLevel(s.level + 1);
+
             let progress = Math.percent(s.experience - startexp, endexp - startexp);
             let left = 50 - parseInt(progress, 10) / 2;
             if (this.state.animated === false) setTimeout(() => { this.animate() }, 1000);
