@@ -36,7 +36,7 @@ export default class Fanfara extends React.Component {
         let lvlAnimationTtlTime = lvlAnimationInterval * lvlDIF;
         let cntEXP = this.props.playerInfo.statistics.experience;
 
-        document.getElementById("fantext").innerHTML = document.getElementById("fantext").innerHTML + "<br>" + (expDIF < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(expDIF));
+        
         if (lvlDIF > 0) {
 
             let t = setInterval(() => {}, 1000);
@@ -110,8 +110,8 @@ export default class Fanfara extends React.Component {
     render() {
         let { playerInfo, opponentInfo } = this.props;
         let header = "";
-        let text = <p></p>;
         let podtext = "";
+        let noise = '';
 
         let playersCheckersUnDone = 12 - playerInfo.done;
         let opponentCheckersUnDone = 12 - opponentInfo.done;
@@ -119,7 +119,7 @@ export default class Fanfara extends React.Component {
         let opercent = Math.round(opponentCheckersUnDone * 100 / 12);
 
         let buttons =
-            <div className="container" style={{ height: "auto" }}>
+            <div key={-1} className="container" style={{ height: "auto" }}>
                 <div className="row">
                     <div className="col-12">
                         <Button
@@ -151,8 +151,6 @@ export default class Fanfara extends React.Component {
                 </div>
             </div>;
 
-        let gonnashow = false;
-
         //if(playerInfo.status!==window.loft.constants.STATUS_WON && playerInfo.status!==window.loft.constants.STATUS_FAIL && playerInfo.status!==window.loft.constants.STATUS_DONE) playerInfo.status = window.loft.constants.STATUS_IN_GAME;
 
         if (playerInfo.status === window.loft.constants.STATUS_WON) {
@@ -174,9 +172,7 @@ export default class Fanfara extends React.Component {
                 if (diff > 4) podtext += Lang("won5andMoreCheckers").replace("$", diff);
                 podtext += " (" + opercent + "%)!";
             }
-            gonnashow = true;
-
-            Noise("victory");
+            noise = "victory";
         }
         if (playerInfo.status === window.loft.constants.STATUS_FAIL) {
             header = Lang("regrets");
@@ -189,47 +185,83 @@ export default class Fanfara extends React.Component {
             } else {
                 podtext = Lang("youveBeenCornered");
             }
-            gonnashow = true;
-
-            Noise("fail");
+            noise = "fail";
         }
         if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status === window.loft.constants.STATUS_DONE) {
             header = Lang("noBadText");
             podtext = Lang("betterThanNothing");
-            gonnashow = true;
-            Noise("draw");
+            noise = "draw";
         }
 
         let {lastGameStat: stat} = this.props.playerInfo;
-
         let stattext = [];
 
-        if (stat.hops) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("hopStatText").replace("$", stat.hops)}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.hops) !== "undefined" && window.loft.serverInfo.gameavgstat.hops < stat.hops) {
-                let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
-                sdiff = Math.round(window.loft.serverInfo.gameavgstat.hops / 100 * sdiff);
-                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+        if (stat.time) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("timeStatText").replace("$", Math.time(stat.time))}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.time) !== "undefined" && window.loft.serverInfo.gameavgstat.time > stat.time) {
+                let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
+                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
+                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
             }
         }
         if (stat.steps) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("stepStatText").replace("$", stat.steps)}</p>);
             if (typeof(window.loft.serverInfo.gameavgstat.steps) !== "undefined" && window.loft.serverInfo.gameavgstat.steps > stat.steps) {
                 let sdiff = window.loft.serverInfo.gameavgstat.steps - stat.steps;
-                sdiff = Math.round(window.loft.serverInfo.gameavgstat.steps / 100 * sdiff);
-                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.steps);
+                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
             }
         }
-        if (stat.time) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("timeStatText").replace("$", Math.time(stat.time))}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.time) !== "undefined" && window.loft.serverInfo.gameavgstat.time > stat.time) {
-                let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
-                sdiff = Math.round(window.loft.serverInfo.gameavgstat.time / 100 * sdiff);
-                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+        if (stat.hops) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("hopStatText").replace("$", stat.hops)}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.hops) !== "undefined") {
+
+                if (window.loft.serverInfo.gameavgstat.hops < stat.hops) {
+                    let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
+                    sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.hops);
+                    if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
+                }
+
+                let hopsPerStep = Math.round(stat.hops * 100 / stat.steps) / 100;
+
+                stattext.push(<p key={stattext.length} className="fanp">{Lang("hopsPerStepText").replace("$", hopsPerStep)}</p>);
+
+                hopsPerStep = window.loft.serverInfo.gameavgstat.hops / window.loft.serverInfo.gameavgstat.steps;
+                
+                if (hopsPerStep < stat.hops / stat.steps) {
+                    let sdiff = stat.hops / stat.steps - hopsPerStep;
+                    sdiff = Math.round(100 * sdiff / hopsPerStep);
+                    if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
+                }
             }
         }
-        if (stat.kills) {
+        if (stat.kills >= 0) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("killStatText").replace("$", stat.kills)}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.kills) !== "undefined" && window.loft.serverInfo.gameavgstat.kills < stat.kills) {
+                let sdiff = stat.kills - window.loft.serverInfo.gameavgstat.kills;
+                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.kills);
+                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
+            }
+        }
+        if (stat.losses >= 0) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("lossStatText").replace("$", stat.losses)}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.losses) !== "undefined" && window.loft.serverInfo.gameavgstat.losses > stat.losses) {
+                let sdiff = window.loft.serverInfo.gameavgstat.losses - stat.losses;
+                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.losses);
+                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
+            }
+
+            let killLossCoeff = Math.round(stat.kills * 100 / stat.losses) / 100;
+
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("killLossCoeffText").replace("$", killLossCoeff)}</p>);
+
+            killLossCoeff = window.loft.serverInfo.gameavgstat.kills / window.loft.serverInfo.gameavgstat.losses;
+            
+            if (killLossCoeff < stat.kills / stat.losses) {
+                let sdiff = stat.kills / stat.losses - killLossCoeff;
+                sdiff = Math.round(100 * sdiff / killLossCoeff);
+                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
+            }
         }
         if (stat.coins) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
@@ -240,17 +272,15 @@ export default class Fanfara extends React.Component {
 
         if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status !== window.loft.constants.STATUS_DONE && playerInfo.done === 12) {
             header = Lang("congratulations");
-            text = <p>{Lang("lastEnemyStep")}</p>
-            Noise("warning");
+            stattext = [<p key="0" className="fanp">{Lang("lastEnemyStep")}</p>];
+            noise = "warning";
         } else {
-            text = <React.Fragment><p id="fantext">{podtext}</p>{stattext}{buttons}</React.Fragment>;
-        }
-
-        let expdiv = '';
-        
-        
+            stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{(stat.points < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(stat.points))}</p>);
+            stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{podtext}</p>);
+            stattext.push(buttons);
+        }       
     
-        if (gonnashow && typeof (playerInfo.statistics) !== "undefined") {
+        if (noise && typeof (playerInfo.statistics) !== "undefined") {
             let { statistics: s } = playerInfo;
 
             let startexp = this.calcExpForLevel(s.level);
@@ -259,16 +289,16 @@ export default class Fanfara extends React.Component {
             let progress = Math.percent(s.experience - startexp, endexp - startexp);
             let left = 50 - parseInt(progress, 10) / 2;
             if (this.state.animated === false) setTimeout(() => { this.animate() }, 1000);
-            expdiv = <div className="exp">
+            stattext.unshift(<div key={stattext.length} className="exp">
                 <div className="progress" style={{ width: progress, left: left + "%" }}>{s.experience}</div>
                 <table className="stable" style={{ padding: "0px" }}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
-            </div>;
+            </div>);
+            Noise(noise);
         }
         return (
             <div className={"status" + playerInfo.status} id="fanfara"><br />
-                <h3>{header}<br />{playerInfo.user.display_name}<br /></h3>
-                {expdiv}
-                {text}
+                <h3>{header}{playerInfo.user.display_name ? ', ' + playerInfo.user.display_name : ''}</h3>
+                {stattext}
             </div>
         );
     }
