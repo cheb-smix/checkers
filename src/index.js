@@ -48,6 +48,7 @@ window.loft = {
     serverInfo: {
         avgwaittime: {cnt: 0, ttl: 0, avg: 0},
         playersstat: {total: 0, searching: 0, in_game: 0},
+        gameavgstat: {hops: 0, steps: 0, time: 0}
     },
     atoken: localStorage.getItem("atoken"),
     isGuest: true,
@@ -133,11 +134,11 @@ async function checkConnection()
     
     if (res) {
         for (let k in res.config) window.loft.config[k] = res.config[k];
+        for (let k in res.serverInfo) window.loft.serverInfo[k] = res.serverInfo[k];
         window.loft.user_info = res.user_info;
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;
-        window.loft.serverInfo = res.serverInfo;
     } else {
         document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
     }
@@ -208,4 +209,15 @@ Math.pifagorColored = (c1,c2,color="any") => {
     return Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2)) * directionCorrection;
 }
 
-
+Math.time = (timestamp, minlevel = 2) => {
+    let level = 0;
+    let del = 0;
+    let levels = [60, 60, 24, 365];
+    let result = [];
+    while ((del = timestamp / levels[level]) > 0 || level < minlevel) {
+        result.push(('0' + (timestamp % levels[level])).slice(-2));
+        timestamp = Math.floor(del);
+        level++;
+    }
+    return result.reverse().join(":");
+}

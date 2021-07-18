@@ -25,11 +25,13 @@ export default class Fanfara extends React.Component {
         // this.props.playerInfo.lastGameStat.points += 200;
         // this.props.playerInfo.lastGameStat.level += 2;
 
-        let newEXP = this.props.playerInfo.statistics.experience + this.props.playerInfo.lastGameStat.points;
-        let expDIF = this.props.playerInfo.lastGameStat.points;
-        let newLVL = this.props.playerInfo.lastGameStat.level;
+        let {lastGameStat: stat} = this.props.playerInfo;
+
+        let newEXP = this.props.playerInfo.statistics.experience + stat.points;
+        let expDIF = stat.points;
+        let newLVL = stat.level;
         let curLVL = this.props.playerInfo.statistics.level;
-        let lvlDIF = this.props.playerInfo.lastGameStat.level - this.props.playerInfo.statistics.level;
+        let lvlDIF = stat.level - this.props.playerInfo.statistics.level;
         let lvlAnimationInterval = 600;
         let lvlAnimationTtlTime = lvlAnimationInterval * lvlDIF;
         let cntEXP = this.props.playerInfo.statistics.experience;
@@ -197,15 +199,55 @@ export default class Fanfara extends React.Component {
             gonnashow = true;
             Noise("draw");
         }
+
+        let {lastGameStat: stat} = this.props.playerInfo;
+
+        let stattext = [];
+
+        if (stat.hops) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("hopStatText").replace("$", stat.hops)}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.hops) !== "undefined" && window.loft.serverInfo.gameavgstat.hops < stat.hops) {
+                let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
+                sdiff = Math.round(window.loft.serverInfo.gameavgstat.hops / 100 * sdiff);
+                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+            }
+        }
+        if (stat.steps) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("stepStatText").replace("$", stat.steps)}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.steps) !== "undefined" && window.loft.serverInfo.gameavgstat.steps > stat.steps) {
+                let sdiff = window.loft.serverInfo.gameavgstat.steps - stat.steps;
+                sdiff = Math.round(window.loft.serverInfo.gameavgstat.steps / 100 * sdiff);
+                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+            }
+        }
+        if (stat.time) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("timeStatText").replace("$", Math.time(stat.time))}</p>);
+            if (typeof(window.loft.serverInfo.gameavgstat.time) !== "undefined" && window.loft.serverInfo.gameavgstat.time > stat.time) {
+                let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
+                sdiff = Math.round(window.loft.serverInfo.gameavgstat.time / 100 * sdiff);
+                stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("stepStatCompareText").replace("$", sdiff)}</p>);
+            }
+        }
+        if (stat.kills) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("killStatText").replace("$", stat.kills)}</p>);
+        }
+        if (stat.coins) {
+            stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
+        }
+        if (stat.level > this.props.playerInfo.statistics.level) {
+            stattext.push(<p key={stattext.length} className="fanp yellow">{Lang("newLevelText").replace("$", stat.level)}</p>);
+        }
+
         if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status !== window.loft.constants.STATUS_DONE && playerInfo.done === 12) {
             header = Lang("congratulations");
             text = <p>{Lang("lastEnemyStep")}</p>
             Noise("warning");
         } else {
-            text = <React.Fragment><p id="fantext">{podtext}</p>{buttons}</React.Fragment>;
+            text = <React.Fragment><p id="fantext">{podtext}</p>{stattext}{buttons}</React.Fragment>;
         }
 
         let expdiv = '';
+        
         
     
         if (gonnashow && typeof (playerInfo.statistics) !== "undefined") {

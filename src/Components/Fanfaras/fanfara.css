@@ -21,9 +21,10 @@
 }
 #fanfara{
     width: 48vw;
-    height: 48vw;
-    background: rgba(0,0,0,0.6);
-    color: white;
+    font-family: ForwardExtra-Light;
+    font-weight: bold;
+    background: rgba(0,0,0,0.8);
+    color: #bbb;
     text-align: center;
     display: block;
     position: absolute;
@@ -32,6 +33,7 @@
 #fanfara h3{
     margin: 0px 0px 10px 0px;
     font-size: 18px;
+    color: var(--theme-secondary-color);
 }
 #fanfara.statusA{
     display: none;
@@ -39,6 +41,21 @@
 #fantext{
     font-size: 16px;
 }
+#fanfara p.fanp {
+    padding: 0;
+    margin: 5px 15px;
+    text-align: left;
+}
+#fanfara p.statcompare{
+    font-size: 13px;
+    color: var(--theme-secondary-color);
+    margin-left: 25px;
+    margin-bottom: 8px;
+}
+.yellow {
+    color: var(--theme-secondary-color);
+}
+ 
 
 @media (orientation: portrait), (max-aspect-ratio: 10/13){
     #fanfara{

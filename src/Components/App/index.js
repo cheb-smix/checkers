@@ -55,6 +55,8 @@ export default class App extends React.Component{
                 steps:  0,
                 hops:   0,
                 points: 0,
+                coins:  0,
+                time:   0,
                 level:  1,
             }
         },
@@ -964,7 +966,7 @@ export default class App extends React.Component{
         let {playerInfo: pi} = this.state;
         pi.statistics.experience += pi.lastGameStat.points;
         pi.statistics.level = pi.lastGameStat.level;
-        for (let k in pi.lastGameStat) if (k !== "level") pi.lastGameStat[k] = 0;
+        //for (let k in pi.lastGameStat) if (k !== "level") pi.lastGameStat[k] = 0;
         this.setMazafuckinState({playerInfo: pi});
     }
 
