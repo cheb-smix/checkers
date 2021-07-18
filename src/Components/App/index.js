@@ -931,6 +931,7 @@ export default class App extends React.Component{
         playerInfo.possibilities = 0;
         playerInfo.lastGameStat = {
             kills: 0,
+            losses: 0,
             steps: 0,
             hops: 0,
             points: 0,
