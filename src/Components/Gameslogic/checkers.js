@@ -67,7 +67,7 @@ export default class Checkers extends App{
             xe=1;ye=1;
         }
         
-        for(let n=1; n<7; n++){
+        for(let n=1; n<8; n++){
             let k1 = (x+(n*xe))+":"+(y+(n*ye));
             if (typeof(c[k1]) === "undefined" || c[k1].color === color) break;
             if (c[k1].color === false) {

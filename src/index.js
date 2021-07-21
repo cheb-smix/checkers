@@ -139,7 +139,18 @@ async function checkConnection()
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;
+        window.loft.settings.set("config", res.config);
+        window.loft.settings.set("user_info", res.user_info);
+        window.loft.settings.set("serverInfo", res.serverInfo);
     } else {
+        let localsetts = ["config", "user_info", "serverInfo"]
+        for (let i in localsetts) {
+            let ls = window.loft.settings.get(localsetts[i]);
+            if (ls) {
+                ls = JSON.parse(ls);
+                for (let k in ls) window.loft[localsetts[i]][k] = ls[k];
+            }
+        }
         document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
     }
 }

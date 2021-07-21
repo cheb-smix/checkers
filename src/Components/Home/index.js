@@ -6,6 +6,9 @@ import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';
 
+
+import RoundProgressBar from '../RoundProgressBar';
+
 export default class Home extends React.Component{
     gameChoice = () => {
         if (window.gvar.length < 2) return;
@@ -75,6 +78,8 @@ export default class Home extends React.Component{
                     </React.Fragment>
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
+
+            <RoundProgressBar />
             </div>
         );
     };

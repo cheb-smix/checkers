@@ -1,5 +1,5 @@
-export default class Settings{
-    
+export default class Settings {
+
     constructor() {
         this.usersettings = {
             animation: 1,
@@ -34,7 +34,7 @@ export default class Settings{
     }
 
     dropSettings = () => {
-        for(let i in this.defaultusersettings){
+        for (let i in this.defaultusersettings) {
             this.saveSetting(i, this.defaultusersettings[i]);
         }
         document.querySelector("#musicplayer").volume = this.defaultusersettings.musicvolume / 100;
@@ -42,21 +42,20 @@ export default class Settings{
     }
 
     loadSettings = () => {
-        for(let key in this.usersettings){
-            let v = localStorage.getItem(key);
-            if(typeof(v)==="string"){
-                v = v==="true"?true:v;
-                v = v==="false"?false:v;
-                this.usersettings[key]=v;
+        for (let key in this.usersettings) {
+            let v = this.get(key);
+            if (typeof (v) === "string") {
+                v = v === "true" ? true : v;
+                v = v === "false" ? false : v;
+                this.usersettings[key] = v;
             }
         }
     }
-    
-    saveSetting = (key,value="") => {
+
+    saveSetting = (key, value = "") => {
         this.usersettings[key] = value;
         window.loft.usersettings[key] = value;
-        if(value==="") localStorage.removeItem(key);
-        else localStorage.setItem(key,value);
+        this.set(key, value);
 
         if (key === "musicvolume") {
             let musicplayer = document.querySelector("#musicplayer");
@@ -77,5 +76,18 @@ export default class Settings{
         if (!this.usersettings.loaded) this.loadSettings();
         if (key) return this.usersettings[key];
         return this.usersettings;
+    }
+
+    get = (key = '') => {
+        return localStorage.getItem(key);
+    }
+
+    set = (key, value = '') => {
+        if (value === "") {
+            localStorage.removeItem(key);
+        } else {
+            if (typeof(value) === 'object') value = JSON.stringify(value);
+            localStorage.setItem(key, value);
+        }
     }
 }
