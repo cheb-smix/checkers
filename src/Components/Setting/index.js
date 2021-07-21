@@ -7,7 +7,7 @@ import Lang from '../Localization';
 
 export default class Setting extends React.Component{
     state = {
-        modal: (typeof(this.props.modal) === "undefined" || this.props.modal !== false)
+        modal: (!React.isset(this.props.modal) || this.props.modal !== false)
     }
     
     render() {

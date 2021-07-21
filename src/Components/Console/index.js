@@ -12,8 +12,6 @@ export default class Console extends React.Component{
         let consoleClassName = "console neonconsole";
         
         if(this.state.isMobile) consoleClassName = "console altneonconsole";
-
-        console.log(this.props.player)
         
         let avgtime = window.loft.serverInfo.avgwaittime.avg;
         if(avgtime === 0){

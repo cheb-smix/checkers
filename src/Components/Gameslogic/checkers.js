@@ -252,15 +252,12 @@ export default class Checkers extends App{
             ///////Third 3 in 1 algorithms using sorting
             let rndcomfunc = Math.floor(1 + Math.random() * 2);
 
-            //console.log(iicells);
-
             iicells = this.watchFuture2(iicells, cells, `compareFunc${rndcomfunc}`, 10);
 
             let index = 0;
             if(this.state.autochess) index = Math.floor(Math.random()*iicells.length*0.1);
             let c = iicells[index];
             
-            //console.log("Taken checker:",index,c);
             if(typeof(c.type)!=="undefined") this.rampage(0,c.type);
 
             this.doStep(c.to, c.from, true, false);

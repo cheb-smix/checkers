@@ -179,7 +179,6 @@ export default class Acc
     }
 
     signUp = () => {
-        console.log(window.loft);
         window.loft.showModal(
             <div className="container">
                 <div className="row">
