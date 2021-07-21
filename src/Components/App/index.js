@@ -34,9 +34,6 @@ export default class App extends React.Component {
             },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "white",
-            hops: 0,
-            steps: 0,
-            cells: 12,
             done: 0,
             possibilities: 10,
             statistics: {
@@ -67,9 +64,6 @@ export default class App extends React.Component {
             },
             status: window.loft.constants.STATUS_IN_GAME,
             color: "black",
-            hops: 0,
-            steps: 0,
-            cells: 12,
             done: 0,
             possibilities: 10,
         },
@@ -687,23 +681,17 @@ export default class App extends React.Component {
             });
         }
 
-        if (bestMove === null || bestMove.hops < hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity) {
-            bestMove = {
-                mask: this.getDeskMask(this.state.cells, true),
-                from: koordsfrom,
-                to: koordsto,
-                hops: hops,
-                path: cells[koordsfrom].possibilities[koordsto].path,
-                effectivity: cells[koordsfrom].possibilities[koordsto].effectivity
-            };
-        }
-        if (cells[koordsfrom].color === playerInfo.color) {
-            playerInfo.hops += hops;
-            playerInfo.steps++;
-        } else {
-            opponentInfo.hops += hops;
-            opponentInfo.steps++;
-        }
+        // if (bestMove === null || bestMove.hops < hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity) {
+        //     bestMove = {
+        //         mask: this.getDeskMask(this.state.cells, true),
+        //         from: koordsfrom,
+        //         to: koordsto,
+        //         hops: hops,
+        //         path: cells[koordsfrom].possibilities[koordsto].path,
+        //         effectivity: cells[koordsfrom].possibilities[koordsto].effectivity
+        //     };
+        // }
+
         cells[koordsto].checker = cells[koordsfrom].checker;
         cells[koordsto].color = cells[koordsfrom].color;
         cells[koordsto].damka = cells[koordsfrom].possibilities[koordsto].damka;
@@ -725,12 +713,13 @@ export default class App extends React.Component {
         if (playerInfo.done === 12 || opponentInfo.done === 12) consoleText = Lang("gameOverText");
 
         let playstage = 1;
-        if (playerInfo.steps + opponentInfo.steps > 4) {
-            playstage = 2;
+        if (playstage < 2) {
+            playstage += 0.2;
+        } else {
             if (playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
         }
 
-        if (this.state.online === false && (playerInfo.done > 10 || opponentInfo.done > 10)) {
+        if (this.state.online === false && (playerInfo.done > 10 || opponentInfo.done > 10 || playerInfo.possibilities === 0 || opponentInfo.possibilities === 0)) {
             let o = this.checkOfflineGameStatus(playerInfo, opponentInfo);
             if (o !== false) {
                 playerInfo = o.playerInfo;
@@ -948,17 +937,16 @@ export default class App extends React.Component {
         let { playerInfo } = this.state;
         playerInfo.status = window.loft.constants.STATUS_IN_GAME;
         playerInfo.color = "white";
-        playerInfo.hops = 0;
-        playerInfo.steps = 0;
         playerInfo.done = 0;
         playerInfo.possibilities = 0;
         playerInfo.lastGameStat = {
             kills: 0,
-            losses: 0,
             steps: 0,
             hops: 0,
             points: 0,
-            newlevels: 0,
+            coins: 0,
+            time: 0,
+            level: playerInfo.statistics.level,
         };
 
         this.setStateUpdate({
@@ -971,12 +959,9 @@ export default class App extends React.Component {
                 name: "bot" + Math.round(Math.random() * 1000 + 1000),
                 status: window.loft.constants.STATUS_IN_GAME,
                 color: "black",
-                hops: 0,
-                steps: 0,
                 done: 0,
                 possibilities: 10,
             },
-            afkcounter: 0,
             cells: this.dropCheckersToDefaults(),
             playstage: 1,
             online: false,
