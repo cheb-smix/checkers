@@ -8,7 +8,7 @@ export default class Slider extends React.Component{
     }
 
     setNewValue = (e) => {
-        let offsetX = typeof(e.nativeEvent.offsetX) !== "undefined" ? e.nativeEvent.offsetX : e.clientX - ((document.body.offsetWidth - e.target.offsetWidth) / 2);
+        let offsetX = React.isset(e.nativeEvent.offsetX) ? e.nativeEvent.offsetX : e.clientX - ((document.body.offsetWidth - e.target.offsetWidth) / 2);
         offsetX = Math.round(offsetX * 100 / e.target.offsetWidth);
 
         if (offsetX > 95) offsetX = 100;

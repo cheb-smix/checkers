@@ -232,3 +232,11 @@ Math.time = (timestamp, minlevel = 2) => {
     }
     return result.reverse().join(":");
 }
+
+React.isset = (variable) => {
+    return typeof(variable) !== 'undefined';
+} 
+
+React.empty = (variable) => {
+    return (variable === '' || !variable || !variable.length || !Object.keys(variable).length);
+}

@@ -198,7 +198,7 @@ export default class Fanfara extends React.Component {
 
         if (stat.time) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("timeStatText").replace("$", Math.time(stat.time))}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.time) !== "undefined" && window.loft.serverInfo.gameavgstat.time > stat.time) {
+            if (React.isset(window.loft.serverInfo.gameavgstat.time) && window.loft.serverInfo.gameavgstat.time > stat.time) {
                 let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
                 sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
                 if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
@@ -206,7 +206,7 @@ export default class Fanfara extends React.Component {
         }
         if (stat.steps) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("stepStatText").replace("$", stat.steps)}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.steps) !== "undefined" && window.loft.serverInfo.gameavgstat.steps > stat.steps) {
+            if (React.isset(window.loft.serverInfo.gameavgstat.steps) && window.loft.serverInfo.gameavgstat.steps > stat.steps) {
                 let sdiff = window.loft.serverInfo.gameavgstat.steps - stat.steps;
                 sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.steps);
                 if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
@@ -214,7 +214,7 @@ export default class Fanfara extends React.Component {
         }
         if (stat.hops) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("hopStatText").replace("$", stat.hops)}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.hops) !== "undefined") {
+            if (React.isset(window.loft.serverInfo.gameavgstat.hops)) {
 
                 if (window.loft.serverInfo.gameavgstat.hops < stat.hops) {
                     let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
@@ -237,7 +237,7 @@ export default class Fanfara extends React.Component {
         }
         if (stat.kills >= 0) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("killStatText").replace("$", stat.kills)}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.kills) !== "undefined" && window.loft.serverInfo.gameavgstat.kills < stat.kills) {
+            if (React.isset(window.loft.serverInfo.gameavgstat.kills) && window.loft.serverInfo.gameavgstat.kills < stat.kills) {
                 let sdiff = stat.kills - window.loft.serverInfo.gameavgstat.kills;
                 sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.kills);
                 if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
@@ -245,7 +245,7 @@ export default class Fanfara extends React.Component {
         }
         if (stat.losses >= 0) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("lossStatText").replace("$", stat.losses)}</p>);
-            if (typeof(window.loft.serverInfo.gameavgstat.losses) !== "undefined" && window.loft.serverInfo.gameavgstat.losses > stat.losses) {
+            if (React.isset(window.loft.serverInfo.gameavgstat.losses) && window.loft.serverInfo.gameavgstat.losses > stat.losses) {
                 let sdiff = window.loft.serverInfo.gameavgstat.losses - stat.losses;
                 sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.losses);
                 if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
@@ -280,7 +280,7 @@ export default class Fanfara extends React.Component {
             stattext.push(buttons);
         }       
     
-        if (noise && typeof (playerInfo.statistics) !== "undefined") {
+        if (noise && React.isset(playerInfo.statistics)) {
             let { statistics: s } = playerInfo;
 
             let startexp = this.calcExpForLevel(s.level);

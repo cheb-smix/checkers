@@ -13,15 +13,15 @@ import Noise from '../../Funcs/Noise';
 import './app.css';
 import Socket from '../../Funcs/Socket';
 
-export default class App extends React.Component{
+export default class App extends React.Component {
 
     INT = 0;
 
-    STATUS_IN_GAME    = 0;
-    STATUS_DONE       = 5;
-    STATUS_FAIL       = 6;
-    STATUS_WON        = 7;
-    STATUS_DRAW       = 8;
+    STATUS_IN_GAME = 0;
+    STATUS_DONE = 5;
+    STATUS_FAIL = 6;
+    STATUS_WON = 7;
+    STATUS_DRAW = 8;
 
     state = {
         /* USERS DYNAMIC INFO */
@@ -29,7 +29,7 @@ export default class App extends React.Component{
         bestMove: null,
         playerInfo: {
             user: {
-                display_name: window.loft.user_info.display_name, 
+                display_name: window.loft.user_info.display_name,
                 username: window.loft.user_info.username,
             },
             status: window.loft.constants.STATUS_IN_GAME,
@@ -40,29 +40,29 @@ export default class App extends React.Component{
             done: 0,
             possibilities: 10,
             statistics: {
-                total_games:    0,
-                total_wins:     0,
-                total_failes:   0, 
-                total_draws:    0,
-                total_steps:    0,
-                total_hops:     0,
-                total_kills:    0,
-                experience:     0,
-                level:          1,
+                total_games: 0,
+                total_wins: 0,
+                total_failes: 0,
+                total_draws: 0,
+                total_steps: 0,
+                total_hops: 0,
+                total_kills: 0,
+                experience: 0,
+                level: 1,
             },
             lastGameStat: {
-                kills:  0,
-                steps:  0,
-                hops:   0,
+                kills: 0,
+                steps: 0,
+                hops: 0,
                 points: 0,
-                coins:  0,
-                time:   0,
-                level:  1,
+                coins: 0,
+                time: 0,
+                level: 1,
             }
         },
         opponentInfo: {
             user: {
-                display_name: "bot" + Math.round(Math.random() * 1000 + 1000), 
+                display_name: "bot" + Math.round(Math.random() * 1000 + 1000),
                 username: false,
             },
             status: window.loft.constants.STATUS_IN_GAME,
@@ -89,11 +89,11 @@ export default class App extends React.Component{
         },
         rampageCode: "",
         rampageTO: null,
-        targetCells: {}, 
+        targetCells: {},
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
-        
+
         /* DEV FIELDS */
         botStepBuffer: null,
         autochess: false,
@@ -119,20 +119,20 @@ export default class App extends React.Component{
         if (window.loft.usersettings.mode === "online") {
             if (window.loft.socket === null) {
                 window.loft.socket = new Socket(this.state.playerInfo.user.display_name, window.loft.usersettings.game, this.dataRecieved);
-                this.setState({ searchingOnlineOpponent: true });
+                this.setStateUpdate({ searchingOnlineOpponent: true });
             }
             setTimeout(this.startNewSearch, 1000);
         }
     }
 
     initiation = (state) => {
-        let {playerInfo, opponentInfo} = this.state;
-        
+        let { playerInfo, opponentInfo } = this.state;
+
         playerInfo.user.display_name = window.loft.user_info.display_name;
         playerInfo.user.username = window.loft.user_info.username;
-        if (typeof(window.loft.user_info.stat) !== "undefined") playerInfo.statistics = window.loft.user_info.stat;
+        if (React.isset(window.loft.user_info.stat)) playerInfo.statistics = window.loft.user_info.stat;
 
-        if(this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
+        if (this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
 
         state.playerInfo = playerInfo;
 
@@ -150,8 +150,8 @@ export default class App extends React.Component{
 
         state.targetCells = this.setTargetCells();
         state.cells = this.dropCheckersToDefaults(state.debug);
-        
-        this.setMazafuckinState(state);
+
+        this.setStateUpdate(state);
 
         if (window.loft.usersettings.mode === "bot") {
             if (window.loft.AjaxAvailable) {
@@ -163,15 +163,15 @@ export default class App extends React.Component{
                         }
                     },
                     error: () => {
-                        if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
+                        if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
                     }
                 });
             } else {
-                if(this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
+                if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
             }
         }
-        
-        
+
+
     }
 
 
@@ -189,7 +189,7 @@ export default class App extends React.Component{
             // window.loft.socket.send(JSON.stringify(o.data), o.success);
         } else if (window.loft.AjaxAvailable) {
             postData({
-                url: window.loft.apiserver + o.action + (typeof(o.id) !== "undefined" ? `/${o.id}` : ""),
+                url: window.loft.apiserver + o.action + (React.isset(o.id) ? `/${o.id}` : ""),
                 data: o.data,
                 success: o.success
             });
@@ -213,7 +213,7 @@ export default class App extends React.Component{
     startCheckingSearchInterval = () => {
         clearInterval(this.INT);
         this.INT = setInterval(() => {
-            this.setState({
+            this.setStateUpdate({
                 searchingOnlineOpponent: true,
                 searchingOnlineCounter: this.state.searchingOnlineCounter + 1,
             });
@@ -238,7 +238,7 @@ export default class App extends React.Component{
 
     stopCheckingSearchInterval = () => {
         clearInterval(this.INT);
-        this.setState({
+        this.setStateUpdate({
             searchingOnlineOpponent: false,
             searchingOnlineCounter: 0,
         });
@@ -261,9 +261,20 @@ export default class App extends React.Component{
     startGame = (game) => {
         let playersStep = game.players.player.color === "white";
 
-        let {playerInfo, opponentInfo} = this.state;
+        let { playerInfo, opponentInfo } = this.state;
 
-        for (let k in game.players.player) if (typeof(playerInfo[k]) !== 'undefined') playerInfo[k] = game.players.player[k];
+        let keys = ["color", "cells", "done", "possibilities"]; 
+        for (let i in keys) {
+            let key = keys[i];
+            if (React.isset(game.players.player[key])) {
+                playerInfo[key] = game.players.player[key];
+            }
+            if (React.isset(game.players.opponent[key])) {
+                opponentInfo[key] = game.players.opponent[key];
+            }
+        }
+        if (!React.empty(game.players.player.user)) playerInfo.user = game.players.player.user;
+        if (!React.empty(game.players.opponent.user)) opponentInfo.user = game.players.opponent.user;
 
         let newState = {
             playersStep: playersStep,
@@ -285,13 +296,13 @@ export default class App extends React.Component{
             newState.opponentInfo = opponentInfo;
         }
 
-        this.setState(newState);
+        this.setStateUpdate(newState);
 
         clearInterval(this.INT);
 
         if (this.state.online) {
-            this.INT =  setInterval(()=>{
-                if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
+            this.INT = setInterval(() => {
+                if (this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
 
                     let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
 
@@ -312,16 +323,16 @@ export default class App extends React.Component{
                 }
             }, 1000);
         } else {
-            if(this.state.autochess || !playersStep) setTimeout(() => this.botStep("black"), 300);
+            if (this.state.autochess || !playersStep) setTimeout(() => this.botStep("black"), 300);
         }
     }
 
-    checkTOI = (r) => {        
+    checkTOI = (r) => {
         if (r > window.loft.config.StepTimeLimit * 2 / 3) {
-            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
+            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
         }
         if (r > window.loft.config.StepTimeLimit) {
-            if(!this.state.playersStep) {
+            if (!this.state.playersStep) {
                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
             }
             this.consoleLog(Lang("gameOverByTimeout"));
@@ -332,9 +343,9 @@ export default class App extends React.Component{
     checkStep = (action, r) => {
         this.act({
             action: action,
-            data: {game_id: this.state.game_id},
+            data: { game_id: this.state.game_id },
             success: (res) => {
-                if (res.success){
+                if (res.success) {
                     this.procedureStepData(res);
                 } else {
                     console.log(res);
@@ -345,29 +356,29 @@ export default class App extends React.Component{
     }
 
     procedureStepData = (stepData) => {
-        if (typeof(stepData.game_results) !== "undefined") {
+        if (React.isset(stepData.game_results)) {
 
             console.log(stepData.game_results, window.loft.constants);
 
             if (stepData.game_results.status === window.loft.constants.STATUS_NOMANS) {
 
-                let {playerInfo, opponentInfo} = this.state;
+                let { playerInfo, opponentInfo } = this.state;
                 playerInfo.status = window.loft.constants.STATUS_DRAW;
                 opponentInfo.status = window.loft.constants.STATUS_DRAW;
-                this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                this.setStateUpdate({ playerInfo: playerInfo, opponentInfo: opponentInfo });
                 clearInterval(this.INT);
 
             } else if (stepData.game_results.status === window.loft.constants.STATUS_FINISHED) {
 
-                let {playerInfo, opponentInfo} = this.state;
-                if (typeof(stepData.game_results.winner) !== "undefined") {
+                let { playerInfo, opponentInfo } = this.state;
+                if (React.isset(stepData.game_results.winner)) {
                     playerInfo.status = window.loft.constants.STATUS_WON;
                     opponentInfo.status = window.loft.constants.STATUS_FAIL;
-                } else if (typeof(stepData.game_results.looser) !== "undefined") {
+                } else if (React.isset(stepData.game_results.looser)) {
                     playerInfo.status = window.loft.constants.STATUS_FAIL;
                     opponentInfo.status = window.loft.constants.STATUS_WON;
                 }
-                this.setState({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                this.setStateUpdate({ playerInfo: playerInfo, opponentInfo: opponentInfo });
                 clearInterval(this.INT);
 
             }
@@ -376,9 +387,9 @@ export default class App extends React.Component{
 
         }
 
-        if (typeof(stepData.lastStep) !== "undefined") {
+        if (React.isset(stepData.lastStep)) {
 
-            this.setState({
+            this.setStateUpdate({
                 lastStepTime: stepData.lastStep.timestamp,
             });
             this.doStep(
@@ -401,12 +412,12 @@ export default class App extends React.Component{
                 color: color
             },
             success: (res) => {
-                if(!res.success){
+                if (!res.success) {
                     this.iiStep(color);
-                }else{
-                    if(this.state.cells[res.botstep.from].color === color && typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined"){
+                } else {
+                    if (this.state.cells[res.botstep.from].color === color && React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
                         this.doStep(res.botstep.to, res.botstep.from, true, false);
-                    }else{
+                    } else {
                         this.iiStep(color);
                     }
                 }
@@ -415,10 +426,10 @@ export default class App extends React.Component{
     }
 
     saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
-        let {cells} = this.state;
+        let { cells } = this.state;
         if (this.state.game_id) {
             let kills = [];
-            if (typeof(cells[koordsfrom].possibilities[koordsto]) === 'undefined') {
+            if (!React.isset(cells[koordsfrom].possibilities[koordsto])) {
                 console("WARNING!!! NO POSSIBILITY OR WHAT?", koordsto, cells[koordsfrom].possibilities);
             } else {
                 kills = cells[koordsfrom].possibilities[koordsto].kills;
@@ -426,28 +437,28 @@ export default class App extends React.Component{
             this.act({
                 action: 'set-step',
                 data: {
-                    mask:       this.getDeskMask(this.state.cells, true),
-                    from:       koordsfrom,
-                    to:         koordsto,
-                    kills:      kills.join('-'),
-                    path:       cells[koordsfrom].possibilities[koordsto].path.join('-'),
-                    game_id:    this.state.game_id,
-                    write:      write,
+                    mask: this.getDeskMask(this.state.cells, true),
+                    from: koordsfrom,
+                    to: koordsto,
+                    kills: kills.join('-'),
+                    path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
+                    game_id: this.state.game_id,
+                    write: write,
                 },
-                
-                success: (res)=>{
+
+                success: (res) => {
                     if (!res.success) {
                         alert(res.errors.shift());
                     } else {
-                        if (typeof(res.botstep) !== "undefined" && res.botstep) {
-                            if (typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined") {
-                                this.setState({botStepBuffer: res.botstep});
+                        if (React.isset(res.botstep) && !React.empty(res.botstep)) {
+                            if (React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
+                                this.setStateUpdate({ botStepBuffer: res.botstep });
                             }
                         }
-                        if (typeof(res.lastGameStat) !== "undefined") {
-                            let {playerInfo} = this.state;
+                        if (React.isset(res.lastGameStat)) {
+                            let { playerInfo } = this.state;
                             playerInfo.lastGameStat = res.lastGameStat;
-                            this.setState({playerInfo: playerInfo});
+                            this.setStateUpdate({ playerInfo: playerInfo });
                         }
                     }
                 }
@@ -455,7 +466,7 @@ export default class App extends React.Component{
         }
     }
 
-    
+
 
 
 
@@ -465,42 +476,58 @@ export default class App extends React.Component{
 
     dataRecieved = (response) => {
         let data = JSON.parse(response);
-        if(typeof(data.serverInfo) !== "undefined"){
+        if (React.isset(data.serverInfo)) {
             window.loft.serverInfo = data.serverInfo;
         }
-        if(typeof(data.game) !== "undefined"){
+        if (React.isset(data.game)) {
             clearInterval(this.state.searchingOnlineOpponent);
-            let playersStep = data.lastStep!==this.state.playerInfo.token;
-            let colorInfo = Lang(`${data.players[this.state.playerInfo.token].color}IsYours`);
+            let playersStep = data.game.players.player.color === 'white';
+            let colorInfo = Lang(`${data.game.players.player.color}IsYours`);
+
+            let {playerInfo, opponentInfo} = this.state;
+            
+            let keys = ["color", "cells", "done", "possibilities"]; 
+            for (let i in keys) {
+                let key = keys[i];
+                if (React.isset(data.game.players.player[key])) {
+                    playerInfo[key] = data.game.players.player[key];
+                }
+                if (React.isset(data.game.players.opponent[key])) {
+                    opponentInfo[key] = data.game.players.opponent[key];
+                }
+            }
+            if (!React.empty(data.game.players.player.user)) playerInfo.user = data.game.players.player.user;
+            if (!React.empty(data.game.players.opponent.user)) opponentInfo.user = data.game.players.opponent.user;
+
             let newStateObject = {
                 playersStep: playersStep,
                 lastStep: data.lastStep,
                 lastStepTime: data.lastStepTime,
-                opponentInfo: data.players[data.players[this.state.playerInfo.token].opponent],
-                playerInfo: data.players[this.state.playerInfo.token],
-                consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+colorInfo,
+                opponentInfo: opponentInfo,
+                playerInfo: playerInfo,
+                consoleText: (playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + colorInfo,
                 online: true,
                 cells: this.dropCheckersToDefaults(),
                 searchingOnlineOpponent: false,
                 searchingOnlineCounter: 0,
-                timeoutCheckInterval: setInterval(()=>{
-                    if(this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime>0){
+                timeoutCheckInterval: setInterval(() => {
+                    if (this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
-                        if(r > window.loft.config.StepTimeLimit * 2 / 3){
-                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText"))+(window.loft.config.StepTimeLimit - r));
+                        if (r > window.loft.config.StepTimeLimit * 2 / 3) {
+                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
                         }
-                        if(r > window.loft.config.StepTimeLimit){
-                            if(!this.state.playersStep){
-                                this.socketSend({action:"TIMEOUTOPPO"});
+                        if (r > window.loft.config.StepTimeLimit) {
+                            if (!this.state.playersStep) {
+                                this.socketSend({ action: "TIMEOUTOPPO" });
                                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
                             }
                             this.consoleLog(Lang("gameOverByTimeout"));
                             clearInterval(this.state.timeoutCheckInterval);
                         }
                     }
-                },1000)
+                }, 1000)
             }
-            this.setMazafuckinState(newStateObject);
+            this.setStateUpdate(newStateObject);
             return;
         }
         /*if(response.response==="REGISTERED"){
@@ -509,7 +536,7 @@ export default class App extends React.Component{
                 for(let k in data){
                     playerInfo[k] = data[k];
                 }
-                this.setMazafuckinState({ playerInfo: playerInfo});
+                this.setStateUpdate({ playerInfo: playerInfo});
             }
             return;
         }
@@ -520,17 +547,17 @@ export default class App extends React.Component{
             opponentInfo['status'] = data[this.state.opponentInfo.token]['status'];
             playerInfo['done'] = data[this.state.playerInfo.token]['done'];
             opponentInfo['done'] = data[this.state.opponentInfo.token]['done'];
-            this.setMazafuckinState({playerInfo:playerInfo,opponentInfo:opponentInfo});
+            this.setStateUpdate({playerInfo:playerInfo,opponentInfo:opponentInfo});
         }
         if(response.response==="THESTEP"){
             const a = this.state.cells[data.from].possibilities[data.to];
 
-            if(a !== "undefined"){
+            if(React.isset(a)){
                 let o = {
                     lastStep: data.lastStep,
                     lastStepTime: data.lastStepTime
                 };
-                if(typeof(data[this.state.playerInfo.token]) !== "undefined" && (data[this.state.playerInfo.token]['status'] !== this.state.playerInfo['status'] || this.state.opponentInfo['status'] !== data[this.state.opponentInfo.token]['status'])){
+                if(React.isset(data[this.state.playerInfo.token]) && (data[this.state.playerInfo.token]['status'] !== this.state.playerInfo['status'] || this.state.opponentInfo['status'] !== data[this.state.opponentInfo.token]['status'])){
                     //let {playerInfo, opponentInfo} = this.state;
                     o.playerInfo = this.state.playerInfo;
                     o.opponentInfo = this.state.opponentInfo;
@@ -539,7 +566,7 @@ export default class App extends React.Component{
                     o.playerInfo['done'] = data[this.state.playerInfo.token]['done'];
                     o.opponentInfo['done'] = data[this.state.opponentInfo.token]['done'];
                 }
-                this.setMazafuckinState(o);
+                this.setStateUpdate(o);
 
                 this.doStep(
                     data.to,
@@ -553,7 +580,7 @@ export default class App extends React.Component{
         if(response.response==="GAMEOVER"){
             if(response.data.reason === "OPPOTIMEOUT"){
                 clearInterval(this.state.timeoutCheckInterval);
-                this.setMazafuckinState({
+                this.setStateUpdate({
                     timeoutCheckInterval: false,
                     online: false,
                     consoleText: Lang("enemyLostByTimeout")
@@ -561,7 +588,7 @@ export default class App extends React.Component{
             }
             if(response.data.reason === "TIMEOUT"){
                 clearInterval(this.state.timeoutCheckInterval);
-                this.setMazafuckinState({
+                this.setStateUpdate({
                     timeoutCheckInterval: false,
                     online: false,
                     consoleText: Lang("youveLostByTimeout")
@@ -581,34 +608,34 @@ export default class App extends React.Component{
     suggestNewOneGame = (text = "") => {
         window.loft.showModal(
             <div>
-                <Button action={()=>this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
-                <Button action={()=>this.startNewSearch()} href="" value={Lang("yesText")} />
+                <Button action={() => this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
+                <Button action={() => this.startNewSearch()} href="" value={Lang("yesText")} />
             </div>,
             text + "<br />" + Lang("findAnewGame")
         );
     }
 
 
-    quitGameConfirmer = (onconfirm = () => {}) => {
+    quitGameConfirmer = (onconfirm = () => { }) => {
         window.loft.showModal(
             <div className="container">
                 <div className="row">
                     <div className="col-12">
-                    <h5>{Lang("sureYouWannaQuit")}</h5><h5 className="warning">{Lang("youllLooseIfYouQuit")}</h5>
+                        <h5>{Lang("sureYouWannaQuit")}</h5><h5 className="warning">{Lang("youllLooseIfYouQuit")}</h5>
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
-                            action={() => window.loft.showModal(false)} 
-                            href="" 
-                            value={Lang("cancelText")} 
+                            action={() => window.loft.showModal(false)}
+                            href=""
+                            value={Lang("cancelText")}
                             theme="neon"
                             strong="true"
                         />
                     </div>
                     <div className="col-md-6 col-12">
                         <Button
-                            action={() => { this.quit(); onconfirm(); }} 
-                            href="" 
+                            action={() => { this.quit(); onconfirm(); }}
+                            href=""
                             value={Lang("quitTheGame")}
                             theme="neon"
                             strong="light"
@@ -620,16 +647,16 @@ export default class App extends React.Component{
         );
     }
 
-    rampage = (hops, word="", returnObj=false) => {
+    rampage = (hops, word = "", returnObj = false) => {
         clearTimeout(this.state.rampageTO);
         let newstate = {
-            rampageCode:<Rampage hops={hops} word={word} />,
-            rampageTO:setTimeout(()=>{
-                this.setMazafuckinState({rampageCode:"",rampageTO:null});
-            },3000)
+            rampageCode: <Rampage hops={hops} word={word} />,
+            rampageTO: setTimeout(() => {
+                this.setStateUpdate({ rampageCode: "", rampageTO: null });
+            }, 3000)
         };
         if (returnObj) return newstate;
-        this.setMazafuckinState(newstate);
+        this.setStateUpdate(newstate);
     }
 
     sleep = (ms) => {
@@ -637,21 +664,21 @@ export default class App extends React.Component{
     }
 
     doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true) => {
-        if(window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, write);
-        
-        if(window.loft.usersettings.animation==='0'){
-            this.theStep(koordsto,koordsfrom,newPlayersStep);
-        }else{
-            this.stepAnimation(koordsto,koordsfrom,newPlayersStep);
+        if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, write);
+
+        if (window.loft.usersettings.animation === '0') {
+            this.theStep(koordsto, koordsfrom, newPlayersStep);
+        } else {
+            this.stepAnimation(koordsto, koordsfrom, newPlayersStep);
         }
     }
 
-    theStep = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false) => {
-        let {playerInfo,opponentInfo,bestMove,cells, gameTotalStat} = this.state;
-        let {color} = cells[koordsfrom];
+    theStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false) => {
+        let { playerInfo, opponentInfo, bestMove, cells, gameTotalStat } = this.state;
+        let { color } = cells[koordsfrom];
         let hops = cells[koordsfrom].possibilities[koordsto].path.length;
 
-        if (typeof(cells[koordsfrom].possibilities[koordsto].kills) !== "undefined") {
+        if (React.isset(cells[koordsfrom].possibilities[koordsto].kills)) {
             cells[koordsfrom].possibilities[koordsto].kills.forEach((k, v) => {
                 cells[k].checker = false;
                 cells[k].color = false;
@@ -659,21 +686,21 @@ export default class App extends React.Component{
                 cells[k].damka = false;
             });
         }
-        
-        if(bestMove===null || bestMove.hops<hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity){
+
+        if (bestMove === null || bestMove.hops < hops || bestMove.effectivity < cells[koordsfrom].possibilities[koordsto].effectivity) {
             bestMove = {
                 mask: this.getDeskMask(this.state.cells, true),
-                from:koordsfrom,
-                to:koordsto,
-                hops:hops,
-                path:cells[koordsfrom].possibilities[koordsto].path,
-                effectivity:cells[koordsfrom].possibilities[koordsto].effectivity
+                from: koordsfrom,
+                to: koordsto,
+                hops: hops,
+                path: cells[koordsfrom].possibilities[koordsto].path,
+                effectivity: cells[koordsfrom].possibilities[koordsto].effectivity
             };
         }
-        if(cells[koordsfrom].color === playerInfo.color){
+        if (cells[koordsfrom].color === playerInfo.color) {
             playerInfo.hops += hops;
             playerInfo.steps++;
-        }else{
+        } else {
             opponentInfo.hops += hops;
             opponentInfo.steps++;
         }
@@ -690,22 +717,22 @@ export default class App extends React.Component{
         cells = this.regeneratePossibilities(cells);
 
         let doneStat = this.countDoneCheckers(cells);
-        
+
         for (let d in doneStat[this.state.playerInfo.color]) playerInfo[d] = doneStat[this.state.playerInfo.color][d];
         for (let d in doneStat[this.state.opponentInfo.color]) opponentInfo[d] = doneStat[this.state.opponentInfo.color][d];
 
         let consoleText = newPlayersStep ? Lang("yourTurnText") : Lang("enemyTurnText");
-        if(playerInfo.done === 12 || opponentInfo.done === 12) consoleText = Lang("gameOverText");
+        if (playerInfo.done === 12 || opponentInfo.done === 12) consoleText = Lang("gameOverText");
 
         let playstage = 1;
-        if(playerInfo.steps + opponentInfo.steps > 4){
+        if (playerInfo.steps + opponentInfo.steps > 4) {
             playstage = 2;
-            if(playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
+            if (playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
         }
 
-        if(this.state.online===false && (playerInfo.done>10 || opponentInfo.done>10)){
-            let o = this.checkOfflineGameStatus(playerInfo,opponentInfo);
-            if(o!==false){
+        if (this.state.online === false && (playerInfo.done > 10 || opponentInfo.done > 10)) {
+            let o = this.checkOfflineGameStatus(playerInfo, opponentInfo);
+            if (o !== false) {
                 playerInfo = o.playerInfo;
                 opponentInfo = o.opponentInfo;
             }
@@ -730,7 +757,7 @@ export default class App extends React.Component{
             }
         }
         let newstate = {}
-        if(hops>2) newstate = this.rampage(hops, "", true);
+        if (hops > 2) newstate = this.rampage(hops, "", true);
         Noise(hops);
 
         newstate.playerInfo = playerInfo;
@@ -738,21 +765,21 @@ export default class App extends React.Component{
         newstate.bestMove = bestMove;
         newstate.playersStep = newPlayersStep;
         newstate.playstage = playstage;
-        newstate.consoleText =  consoleText;
-        newstate.selectedChecker =  false;
+        newstate.consoleText = consoleText;
+        newstate.selectedChecker = false;
         newstate.cells = cells;
-        newstate.gameTotalStat = gameTotalStat;  
+        newstate.gameTotalStat = gameTotalStat;
 
-        this.setMazafuckinState(newstate);
+        this.setStateUpdate(newstate);
 
         setTimeout(() => this.botStep(color), 300);
     }
 
     getDeskMask = (cells = this.state.cells, colors = false) => {
         let mask = "";
-        for(let y=1;y<9;y++){
-            for(let x=1;x<9;x++){
-                let k = x+":"+y;
+        for (let y = 1; y < 9; y++) {
+            for (let x = 1; x < 9; x++) {
+                let k = x + ":" + y;
                 if (colors) mask += cells[k].color ? (cells[k].color === "black" ? "0" : "1") : "_";
                 else mask += cells[k].color ? "1" : "0";
             }
@@ -761,19 +788,19 @@ export default class App extends React.Component{
     }
 
     botStep = (lastStepColor) => {
-        let color = this.state.autochess?(lastStepColor==="white"?"black":"white"):(this.state.playerInfo.color==="white"?"black":"white");
+        let color = this.state.autochess ? (lastStepColor === "white" ? "black" : "white") : (this.state.playerInfo.color === "white" ? "black" : "white");
 
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === window.loft.constants.STATUS_IN_GAME));
-        
-        if((this.state.playersStep===false || this.state.autochess) && this.state.online===false && gamestatuschecked && window.loft.usersettings.mode === "bot"){
+
+        if ((this.state.playersStep === false || this.state.autochess) && this.state.online === false && gamestatuschecked && window.loft.usersettings.mode === "bot") {
             setTimeout(() => {
 
                 let rndBOOL = true;//3.5 - window.loft.usersettings.difficulty < Math.random() * 3;
 
                 if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
-                    if (this.state.botStepBuffer && typeof(this.state.botStepBuffer.from) !== "undefined") {
+                    if (this.state.botStepBuffer && React.isset(this.state.botStepBuffer.from)) {
                         this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false);
-                        this.setState({botStepBuffer: null});
+                        this.setStateUpdate({ botStepBuffer: null });
                     } else if (this.state.botStepBuffer === null) {
                         this.iiStep(color);
                     } else {
@@ -788,8 +815,8 @@ export default class App extends React.Component{
     }
 
     oneAnimatedStep = async (stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells) => {
-        
-        stepper.style.transition = t+"ms transform ease-in";
+
+        stepper.style.transition = t + "ms transform ease-in";
 
         let k1 = possibility.path[index - 1];
         let k2 = possibility.path[index];
@@ -809,7 +836,7 @@ export default class App extends React.Component{
         let dy = y1 - (y1 - y2) / 2;
 
         if (index === hops - 1 && hops > window.loft.config.EpicStepNum && Math.random() > 0.5 && !cells[koordsfrom].damka) {
-            
+
             if (hops > window.loft.config.EpicStepNum + 2 || Math.random() > 0.5) {
                 Noise("epic-rock");
             } else {
@@ -828,32 +855,32 @@ export default class App extends React.Component{
             stepper.style.transition = "none";
             checker.style.opacity = 1;
 
-            this.theStep(koordsto,koordsfrom,newPlayersStep);
+            this.theStep(koordsto, koordsfrom, newPlayersStep);
 
             let ant1 = this.state.playerInfo.color === "black" ? "animate__revbounce" : "animate__bounce";
             let ant2 = this.state.playerInfo.color === "black" ? "animate__revshakeX" : "animate__shakeX";
 
             let k = document.querySelectorAll(".uchecker");
-            for( let n = 0; n < k.length; n++) {
+            for (let n = 0; n < k.length; n++) {
                 if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
                     k[n].className += ` ${ant1} animate__animated`;
                 }
             }
             let u = document.querySelectorAll(`#ufield, #${cells[koordsto].checker}`);
-            for( let n = 0; n < k.length; n++) {
-                if (typeof(u[n]) === "undefined") continue;
+            for (let n = 0; n < k.length; n++) {
+                if (!React.isset(u[n])) continue;
                 u[n].className += ` ${ant2} animate__animated`;
             }
 
             await this.sleep(1000);
 
-            for( let n = 0; n < k.length; n++) {
+            for (let n = 0; n < k.length; n++) {
                 if (k[n].id !== "stepper" && k[n].id !== cells[koordsto].checker) {
                     k[n].className = k[n].className.replace(` ${ant1}`, "").replace(" animate__animated", "");
                 }
             }
-            for( let n = 0; n < k.length; n++) {
-                if (typeof(u[n]) === "undefined") continue;
+            for (let n = 0; n < k.length; n++) {
+                if (!React.isset(u[n])) continue;
                 u[n].className = u[n].className.replace(` ${ant2}`, "").replace(" animate__animated", "");
             }
 
@@ -862,7 +889,7 @@ export default class App extends React.Component{
 
         stepper.style.transform = `translate(${dx}px, ${dy}px) scale(1.5)`;
         await this.sleep(t)
-        stepper.style.transition = t+"ms transform ease-out";
+        stepper.style.transition = t + "ms transform ease-out";
         stepper.style.transform = `translate(${ooo.offsetLeft}px, ${ooo.offsetTop}px) scale(1)`
         await this.sleep(t);
 
@@ -870,35 +897,35 @@ export default class App extends React.Component{
             stepper.style.display = "none";
             stepper.style.transition = "none";
             checker.style.opacity = 1;
-            this.theStep(koordsto,koordsfrom,newPlayersStep);
+            this.theStep(koordsto, koordsfrom, newPlayersStep);
             return; // end of default last step
-        } 
+        }
 
         Noise("soft");
 
         index++;
 
-        if (typeof(possibility.path[index]) !== "undefined") {
+        if (React.isset(possibility.path[index])) {
             t = Math.pifagor(cells[possibility.path[index - 1]], cells[possibility.path[index]]) * (this.state.animationSpeed - (possibility.len * 2));
-            
+
             setTimeout(async () => {
                 this.oneAnimatedStep(stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
-            }, t*2);
+            }, t * 2);
         }
     }
 
-    stepAnimation = (koordsto,koordsfrom=this.state.selectedChecker,newPlayersStep=false,p=false) => {
-        let {cells} = this.state;
+    stepAnimation = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, p = false) => {
+        let { cells } = this.state;
         if (window.loft.usersettings.game === "corners" && cells[koordsfrom].possibilities[koordsto].path.length > 2) {
-            cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v,k) => k%2===0);
+            cells[koordsfrom].possibilities[koordsto].path = cells[koordsfrom].possibilities[koordsto].path.filter((v, k) => k % 2 === 0);
         }
         let possibility = cells[koordsfrom].possibilities[koordsto];
-        
+
         let stepper = document.getElementById("stepper");
-        
+
         let checker = document.getElementById(cells[koordsfrom].checker);
         let lastStepColor = cells[koordsfrom].color;
-        
+
         checker.style.opacity = 0;
         stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
         stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop}px)`;
@@ -910,15 +937,15 @@ export default class App extends React.Component{
         setTimeout(async () => {
             this.oneAnimatedStep(stepper, checker, possibility, index, t, koordsfrom, koordsto, lastStepColor, newPlayersStep, cells);
             index++;
-        }, t*2);
+        }, t * 2);
     }
 
     consoleLog = (text) => {
-        this.setMazafuckinState({consoleText: text});
+        this.setStateUpdate({ consoleText: text });
     }
 
     clearPlayerInfoAfterGameOver = () => {
-        let {playerInfo} = this.state;
+        let { playerInfo } = this.state;
         playerInfo.status = window.loft.constants.STATUS_IN_GAME;
         playerInfo.color = "white";
         playerInfo.hops = 0;
@@ -934,14 +961,14 @@ export default class App extends React.Component{
             newlevels: 0,
         };
 
-        this.setMazafuckinState({
+        this.setStateUpdate({
             playersStep: true,
             opponentInfo: {
                 user: {
-                    display_name: "bot" + Math.round(Math.random() * 1000 + 1000), 
+                    display_name: "bot" + Math.round(Math.random() * 1000 + 1000),
                     username: false,
                 },
-                name: "bot"+Math.round(Math.random()*1000 + 1000), 
+                name: "bot" + Math.round(Math.random() * 1000 + 1000),
                 status: window.loft.constants.STATUS_IN_GAME,
                 color: "black",
                 hops: 0,
@@ -960,11 +987,11 @@ export default class App extends React.Component{
     }
 
     updatePI = () => {
-        let {playerInfo: pi} = this.state;
+        let { playerInfo: pi } = this.state;
         pi.statistics.experience += pi.lastGameStat.points;
         pi.statistics.level = pi.lastGameStat.level;
         //for (let k in pi.lastGameStat) if (k !== "level") pi.lastGameStat[k] = 0;
-        this.setMazafuckinState({playerInfo: pi});
+        this.setStateUpdate({ playerInfo: pi });
     }
 
     showBestMove = () => {
@@ -992,7 +1019,7 @@ export default class App extends React.Component{
                     }
                     cells[x+":"+y] = {x:x,y:y,k:i+1,checker:checker,color:color};
                 }
-                this.setMazafuckinState({cells:cells});
+                this.setStateUpdate({cells:cells});
                 setTimeout(()=>{
                     this.stepAnimation(b.to,b.from,false,b.path);
                 },200);
@@ -1000,73 +1027,72 @@ export default class App extends React.Component{
         }*/
     }
 
-    setMazafuckinState = (o) => { // method just for debug
-        //console.log("Changing state",o); 
+    setStateUpdate = (o) => { // method just for debug
+        // console.log("Changing state", o);
         this.setState(o);
     }
-    
+
 
     deepCopy = (o) => {
         let t = {};
-        for(let k in o) t[k] = typeof(o[k])!=="object" ? o[k] : this.deepCopy(o[k]);
+        for (let k in o) t[k] = typeof (o[k]) !== "object" ? o[k] : this.deepCopy(o[k]);
         return t;
     }
 
     deepArrCopy = (o) => {
         let t = [];
-        for(let k in o) t[k] = o[k];
+        for (let k in o) t[k] = o[k];
         return t;
     }
 
     // Main user action
 
     onCheckerClick = (koords) => {
-        let {cells} = this.state;
-        
-        if (typeof(cells[koords])!=="undefined" && this.state.playersStep && this.state.playerInfo.status===window.loft.constants.STATUS_IN_GAME)
-        {
+        let { cells } = this.state;
+
+        if (React.isset(cells[koords]) && this.state.playersStep && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) {
             //Cell exists and it is a players turn to do a step
             if (cells[koords].color !== this.state.opponentInfo.color) {
                 //If checker is player`s one or empty cell
                 if (cells[koords].checker !== false) {
                     //New checker click
                     let newselectedChecker = false;
-                    if(cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords){
+                    if (cells[koords].color === this.state.playerInfo.color && this.state.selectedChecker !== koords) {
                         newselectedChecker = koords;
                     }
                     Noise("checker-take");
-                    this.setMazafuckinState({selectedChecker: newselectedChecker});
+                    this.setStateUpdate({ selectedChecker: newselectedChecker });
                 } else {
                     //Trying to do a step
                     if (this.state.selectedChecker !== false) {
                         //If we have an active checker
-                        if(typeof(cells[this.state.selectedChecker].possibilities[koords]) !== "undefined"){
+                        if (React.isset(cells[this.state.selectedChecker].possibilities[koords])) {
                             //If we have such step as possible
                             this.doStep(koords);
                             if (this.state.online) {
                                 let param = {
-                                    action:"THESTEP",
-                                    from:this.state.selectedChecker,
-                                    to:koords,
+                                    action: "THESTEP",
+                                    from: this.state.selectedChecker,
+                                    to: koords,
                                     hops: cells[this.state.selectedChecker].possibilities[koords].path.length,
-                                    checker:cells[this.state.selectedChecker].checker,
+                                    checker: cells[this.state.selectedChecker].checker,
                                     effectivity: cells[this.state.selectedChecker].possibilities[koords].effectivity
                                 };
-                                if(this.state.playerInfo.done>9) param.checkdone = 1;
-                                if(this.state.socketOpened) this.socketSend(param);
+                                if (this.state.playerInfo.done > 9) param.checkdone = 1;
+                                if (this.state.socketOpened) this.socketSend(param);
                             }/*else{
                                 this.doStep(koords);
                             }*/
-                        }else{
+                        } else {
                             //Unable to go there
                             //cells[this.state.selectedChecker].active = false;
-                            
+
                             let needToEatMore = false;
                             if (window.loft.isCheckers) {
                                 for (let p in cells[this.state.selectedChecker].possibilities) {
                                     let pos = cells[this.state.selectedChecker].possibilities[p];
                                     if (pos.path.indexOf(koords) > 0 && pos.path.indexOf(koords) < pos.path.length - 1) {
-                                        needToEatMore = {kills: pos.kills, more: true};
+                                        needToEatMore = { kills: pos.kills, more: true };
                                         break;
                                     }
                                 }
@@ -1076,19 +1102,19 @@ export default class App extends React.Component{
                                         for (let p in cells[c].possibilities) {
                                             let pos = cells[c].possibilities[p];
                                             if (pos.kills.length > 0) {
-                                                needToEatMore = {kills: pos.kills, more: false};
+                                                needToEatMore = { kills: pos.kills, more: false };
                                                 break;
                                             }
                                         }
                                     }
                                 }
                             }
-                            
+
                             if (needToEatMore) {
                                 Noise("warning");
                                 if (window.cordova) navigator.vibrate(200);
-                                if (needToEatMore.more) this.consoleLog( Lang("youHaveToTakeMore") );
-                                else this.consoleLog( Lang("youHaveToTake") );
+                                if (needToEatMore.more) this.consoleLog(Lang("youHaveToTakeMore"));
+                                else this.consoleLog(Lang("youHaveToTake"));
                                 for (let k in needToEatMore.kills) {
                                     let ch = document.querySelector(`.ucell[koords='${needToEatMore.kills[k]}'] .uchecker`);
                                     ch.className = `${ch.className} deadly`;
@@ -1096,7 +1122,7 @@ export default class App extends React.Component{
                             } else {
                                 this.consoleLog(Lang("stepIsImpossible"));
                             }
-                            
+
                         }
                     }
                 }
@@ -1106,11 +1132,11 @@ export default class App extends React.Component{
 
     // Render
 
-    render(){
+    render() {
         let renderedField = '';
-        if(Object.keys(this.state.cells).length > 0){
+        if (Object.keys(this.state.cells).length > 0) {
             renderedField = Object.keys(this.state.cells).map((koords) => {
-                let {x,y,k,color,checker,possibilities} = this.state.cells[koords];
+                let { x, y, k, color, checker, possibilities } = this.state.cells[koords];
                 let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && window.loft.isCheckers);
                 let active = koords === this.state.selectedChecker;
                 return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
@@ -1122,31 +1148,31 @@ export default class App extends React.Component{
 
         return (
             <div className="ucon">
-                <AppHeader 
-                        /*playerName={this.state.playerInfo.display_name}
-                        playerColor={this.state.playerInfo.color}
-                        playerStatus={this.state.playerInfo.status}
-                        playerStat={window.loft.isGuest ? {} : this.state.playerInfo.stat}*/
-                        playerInfo={this.state.playerInfo}
-                        searching={this.state.searchingOnlineOpponent} 
-                        count={this.state.searchingOnlineCounter} 
-                        online={this.state.online}
-                        startNewSearch={this.startNewSearch}
-                        stopTheSearch={this.stopTheSearch}
-                        quitGameConfirmer={this.quitGameConfirmer}
-                        updateSetting={this.updateSetting}
-                        setAppState={this.props.setAppState}
-                        quit={this.quit}
+                <AppHeader
+                    /*playerName={this.state.playerInfo.display_name}
+                    playerColor={this.state.playerInfo.color}
+                    playerStatus={this.state.playerInfo.status}
+                    playerStat={window.loft.isGuest ? {} : this.state.playerInfo.stat}*/
+                    playerInfo={this.state.playerInfo}
+                    searching={this.state.searchingOnlineOpponent}
+                    count={this.state.searchingOnlineCounter}
+                    online={this.state.online}
+                    startNewSearch={this.startNewSearch}
+                    stopTheSearch={this.stopTheSearch}
+                    quitGameConfirmer={this.quitGameConfirmer}
+                    updateSetting={this.updateSetting}
+                    setAppState={this.props.setAppState}
+                    quit={this.quit}
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield">
                         <div className="ufcn">
-                        <div className="uchecker black" id="stepper">&nbsp;</div>
-                        {renderedField}
+                            <div className="uchecker black" id="stepper">&nbsp;</div>
+                            {renderedField}
                         </div>
                         <Fanfara
-                            playerInfo={this.state.playerInfo} 
-                            opponentInfo={this.state.opponentInfo} 
+                            playerInfo={this.state.playerInfo}
+                            opponentInfo={this.state.opponentInfo}
                             bestMove={this.state.bestMove}
                             continueWithSameOpponent={this.continueWithSameOpponent}
                             searchNewOpponent={this.searchNewOpponent}
@@ -1154,19 +1180,19 @@ export default class App extends React.Component{
                             updatePI={this.updatePI}
                             rampage={this.rampage}
                             showBestMove={this.showBestMove}
-                    />
+                        />
                     </div>
                     <Console
-                        text={this.state.consoleText} 
+                        text={this.state.consoleText}
                         online={this.state.online}
                         rampageCode={this.state.rampageCode}
                         player={this.state.playerInfo.user.display_name}
                         opponent={this.state.opponentInfo.user.display_name}
-                        searching={this.state.searchingOnlineOpponent} 
+                        searching={this.state.searchingOnlineOpponent}
                         count={this.state.searchingOnlineCounter}
                     />
                 </div>
-        </div>
+            </div>
         );
     }
 }
