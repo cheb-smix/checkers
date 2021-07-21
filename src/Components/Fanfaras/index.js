@@ -84,7 +84,7 @@ export default class Fanfara extends React.Component {
                     pdiv.innerHTML = newEXP;
                     clearInterval(s);
                     clearInterval(t);
-                    this.props.updatePI();
+                    // this.props.updatePI();
                 }
             }, lvlAnimationInterval)
         } else {
@@ -95,7 +95,7 @@ export default class Fanfara extends React.Component {
             pdiv.style.width = progress;
             pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
             pdiv.innerHTML = newEXP;
-            this.props.updatePI();
+            // this.props.updatePI();
         }
         //this.props.showBestMove();
     }
@@ -123,14 +123,14 @@ export default class Fanfara extends React.Component {
                 <div className="row">
                     <div className="col-12">
                         <Button
-                            action={this.props.quit}
-                            href=""
+                            action=""
+                            href="/home"
                             value={Lang("closeText")}
                             theme="grey"
                             strong="true"
                         />
                     </div>
-                    <div className="col-12">
+                    {/* <div className="col-12">
                         <Button
                             action={this.props.continueWithSameOpponent}
                             href=""
@@ -147,7 +147,7 @@ export default class Fanfara extends React.Component {
                             theme="neon"
                             strong="true"
                         />
-                    </div>
+                    </div> */}
                 </div>
             </div>;
 

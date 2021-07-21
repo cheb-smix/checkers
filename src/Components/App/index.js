@@ -101,7 +101,6 @@ export default class App extends React.Component{
     };
 
     componentDidMount() {
-        console.log(this.state);
         if (window.cordova) {
             window.loft.removeAllListeners(document, "backbutton");
             window.loft.addListener(document, "backbutton", () => {
@@ -150,7 +149,6 @@ export default class App extends React.Component{
         }
 
         state.targetCells = this.setTargetCells();
-
         state.cells = this.dropCheckersToDefaults(state.debug);
         
         this.setMazafuckinState(state);
@@ -418,7 +416,6 @@ export default class App extends React.Component{
 
     saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
         let {cells} = this.state;
-        console.log(this.state.botStepBuffer);
         if (this.state.game_id) {
             let kills = [];
             if (typeof(cells[koordsfrom].possibilities[koordsto]) === 'undefined') {
@@ -444,7 +441,6 @@ export default class App extends React.Component{
                     } else {
                         if (typeof(res.botstep) !== "undefined" && res.botstep) {
                             if (typeof(this.state.cells[res.botstep.from].possibilities[res.botstep.to]) !== "undefined") {
-                                console.log("GOT BOTSTEP!");
                                 this.setState({botStepBuffer: res.botstep});
                             }
                         }
