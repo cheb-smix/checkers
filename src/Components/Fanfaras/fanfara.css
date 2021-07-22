@@ -23,7 +23,7 @@
     width: 48vw;
     font-family: ForwardExtra-Light;
     font-weight: bold;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.9);
     color: #bbb;
     text-align: center;
     display: block;
@@ -57,6 +57,5 @@
 @media (orientation: portrait), (max-aspect-ratio: 10/13){
     #fanfara{
         width: 100vw;
-        height: 100vw;
     }
 }

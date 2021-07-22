@@ -3,6 +3,7 @@ import Lang from '../Localization';
 import Button from '../Button';
 import "./fanfara.css";
 import Noise from '../../Funcs/Noise';
+import RoundProgressBar from '../RoundProgressBar';
 
 export default class Fanfara extends React.Component {
 
@@ -196,72 +197,97 @@ export default class Fanfara extends React.Component {
         let {lastGameStat: stat} = this.props.playerInfo;
         let stattext = [];
 
+        // <RoundProgressBar perc="59" />
+        //     <RoundProgressBar perc="32" last="true" timeout="500" />
+
         if (stat.time) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("timeStatText").replace("$", Math.time(stat.time))}</p>);
-            if (React.isset(window.loft.serverInfo.gameavgstat.time) && window.loft.serverInfo.gameavgstat.time > stat.time) {
-                let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
-                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
-                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-            }
+            let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
+            sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={Math.time(stat.time)} 
+                text={Lang("timeStatText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
         }
         if (stat.steps) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("stepStatText").replace("$", stat.steps)}</p>);
-            if (React.isset(window.loft.serverInfo.gameavgstat.steps) && window.loft.serverInfo.gameavgstat.steps > stat.steps) {
-                let sdiff = window.loft.serverInfo.gameavgstat.steps - stat.steps;
-                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.steps);
-                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-            }
+            let sdiff = window.loft.serverInfo.gameavgstat.steps - stat.steps;
+            sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.steps);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={stat.steps} 
+                text={Lang("stepStatText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
         }
         if (stat.hops) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("hopStatText").replace("$", stat.hops)}</p>);
-            if (React.isset(window.loft.serverInfo.gameavgstat.hops)) {
 
-                if (window.loft.serverInfo.gameavgstat.hops < stat.hops) {
-                    let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
-                    sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.hops);
-                    if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-                }
+            let sdiff = stat.hops - window.loft.serverInfo.gameavgstat.hops;
+            sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.hops);
 
-                let hopsPerStep = Math.round(stat.hops * 100 / stat.steps) / 100;
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={stat.hops} 
+                text={Lang("hopStatText").replace("$", sdiff >= 1 ? '+' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
 
-                stattext.push(<p key={stattext.length} className="fanp">{Lang("hopsPerStepText").replace("$", hopsPerStep)}</p>);
+            let hopsPerStep = Math.round(stat.hops * 100 / stat.steps) / 100;
+            let hopsPerStep2 = window.loft.serverInfo.gameavgstat.hops / window.loft.serverInfo.gameavgstat.steps;
 
-                hopsPerStep = window.loft.serverInfo.gameavgstat.hops / window.loft.serverInfo.gameavgstat.steps;
-                
-                if (hopsPerStep < stat.hops / stat.steps) {
-                    let sdiff = stat.hops / stat.steps - hopsPerStep;
-                    sdiff = Math.round(100 * sdiff / hopsPerStep);
-                    if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-                }
-            }
+            sdiff = stat.hops / stat.steps - hopsPerStep2;
+            sdiff = Math.round(100 * sdiff / hopsPerStep2);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={hopsPerStep} 
+                text={Lang("hopsPerStepText").replace("$", sdiff >= 1 ? '+' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
         }
         if (stat.kills >= 0) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("killStatText").replace("$", stat.kills)}</p>);
-            if (React.isset(window.loft.serverInfo.gameavgstat.kills) && window.loft.serverInfo.gameavgstat.kills < stat.kills) {
-                let sdiff = stat.kills - window.loft.serverInfo.gameavgstat.kills;
-                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.kills);
-                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-            }
+            let sdiff = stat.kills - window.loft.serverInfo.gameavgstat.kills;
+            sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.kills);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={stat.kills} 
+                text={Lang("killStatText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
         }
         if (stat.losses >= 0) {
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("lossStatText").replace("$", stat.losses)}</p>);
-            if (React.isset(window.loft.serverInfo.gameavgstat.losses) && window.loft.serverInfo.gameavgstat.losses > stat.losses) {
-                let sdiff = window.loft.serverInfo.gameavgstat.losses - stat.losses;
-                sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.losses);
-                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-            }
+            let sdiff = window.loft.serverInfo.gameavgstat.losses - stat.losses;
+            sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.losses);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={stat.losses} 
+                text={Lang("lossStatText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
 
             let killLossCoeff = Math.round(stat.kills * 100 / stat.losses) / 100;
+            let killLossCoeff2 = window.loft.serverInfo.gameavgstat.kills / window.loft.serverInfo.gameavgstat.losses;
+            sdiff = stat.kills / stat.losses - killLossCoeff2;
+            sdiff = Math.round(100 * sdiff / killLossCoeff2);
 
-            stattext.push(<p key={stattext.length} className="fanp">{Lang("killLossCoeffText").replace("$", killLossCoeff)}</p>);
-
-            killLossCoeff = window.loft.serverInfo.gameavgstat.kills / window.loft.serverInfo.gameavgstat.losses;
-            
-            if (killLossCoeff < stat.kills / stat.losses) {
-                let sdiff = stat.kills / stat.losses - killLossCoeff;
-                sdiff = Math.round(100 * sdiff / killLossCoeff);
-                if (sdiff > 0) stattext.push(<p key={stattext.length} className="fanp statcompare">{Lang("gameStatCompareText").replace("$", sdiff)}</p>);
-            }
+            stattext.push(<RoundProgressBar 
+                last="true"
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={killLossCoeff} 
+                text={Lang("killLossCoeffText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
+            />);
         }
         if (stat.coins) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
