@@ -6,7 +6,7 @@ import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';
 
-import RoundProgressBar from '../RoundProgressBar';
+// import RoundProgressBar from '../RoundProgressBar';
 
 export default class Home extends React.Component{
     gameChoice = () => {
@@ -77,7 +77,7 @@ export default class Home extends React.Component{
                     </React.Fragment>
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
-
+{/* 
                 <RoundProgressBar perc="15" />
                 <RoundProgressBar perc="43" />
                 <RoundProgressBar perc="58" />
@@ -86,7 +86,7 @@ export default class Home extends React.Component{
                 <RoundProgressBar perc="149" />
                 <RoundProgressBar perc="165" />
                 <RoundProgressBar perc="205" />
-                <RoundProgressBar perc="-214" last="true"/>
+                <RoundProgressBar perc="-214" last="true"/> */}
 
             </div>
         );
