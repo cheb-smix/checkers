@@ -197,9 +197,6 @@ export default class Fanfara extends React.Component {
         let {lastGameStat: stat} = this.props.playerInfo;
         let stattext = [];
 
-        // <RoundProgressBar perc="59" />
-        //     <RoundProgressBar perc="32" last="true" timeout="500" />
-
         if (stat.time) {
             let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
             sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
@@ -259,7 +256,7 @@ export default class Fanfara extends React.Component {
                 key={stattext.length} 
                 perc={sdiff + 100} 
                 num={stat.kills} 
-                text={Lang("killStatText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                text={Lang("killStatText").replace("$", sdiff >= 1 ? '+' + sdiff + '%' : '')} 
                 tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
             />);
         }
@@ -285,7 +282,7 @@ export default class Fanfara extends React.Component {
                 key={stattext.length} 
                 perc={sdiff + 100} 
                 num={killLossCoeff} 
-                text={Lang("killLossCoeffText").replace("$", sdiff >= 1 ? '-' + sdiff + '%' : '')} 
+                text={Lang("killLossCoeffText").replace("$", sdiff >= 1 ? '+' + sdiff + '%' : '')} 
                 tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
             />);
         }
