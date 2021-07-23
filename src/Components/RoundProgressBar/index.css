@@ -66,11 +66,17 @@
     background: var(--neon-bg-color-dark);
 }
 
-.diagram.over_50 .piece.left, .diagram.over_100 .piece.right, .diagram.over_150 .piece.left {
+.diagram.over_50 .piece.left {
     transform: rotate(180deg);
 }
-.diagram.over_50 .piece.right, .diagram.over_100 .piece.left, .diagram.over_150 .piece.right {
+.diagram.over_50 .piece.right, .diagram.over_100 .piece.left {
     transform: rotate(360deg);
+}
+.diagram.over_150 .piece.left, .diagram.over_100 .piece.right {
+    transform: rotate(540deg);
+}
+.diagram.over_150 .piece.right {
+    transform: rotate(720deg);
 }
 .diagram.over_50 .left::before {
     background: var(--neon-border-color);

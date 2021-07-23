@@ -8,7 +8,7 @@ export default class RoundProgressBar extends React.Component{
         setTimeout(() => {
             document.querySelectorAll('.diagram').forEach((box, i) => {
                 setTimeout(() => {
-                    let deg = (360 * box.dataset.percent / 100) + 180;
+                    let deg = (360 * (box.dataset.percent > 200 ? 200 : box.dataset.percent) / 100) + 180;
                     box.classList.add('shown');
                     setTimeout(() => {
                         if (box.dataset.percent > 150) {
@@ -28,6 +28,7 @@ export default class RoundProgressBar extends React.Component{
             });
         }, 50);
     }
+    
 
     render(){
         if (this.props.last === 'true') this.progressView();
