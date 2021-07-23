@@ -6,7 +6,7 @@ import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';
 
-// import RoundProgressBar from '../RoundProgressBar';
+import Charts from '../Charts';
 
 export default class Home extends React.Component{
     gameChoice = () => {
@@ -77,6 +77,8 @@ export default class Home extends React.Component{
                     </React.Fragment>
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
+
+                <Charts />
 {/* 
                 <RoundProgressBar perc="15" />
                 <RoundProgressBar perc="43" />
