@@ -6,7 +6,7 @@ import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';
 
-// import RoundProgressBar from '../RoundProgressBar';
+import Charts from '../Charts';
 
 export default class Home extends React.Component{
     gameChoice = () => {
@@ -49,6 +49,7 @@ export default class Home extends React.Component{
 
     render(){
         let acc = new Acc(this.props.setAppState);
+
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated">
                 <LangBtn />
@@ -77,6 +78,11 @@ export default class Home extends React.Component{
                     </React.Fragment>
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
+
+                <Charts 
+                data={window.loft.chart} 
+                font="1.4vh Federo"
+                />
 {/* 
                 <RoundProgressBar perc="15" />
                 <RoundProgressBar perc="43" />
