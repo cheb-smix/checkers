@@ -234,7 +234,7 @@ export default class Fanfara extends React.Component {
                 tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
             />);
 
-            let hopsPerStep = Math.round(stat.hops * 100 / stat.steps) / 100;
+            let hopsPerStep = Math.pround(stat.hops / stat.steps, 2);
             let hopsPerStep2 = window.loft.serverInfo.gameavgstat.hops / window.loft.serverInfo.gameavgstat.steps;
 
             sdiff = stat.hops / stat.steps - hopsPerStep2;
@@ -272,7 +272,7 @@ export default class Fanfara extends React.Component {
                 tooltip={sdiff >= 1 ? Lang("gameStatCompareText").replace("$", sdiff) : (sdiff + 100) + '%'}
             />);
 
-            let killLossCoeff = Math.round(stat.kills * 100 / stat.losses) / 100;
+            let killLossCoeff = Math.pround(stat.kills / stat.losses, 2);
             let killLossCoeff2 = window.loft.serverInfo.gameavgstat.kills / window.loft.serverInfo.gameavgstat.losses;
             sdiff = stat.kills / stat.losses - killLossCoeff2;
             sdiff = Math.round(100 * sdiff / killLossCoeff2);

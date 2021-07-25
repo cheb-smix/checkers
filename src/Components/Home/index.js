@@ -49,6 +49,7 @@ export default class Home extends React.Component{
 
     render(){
         let acc = new Acc(this.props.setAppState);
+
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated">
                 <LangBtn />
@@ -78,7 +79,10 @@ export default class Home extends React.Component{
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
 
-                <Charts />
+                <Charts 
+                data={window.loft.chart} 
+                font="1.4vh Federo"
+                />
 {/* 
                 <RoundProgressBar perc="15" />
                 <RoundProgressBar perc="43" />
