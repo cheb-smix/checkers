@@ -21,8 +21,11 @@ export default class Charts extends React.Component {
         "Steps": {1: 0.15, 2: 0.2, 3: 0.8, 4: 0.9, 5: 0.5, 6: 0.2, 7: 0.05, 8: 0.1},
     };
     font = this.props.font ? this.props.font : '1vh Federo';
+    dots = this.props.dots ? this.props.dots : 'true';
 
-    init = () => {        
+    init = () => {       
+        // this.data = {TMP: this.data["WLR"]};
+        
         let canvas = document.getElementById('canvas'); 
         let ctx = canvas.getContext('2d');
 
@@ -111,12 +114,14 @@ export default class Charts extends React.Component {
             }
 
             ctx.strokeStyle = this.colors[c]; 
+            ctx.fillStyle = this.colors[c];
             ctx.lineWidth = 2.0; 
             ctx.beginPath();
 
             let x = this.xmin + widthInc / 2;
             let y = this.ymax + heightInc + (1 - (this.data[c][0] / (Math.abs(min) + Math.abs(max)))) * (h - this.ymax * 2 - heightInc);
             ctx.moveTo(x, y); 
+            if (this.dots === 'true') ctx.fillRect(x - 2, y - 2, 5, 5);
 
             let c1 = {x: x, y: y};
             let c2 = {x: x + widthInc, y: this.ymax + heightInc + (1 - (this.data[c][1] / (Math.abs(min) + Math.abs(max)))) * (h - this.ymax * 2 - heightInc)};
@@ -127,7 +132,7 @@ export default class Charts extends React.Component {
             for (let k = 0; k < this.data[c].length; k++) {
                 if (k === 0) continue;
                 x += widthInc;
-                y = this.ymax + (heightInc / 2) + (1 - (this.data[c][k] / (Math.abs(min) + Math.abs(max)))) * (h - this.ymax * 2 - heightInc / 2);
+                y = this.ymax + heightInc + (1 - (this.data[c][k] / (Math.abs(min) + Math.abs(max)))) * (h - this.ymax * 2 - heightInc);
                 
                 ctx.bezierCurveTo(b.n1.x, b.n1.y, b.n2.x, b.n2.y, x, y);
 
@@ -137,30 +142,28 @@ export default class Charts extends React.Component {
 
                 if (c2) b = Math.findBezier(b.n2, c1, c2, c3);
 
-                // ctx.fillRect(x - 1, y - 1, 3, 3);
+                if (this.dots === 'true') ctx.fillRect(x - 2, y - 2, 5, 5);
             }
             ctx.stroke(); 
         }
 
-        let lineHeight = 1.3;
-
         ctx.fillStyle = this.bgColor;
-        ctx.fillRect(this.xmax - widthInc * 1.3, this.ymax / 2, widthInc * 1.3 + this.xmin / 2, heightInc * lineHeight * LLegend.length);
+        ctx.fillRect(this.xmax - widthInc * 1.3, this.ymax / 2, widthInc * 1.3 + this.xmin / 2, heightInc * 0.95 * LLegend.length);
         ctx.strokeStyle = this.legendColor;
         ctx.lineWidth = 2.0; 
-        ctx.strokeRect(this.xmax - widthInc * 1.3, this.ymax / 2, widthInc * 1.3 + this.xmin / 2, heightInc * lineHeight * LLegend.length);
+        ctx.strokeRect(this.xmax - widthInc * 1.3, this.ymax / 2, widthInc * 1.3 + this.xmin / 2, heightInc * 0.95 * LLegend.length);
 
-        for (let i in LLegend) {
-            let y = this.ymax / 2 + (heightInc * (i + 1)) * (lineHeight / 2) - Math.abs(lineHeight * 10 / 3);
+        for (let i = 0; i < LLegend.length; i++) {
+            let y = this.ymax / 4 + (heightInc * (i + 1)) * 0.8;
             let x = this.xmax - widthInc * 1.2;
 
             ctx.fillStyle = this.colors[i];
-            ctx.fillRect(x, y, Math.abs(lineHeight * 10 / 2), Math.abs(lineHeight * 10 / 2));
+            ctx.fillRect(x, y, Math.abs(heightInc / 4), Math.abs(heightInc / 4));
 
             ctx.textAlign = "start";
             ctx.fillStyle = 'white';//this.legendColor;  
             let text = LLegend[i].length > 18 ? LLegend[i].substr(0, 17) + '..' : LLegend[i];
-            ctx.fillText(text, x + 10, y + heightInc * (lineHeight / 4)); 
+            ctx.fillText(text, x + 10, y + heightInc / 4); 
         }
     }
 

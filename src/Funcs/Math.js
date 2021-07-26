@@ -66,7 +66,7 @@ Math.findBezier = (b0 = null, c1, c2, c3 = null) => {
     let y1 = c1.y;
     let x2 = c2.x;
     let y2 = c2.y;
-    let half = (c2.x - c1.x) / 2;
+    // let half = (c2.x - c1.x) / 2;
 
     if (b0) {
         x1 = c1.x + (c1.x - b0.x);
@@ -82,24 +82,30 @@ Math.findBezier = (b0 = null, c1, c2, c3 = null) => {
     }
 
     if (c3) {
-        let koef = Math.coefficient(c3.y - c2.y, c2.y - c1.y);
+        // let koef = Math.coefficient(c3.y - c2.y, c2.y - c1.y);
 
-        x2 = c2.x;
+        x2 = c1.x + (c2.x - c1.x) / 2;
         y2 = c2.y;
 
-        if (koef <= 0) {
-            koef = 0;
-            x2 = c2.x  - half * (1 - koef);
-        } else if (koef > 1) {
-            koef = 1;
-            y2 = c2.y + half * koef;
-        } else if (koef === 1) {
-            y2 = c2.y + half * koef;
-            x2 = c2.x - half * koef;
-        } else {
-            x2 = c2.x - half * (1 - koef);
-            y2 = c2.y - Math.abs(c2.y - c1.y) / 2 * koef;
-        }
+        // console.log(c1, c2, c3);
+
+        // if (koef <= 0) {
+        //     koef = 0;
+        //     x2 = c2.x  - half * (1 - koef);
+        // } else if (koef > 1) {
+        //     koef = 1;
+        //     y2 = c2.y + half * koef;
+        // } else if (koef === 1) {
+        //     y2 = c2.y + half * koef;
+        //     x2 = c2.x - half * koef;
+        // } else {
+        //     x2 = c2.x - half * (1 - koef);
+        //     y2 = c2.y - Math.abs(c2.y - c1.y) / 2 * koef;
+        // }
+
+        y2 = ((x2 - c2.x) * (c3.y - c2.y) / (c3.x - c2.y)) + c2.y;
+
+        // console.log(x2, y2);
         
     }
 
