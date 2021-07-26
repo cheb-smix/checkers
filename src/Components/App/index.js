@@ -444,6 +444,13 @@ export default class App extends React.Component {
                     if (!res.success) {
                         alert(res.errors.shift());
                     } else {
+                        if (React.isset(res.chartData) && !React.empty(res.chartData)) {
+                            for (let k in res.chartData) {
+                                for (let d in res.chartData[k]) {
+                                    window.loft.chart[k][d] = res.chartData[k][d];
+                                }
+                            }
+                        }
                         if (React.isset(res.botstep) && !React.empty(res.botstep)) {
                             if (React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
                                 this.setStateUpdate({ botStepBuffer: res.botstep });
