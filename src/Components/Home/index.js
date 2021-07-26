@@ -81,7 +81,9 @@ export default class Home extends React.Component{
 
                 <Charts 
                 data={window.loft.chart} 
+                colors={['#f40', 'green', '#08f', '#eeff00']}
                 font="1.4vh Federo"
+                dots="false"
                 />
 {/* 
                 <RoundProgressBar perc="15" />
