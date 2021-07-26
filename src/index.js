@@ -145,7 +145,7 @@ async function checkConnection()
         window.loft.settings.set("user_info", res.user_info);
         window.loft.settings.set("serverInfo", res.serverInfo);
 
-        window.loft.chart = await postData({url: window.loft.apiserver + "chart-data"});
+        window.loft.chart = await postData({url: window.loft.apiserver + "chart-data/checkers?partial=0"});
 
     } else {
         let localsetts = ["config", "user_info", "serverInfo"]

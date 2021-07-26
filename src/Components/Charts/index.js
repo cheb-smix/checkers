@@ -2,7 +2,7 @@ import "./index.css";
 import React from 'react';
 
 export default class Charts extends React.Component {
-    height = this.props.height ? this.props.height : '10vh';
+    height = this.props.height ? this.props.height : '15vh';
     legendColor = this.props.legendColor ? this.props.legendColor : '#1e6899';
     bgColor  = this.props.bgColor ? this.props.bgColor : '#053352';
     padding  = this.props.padding ? this.props.padding : '10% 5%';
@@ -23,6 +23,8 @@ export default class Charts extends React.Component {
     font = this.props.font ? this.props.font : '1vh Federo';
     dots = this.props.dots ? this.props.dots : 'true';
 
+    inited = false;
+
     init = () => {       
         // this.data = {TMP: this.data["WLR"]};
         
@@ -35,6 +37,8 @@ export default class Charts extends React.Component {
         canvas.setAttribute('height', height);
         let w = parseInt(width);
         let h = parseInt(height);
+
+        console.log(this.padding);
 
         this.padding = this.padding.split(' ');
         this.ymax = h * parseInt(this.padding[0]) / 100;
@@ -168,10 +172,13 @@ export default class Charts extends React.Component {
     }
 
     render(){
-        setTimeout(this.init, 100);
+        if (!this.inited) {
+            this.inited = true;
+            setTimeout(this.init, 100);
+        }
         return (
             <React.Fragment>
-                <canvas id="canvas" style={{height: this.props.height}}></canvas>
+                <canvas id="canvas" style={{height: this.height}}></canvas>
             </React.Fragment>
         );
     }

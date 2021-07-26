@@ -4,6 +4,7 @@ import Button from '../Button';
 import "./fanfara.css";
 import Noise from '../../Funcs/Noise';
 import RoundProgressBar from '../RoundProgressBar';
+import Charts from '../Charts';
 
 export default class Fanfara extends React.Component {
 
@@ -321,6 +322,12 @@ export default class Fanfara extends React.Component {
         return (
             <div className={"status" + playerInfo.status} id="fanfara"><br />
                 <h3>{header}{playerInfo.user.display_name ? ', ' + playerInfo.user.display_name : ''}</h3>
+                <Charts 
+                data={window.loft.chart} 
+                colors={['#f40', 'green', '#08f', '#eeff00']}
+                font="1.4vh Federo"
+                dots="false"
+                />
                 {stattext}
             </div>
         );
