@@ -94,5 +94,5 @@ React.isset = (variable) => {
 }
 
 React.empty = (variable) => {
-    return (variable === '' || !variable || !variable.length || !Object.keys(variable).length);
+    return (variable === '' || !variable || !Object.keys(variable).length);
 }
