@@ -10,8 +10,7 @@ export default class Fanfara extends React.Component {
 
 
     state = {
-        animated: false,
-        chart: false,
+        initiated: this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME,
     }
 
     calcExpForLevel = (LVL = 1) => {
@@ -20,9 +19,9 @@ export default class Fanfara extends React.Component {
     }
 
     animate = () => {
-        if (this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME || this.state.animated) return;
+        // if (this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME || this.state.animated) return;
 
-        this.setState({ animated: true, chart: true});
+        // this.setState({ animated: true, chart: true});
 
         // let pdiv = document.querySelector(".progress");
 
@@ -324,23 +323,26 @@ export default class Fanfara extends React.Component {
             // stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{(stat.points < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(stat.points))}</p>);
             stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{podtext}</p>);
             stattext.push(buttons);
-        }       
+        }    
+        
+        if (noise) Noise(noise);
     
-        if (noise && React.isset(playerInfo.statistics)) {
-            let { statistics: s } = playerInfo;
+        // if (noise && React.isset(playerInfo.statistics)) {
+        //     let { statistics: s } = playerInfo;
 
-            let startexp = this.calcExpForLevel(s.level);
-            let endexp = this.calcExpForLevel(s.level + 1);
+        //     let startexp = this.calcExpForLevel(s.level);
+        //     let endexp = this.calcExpForLevel(s.level + 1);
 
-            let progress = Math.percent(s.experience - startexp, endexp - startexp);
-            let left = 50 - parseInt(progress, 10) / 2;
-            if (this.state.animated === false) setTimeout(() => { this.animate() }, 1000);
-            // stattext.unshift(<div key={stattext.length} className="exp">
-            //     <div className="progress" style={{ width: progress, left: left + "%" }}>{s.experience}</div>
-            //     <table className="stable" style={{ padding: "0px" }}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
-            // </div>);
-            Noise(noise);
-        }
+        //     let progress = Math.percent(s.experience - startexp, endexp - startexp);
+        //     let left = 50 - parseInt(progress, 10) / 2;
+        //     if (this.state.animated === false) setTimeout(() => { this.animate() }, 100);
+        //     stattext.unshift(<div key={stattext.length} className="exp">
+        //         <div className="progress" style={{ width: progress, left: left + "%" }}>{s.experience}</div>
+        //         <table className="stable" style={{ padding: "0px" }}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
+        //     </div>);
+        //     Noise(noise);
+        // }
+        
         return (
             <div className={"status" + playerInfo.status} id="fanfara"><br />
                 <h3>{header}{playerInfo.user.display_name ? ', ' + playerInfo.user.display_name : ''}</h3>
@@ -350,7 +352,7 @@ export default class Fanfara extends React.Component {
                 colors={['#f40', 'green', '#08f', '#eeff00']}
                 font="1.4vh Federo"
                 dots="false"
-                chart={this.state.chart}
+                chart={this.state.initiated}
                 /> : '' }
                 {stattext}
             </div>

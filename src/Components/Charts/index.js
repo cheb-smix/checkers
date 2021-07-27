@@ -178,9 +178,7 @@ export default class Charts extends React.Component {
             setTimeout(this.init, 300);
         }
         return (
-            <React.Fragment>
-                <canvas id="canvas" style={{height: this.height}}></canvas>
-            </React.Fragment>
+            <canvas id="canvas" style={{height: this.height}}></canvas>
         );
     }
 }

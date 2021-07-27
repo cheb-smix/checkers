@@ -156,6 +156,8 @@ async function checkConnection()
                 }
             }
 
+            
+
             window.loft.settings.set("chart", res.chart, 3600 * 20);
         }
 
