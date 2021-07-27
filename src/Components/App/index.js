@@ -444,10 +444,10 @@ export default class App extends React.Component {
                     if (!res.success) {
                         alert(res.errors.shift());
                     } else {
-                        if (React.isset(res.chartData) && !React.empty(res.chartData)) {
-                            for (let k in res.chartData) {
-                                for (let d in res.chartData[k]) {
-                                    window.loft.chart[k][d] = res.chartData[k][d];
+                        if (React.isset(res.chart) && !React.empty(res.chart)) {
+                            for (let k in res.chart) {
+                                for (let d in res.chart[k]) {
+                                    window.loft.chart[k][d] = res.chart[k][d];
                                 }
                             }
                         }

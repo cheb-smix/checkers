@@ -2,8 +2,18 @@
     --dia-size: 30vw;
     --dia-marging: 1vw;
     --dia-bord: 4%;
-    --perc-font-size: 10vw;
+    --perc-font-size: 8vw;
     --regular-font-size: 3.2vw;
+}
+
+.greendiagram, .greendiagram .piece:before {
+    background: #0f0 !important;
+}
+.greendiagram .text span {
+    color: #0f0 !important;
+}
+.diagram.hugetext .text b {
+    font-size: calc(var(--perc-font-size) - 2vw);
 }
 
 .diagram {

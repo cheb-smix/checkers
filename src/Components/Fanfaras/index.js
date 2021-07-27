@@ -10,96 +10,95 @@ export default class Fanfara extends React.Component {
 
 
     state = {
-        animated: false
+        animated: false,
+        chart: false,
     }
 
     calcExpForLevel = (LVL = 1) => {
-        return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
+        return LVL > 1 ? Math.floor((window.loft.config.MLTPLR + LVL) * LVL ) : 0;
+        //return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
     }
 
     animate = () => {
         if (this.props.playerInfo.status === window.loft.constants.STATUS_IN_GAME || this.state.animated) return;
 
-        this.setState({ animated: true });
+        this.setState({ animated: true, chart: true});
 
-        let pdiv = document.querySelector(".progress");
+        // let pdiv = document.querySelector(".progress");
 
-        // this.props.playerInfo.lastGameStat.points += 200;
-        // this.props.playerInfo.lastGameStat.level += 2;
+        // let {lastGameStat: stat} = this.props.playerInfo;
 
-        let {lastGameStat: stat} = this.props.playerInfo;
-
-        let newEXP = this.props.playerInfo.statistics.experience + stat.points;
-        let expDIF = stat.points;
-        let newLVL = stat.level;
-        let curLVL = this.props.playerInfo.statistics.level;
-        let lvlDIF = stat.level - this.props.playerInfo.statistics.level;
-        let lvlAnimationInterval = 600;
-        let lvlAnimationTtlTime = lvlAnimationInterval * lvlDIF;
-        let cntEXP = this.props.playerInfo.statistics.experience;
+        // let newEXP = this.props.playerInfo.statistics.experience + stat.points;
+        // let expDIF = stat.points;
+        // let newLVL = stat.level;
+        // let curLVL = this.props.playerInfo.statistics.level;
+        // let lvlDIF = stat.level - this.props.playerInfo.statistics.level;
+        // let lvlAnimationInterval = 600;
+        // let lvlAnimationTtlTime = lvlAnimationInterval * lvlDIF;
+        // let cntEXP = this.props.playerInfo.statistics.experience;
 
         
-        if (lvlDIF > 0) {
+        // if (lvlDIF > 0) {
 
-            let t = setInterval(() => {}, 1000);
-            clearInterval(t);
+        //     let t = setInterval(() => {}, 1000);
+        //     clearInterval(t);
 
-            setTimeout(() => {
-                t = setInterval(() => {
-                    pdiv.innerHTML = cntEXP;
-                    cntEXP++;
-                    if (cntEXP === newEXP) {
-                        pdiv.innerHTML = newEXP;
-                        clearInterval(t);
-                    }
-                }, lvlAnimationTtlTime / expDIF);
-            }, lvlAnimationInterval);
+        //     setTimeout(() => {
+        //         t = setInterval(() => {
+        //             pdiv.innerHTML = cntEXP;
+        //             cntEXP++;
+        //             if (cntEXP === newEXP) {
+        //                 pdiv.innerHTML = newEXP;
+        //                 clearInterval(t);
+        //             }
+        //         }, lvlAnimationTtlTime / expDIF);
+        //     }, lvlAnimationInterval);
 
-            let s = setInterval(() => {
-                if (lvlDIF > 0) {
-                    pdiv.style.transition = "all 0.5s ease";
-                    pdiv.style.width = "100%";
-                    pdiv.style.left = "0%";
-                    lvlDIF--;
-                    curLVL++;
-                    document.querySelector(".exp").className = 'exp animate__tada';
-                    setTimeout(() => {
-                        let startexp = this.calcExpForLevel(curLVL);
-                        let endexp = this.calcExpForLevel(curLVL + 1);
-                        document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
-                        document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
-                        document.querySelector(".exp").classList.toggle('animate__animated');
-                        pdiv.style.transition = "none";
-                        pdiv.style.width = "0%";
-                        pdiv.style.left = "50%";
-                        setTimeout(() => {
-                            pdiv.style.transition = "all 0.5s ease";
-                        }, 30);
-                    }, lvlAnimationInterval / 6 * 5);
-                } else {
-                    let startexp = this.calcExpForLevel(newLVL);
-                    let endexp = this.calcExpForLevel(newLVL + 1);
-                    let progress = Math.percent(newEXP - startexp, endexp - startexp);
-                    pdiv.style.width = progress;
-                    pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
-                    this.props.rampage(0, "NEW LEVEL " + newLVL + "!");
-                    pdiv.innerHTML = newEXP;
-                    clearInterval(s);
-                    clearInterval(t);
-                    // this.props.updatePI();
-                }
-            }, lvlAnimationInterval)
-        } else {
-            let startexp = this.calcExpForLevel(curLVL);
-            let endexp = this.calcExpForLevel(curLVL + 1);
-            let progress = Math.percent(newEXP - startexp, endexp - startexp);
-            pdiv.style.transition = "all 0.5s ease";
-            pdiv.style.width = progress;
-            pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
-            pdiv.innerHTML = newEXP;
-            // this.props.updatePI();
-        }
-        //this.props.showBestMove();
+        //     let s = setInterval(() => {
+        //         if (lvlDIF > 0) {
+        //             pdiv.style.transition = "all 0.5s ease";
+        //             pdiv.style.width = "100%";
+        //             pdiv.style.left = "0%";
+        //             lvlDIF--;
+        //             curLVL++;
+        //             document.querySelector(".exp").className = 'exp animate__tada';
+        //             setTimeout(() => {
+        //                 let startexp = this.calcExpForLevel(curLVL);
+        //                 let endexp = this.calcExpForLevel(curLVL + 1);
+        //                 document.querySelector(".stable td:nth-child(1)").innerHTML = startexp;
+        //                 document.querySelector(".stable td:nth-child(2)").innerHTML = endexp;
+        //                 document.querySelector(".exp").classList.toggle('animate__animated');
+        //                 pdiv.style.transition = "none";
+        //                 pdiv.style.width = "0%";
+        //                 pdiv.style.left = "50%";
+        //                 setTimeout(() => {
+        //                     pdiv.style.transition = "all 0.5s ease";
+        //                 }, 30);
+        //             }, lvlAnimationInterval / 6 * 5);
+        //         } else {
+        //             let startexp = this.calcExpForLevel(newLVL);
+        //             let endexp = this.calcExpForLevel(newLVL + 1);
+        //             let progress = Math.percent(newEXP - startexp, endexp - startexp);
+        //             pdiv.style.width = progress;
+        //             pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
+        //             this.props.rampage(0, "NEW LEVEL " + newLVL + "!");
+        //             pdiv.innerHTML = newEXP;
+        //             clearInterval(s);
+        //             clearInterval(t);
+        //             // this.props.updatePI();
+        //         }
+        //     }, lvlAnimationInterval)
+        // } else {
+        //     let startexp = this.calcExpForLevel(curLVL);
+        //     let endexp = this.calcExpForLevel(curLVL + 1);
+        //     let progress = Math.percent(newEXP - startexp, endexp - startexp);
+        //     pdiv.style.transition = "all 0.5s ease";
+        //     pdiv.style.width = progress;
+        //     pdiv.style.left = (50 - parseInt(progress, 10) / 2) + "%";
+        //     pdiv.innerHTML = newEXP;
+        //     // this.props.updatePI();
+        // }
+        // //this.props.showBestMove();
     }
 
     componentDidMount = () => {
@@ -198,6 +197,29 @@ export default class Fanfara extends React.Component {
         let {lastGameStat: stat} = this.props.playerInfo;
         let stattext = [];
 
+        if (stat.points) {
+            let nextLevelPoint = this.calcExpForLevel(this.props.playerInfo.statistics.level + 1);
+            let sdiff = nextLevelPoint - this.props.playerInfo.statistics.experience + stat.points;
+            sdiff = Math.round(100 * sdiff / nextLevelPoint);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={this.props.playerInfo.statistics.experience + stat.points} 
+                text={Lang("pointsStatText").replace("$", stat.points)} 
+                tooltip={Lang("youveGotExpirience").replace("$", stat.points)}
+            />);
+
+            stattext.push(<RoundProgressBar 
+                key={stattext.length} 
+                perc={sdiff + 100} 
+                num={stat.level} 
+                text={stat.level > this.props.playerInfo.statistics.level ? Lang("newLevelText") : Lang("levelText")} 
+                tooltip={stat.level > this.props.playerInfo.statistics.level ? Lang("newLevelText") : Lang("levelText")}
+                forceColor="#cf0"
+            />);
+        }
+
         if (stat.time) {
             let sdiff = window.loft.serverInfo.gameavgstat.time - stat.time;
             sdiff = Math.round(100 * sdiff / window.loft.serverInfo.gameavgstat.time);
@@ -290,16 +312,16 @@ export default class Fanfara extends React.Component {
         if (stat.coins) {
             stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
         }
-        if (stat.level > this.props.playerInfo.statistics.level) {
-            stattext.push(<p key={stattext.length} className="fanp yellow">{Lang("newLevelText").replace("$", stat.level)}</p>);
-        }
+        // if (stat.level > this.props.playerInfo.statistics.level) {
+        //     stattext.push(<p key={stattext.length} className="fanp yellow">{Lang("newLevelText").replace("$", stat.level)}</p>);
+        // }
 
         if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status !== window.loft.constants.STATUS_DONE && playerInfo.done === 12) {
             header = Lang("congratulations");
             stattext = [<p key="0" className="fanp">{Lang("lastEnemyStep")}</p>];
             noise = "warning";
         } else {
-            stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{(stat.points < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(stat.points))}</p>);
+            // stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{(stat.points < 0 ? Lang("youveLostExpirience") : Lang("youveGotExpirience")).replace("$", Math.abs(stat.points))}</p>);
             stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{podtext}</p>);
             stattext.push(buttons);
         }       
@@ -313,21 +335,23 @@ export default class Fanfara extends React.Component {
             let progress = Math.percent(s.experience - startexp, endexp - startexp);
             let left = 50 - parseInt(progress, 10) / 2;
             if (this.state.animated === false) setTimeout(() => { this.animate() }, 1000);
-            stattext.unshift(<div key={stattext.length} className="exp">
-                <div className="progress" style={{ width: progress, left: left + "%" }}>{s.experience}</div>
-                <table className="stable" style={{ padding: "0px" }}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
-            </div>);
+            // stattext.unshift(<div key={stattext.length} className="exp">
+            //     <div className="progress" style={{ width: progress, left: left + "%" }}>{s.experience}</div>
+            //     <table className="stable" style={{ padding: "0px" }}><tbody><tr><td>{startexp}</td><td>{endexp}</td></tr></tbody></table>
+            // </div>);
             Noise(noise);
         }
         return (
             <div className={"status" + playerInfo.status} id="fanfara"><br />
                 <h3>{header}{playerInfo.user.display_name ? ', ' + playerInfo.user.display_name : ''}</h3>
+                { Object.keys(window.loft.chart).length > 0 ? 
                 <Charts 
                 data={window.loft.chart} 
                 colors={['#f40', 'green', '#08f', '#eeff00']}
                 font="1.4vh Federo"
                 dots="false"
-                />
+                chart={this.state.chart}
+                /> : '' }
                 {stattext}
             </div>
         );

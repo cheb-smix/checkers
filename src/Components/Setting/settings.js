@@ -79,15 +79,23 @@ export default class Settings {
     }
 
     get = (key = '') => {
-        return localStorage.getItem(key);
+        let item = JSON.parse(localStorage.getItem(key));
+        if (item) {
+            if (!item.expiry || item.expiry > new Date().getTime()) {
+                return item.value;
+            } else {
+                localStorage.removeItem(key);
+            }
+        }
+        return null;
     }
 
-    set = (key, value = '') => {
+    set = (key, value = '', expiry = 0) => {
+        let item = {value: value, expiry: new Date().getTime() + expiry * 1000};
         if (value === "") {
             localStorage.removeItem(key);
         } else {
-            if (typeof(value) === 'object') value = JSON.stringify(value);
-            localStorage.setItem(key, value);
+            localStorage.setItem(key, JSON.stringify(item));
         }
     }
 }
