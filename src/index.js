@@ -12,6 +12,8 @@ import postData from './Funcs/PostDataFuncs';
 import './Funcs/Math';
 import { Localization } from './Components/Localization';
 
+// localStorage.clear();
+
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
     apiserver: "https://smix-soft.ru/api/v2/game/",
@@ -141,18 +143,27 @@ async function checkConnection()
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;
-        window.loft.settings.set("config", res.config);
-        window.loft.settings.set("user_info", res.user_info);
-        window.loft.settings.set("serverInfo", res.serverInfo);
 
-        window.loft.chart = await postData({url: window.loft.apiserver + "chart-data/checkers?partial=0"});
+        window.loft.settings.set("config", res.config, 3600 * 24 * 3);
+        window.loft.settings.set("user_info", res.user_info, 3600 * 24);
+        window.loft.settings.set("serverInfo", res.serverInfo, 360);
+
+        if (!React.empty(res.chart)) {
+            for (let k in res.chart) {
+                if (!React.isset(window.loft.chart[k])) window.loft.chart[k] = {};
+                for (let d in res.chart[k]) {
+                    window.loft.chart[k][d] = res.chart[k][d];
+                }
+            }
+
+            window.loft.settings.set("chart", res.chart, 3600 * 20);
+        }
 
     } else {
-        let localsetts = ["config", "user_info", "serverInfo"]
+        let localsetts = ["config", "user_info", "serverInfo", "chart"];
         for (let i in localsetts) {
             let ls = window.loft.settings.get(localsetts[i]);
             if (ls) {
-                ls = JSON.parse(ls);
                 for (let k in ls) window.loft[localsetts[i]][k] = ls[k];
             }
         }
@@ -238,10 +249,10 @@ function onResume()
 //     return result.reverse().join(":");
 // }
 
-React.isset = (variable) => {
-    return typeof(variable) !== 'undefined';
-} 
+// React.isset = (variable) => {
+//     return typeof(variable) !== 'undefined';
+// } 
 
-React.empty = (variable) => {
-    return (variable === '' || !variable || !variable.length || !Object.keys(variable).length);
-}
+// React.empty = (variable) => {
+//     return (variable === '' || !variable || !variable.length || !Object.keys(variable).length);
+// }

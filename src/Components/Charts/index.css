@@ -1,3 +1,6 @@
 #canvas {
     width: 100%;
+    transform-style: flat;
+    transform: perspective(900px) rotate3d(100,0,0,90deg) scale(0.5);
+    transition: transform 0.3s ease;
 }

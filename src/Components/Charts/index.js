@@ -15,14 +15,16 @@ export default class Charts extends React.Component {
     colors = this.props.colors ? this.props.colors : [
         "red", "blue", "green"
     ];
-    data = this.props.data ? this.props.data : {
+    data = this.props.data ? this.props.data : {};
+    /*{
         "Kills-Losses Ratio": {1: 0.25, 2: 0.5, 3: 0.75, 4: 0.88, 5: 0.45, 6: 0.66, 7: 0.45, 8: 0.99},
         "Wins-Failes Radio": {1: 0.35, 2: 0.12, 3: 0.7, 4: 0.8, 5: 0.5, 6: 0.6, 7: 0.1, 8: 0.1},
         "Steps": {1: 0.15, 2: 0.2, 3: 0.8, 4: 0.9, 5: 0.5, 6: 0.2, 7: 0.05, 8: 0.1},
-    };
+    };*/
     font = this.props.font ? this.props.font : '1vh Federo';
     dots = this.props.dots ? this.props.dots : 'true';
 
+    chart = this.props.chart ? this.props.chart : true;
     inited = false;
 
     init = () => {       
@@ -35,10 +37,9 @@ export default class Charts extends React.Component {
         let height = window.getComputedStyle(canvas).getPropertyValue('height');
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
+        canvas.style.transform = 'perspective(900px) rotate3d(100, 0, 0, 0deg) scale(1)';
         let w = parseInt(width);
         let h = parseInt(height);
-
-        console.log(this.padding);
 
         this.padding = this.padding.split(' ');
         this.ymax = h * parseInt(this.padding[0]) / 100;
@@ -172,9 +173,9 @@ export default class Charts extends React.Component {
     }
 
     render(){
-        if (!this.inited) {
+        if (!React.empty(this.data) && this.chart && !this.inited) {
             this.inited = true;
-            setTimeout(this.init, 100);
+            setTimeout(this.init, 300);
         }
         return (
             <React.Fragment>
