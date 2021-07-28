@@ -62,6 +62,8 @@ input[type=text]:focus{
 #root{
     margin: 0px;
     padding: 0px;
+    padding-top: 3.5em;
+    height: 100vh;
 }
 
 /* BOOTSTRAP */
