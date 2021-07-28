@@ -12,8 +12,6 @@ import postData from './Funcs/PostDataFuncs';
 import './Funcs/Math';
 import { Localization } from './Components/Localization';
 
-// localStorage.clear();
-
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
     apiserver: "https://smix-soft.ru/api/v2/game/",

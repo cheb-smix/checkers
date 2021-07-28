@@ -6,8 +6,6 @@ import Droplist from '../Droplist';
 import Acc from '../../Funcs/Acc';
 import './home.css';
 
-import Charts from '../Charts';
-
 export default class Home extends React.Component{
     gameChoice = () => {
         if (window.gvar.length < 2) return;
@@ -79,12 +77,12 @@ export default class Home extends React.Component{
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
 
-                <Charts 
+                {/* <Charts 
                 data={window.loft.chart} 
                 colors={['#f40', 'green', '#08f', '#eeff00']}
                 font="1.4vh Federo"
                 dots="false"
-                />
+                /> */}
 {/* 
                 <RoundProgressBar perc="15" />
                 <RoundProgressBar perc="43" />
