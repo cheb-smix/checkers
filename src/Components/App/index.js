@@ -410,7 +410,7 @@ export default class App extends React.Component {
                     this.iiStep(color);
                 } else {
                     if (this.state.cells[res.botstep.from].color === color && React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
-                        this.doStep(res.botstep.to, res.botstep.from, true, false);
+                        this.doStep(res.botstep.to, res.botstep.from, true, false, true);
                     } else {
                         this.iiStep(color);
                     }
@@ -419,7 +419,7 @@ export default class App extends React.Component {
         });
     }
 
-    saveStepResults = (koordsto, koordsfrom, write) => { /// write у бота не всегда false
+    saveStepResults = (koordsto, koordsfrom, botstep) => {
         let { cells } = this.state;
         if (this.state.game_id) {
             let kills = [];
@@ -437,7 +437,7 @@ export default class App extends React.Component {
                     kills: kills.join('-'),
                     path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
                     game_id: this.state.game_id,
-                    write: write,
+                    botstep: botstep,
                 },
 
                 success: (res) => {
@@ -664,8 +664,10 @@ export default class App extends React.Component {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true) => {
-        if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, write);
+    doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true, botstep = false) => {
+        if (write) {
+            if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, botstep);
+        }
 
         if (window.loft.usersettings.animation === '0') {
             this.theStep(koordsto, koordsfrom, newPlayersStep);
@@ -795,7 +797,7 @@ export default class App extends React.Component {
 
                 if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
                     if (this.state.botStepBuffer && React.isset(this.state.botStepBuffer.from)) {
-                        this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false);
+                        this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false, true);
                         this.setStateUpdate({ botStepBuffer: null });
                     } else if (this.state.botStepBuffer === null) {
                         this.iiStep(color);
