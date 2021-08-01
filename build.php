@@ -166,6 +166,10 @@ if (isset($argumentos["app"])) {
 echo "NOW YOU CAN SIMULATE YOUR APP USING FOLLOWING CMD:\n";
 echo "simulate --device=Nexus10 --dir=$cordova_workfolder --target=opera\n\n";
 
+if (isset($argumentos["simulate"])) {
+    echo `simulate --device=Nexus10 --dir=$cordova_workfolder --target=opera`;
+}
+
 
 function getFolderFilesByMask($folder, $mask)
 {

@@ -17,11 +17,11 @@ export default class Checkers extends App {
     getCheckersPriority = (cells) => {
 
         for (let k in cells) {
-            if (cells[k].color) {
+            if (cells[k].color !== false) {
                 if (cells[k].damka && Math.random() < 0.3) {
                     cells[k].priority = { target: findClosestDiagonalPossition(cells[k]), level: 3 };
                 } else {
-                    if (cells[k].color === "black") {
+                    if (cells[k].color === 0) {
                         cells[k].priority = { target: findClosestColumn(cells[k].x, 8), level: 5 };
                     } else {
                         cells[k].priority = { target: findClosestColumn(cells[k].x, 1), level: 5 };
@@ -41,10 +41,10 @@ export default class Checkers extends App {
 
     regeneratePossibilities = (cells) => {
 
-        let mustEat = {
-            "black": false,
-            "white": false
-        };
+        let mustEat = [
+            false,
+            false,
+        ];
 
         for (let nkoords in cells) {
             if (cells[nkoords].checker !== false) {
@@ -78,28 +78,28 @@ export default class Checkers extends App {
             }
         }
 
-        if (mustEat.black !== false) {
+        if (mustEat[0] !== false) {
             for (let nkoords in cells) {
-                if (cells[nkoords].color === "black") {
+                if (cells[nkoords].color === 0) {
                     for (let p in cells[nkoords].possibilities) {
                         if (cells[nkoords].possibilities[p].kills.length === 0) {
                             delete cells[nkoords].possibilities[p];
                         }
                     }
                 }
-                if (nkoords === mustEat.black) break;
+                if (nkoords === mustEat[0]) break;
             }
         }
-        if (mustEat.white !== false) {
+        if (mustEat[1] !== false) {
             for (let nkoords in cells) {
-                if (cells[nkoords].color === "white") {
+                if (cells[nkoords].color === 1) {
                     for (let p in cells[nkoords].possibilities) {
                         if (cells[nkoords].possibilities[p].kills.length === 0) {
                             delete cells[nkoords].possibilities[p];
                         }
                     }
                 }
-                if (nkoords === mustEat.white) break;
+                if (nkoords === mustEat[1]) break;
             }
         }
 
@@ -171,7 +171,7 @@ export default class Checkers extends App {
 
         let pathString = possibilities[koords].path.join("|");
 
-        let damka = ((cell.color === "white" && pathString.indexOf(":1") > 0) || (cell.color === "black" && pathString.indexOf(":8") > 0) || cell.damka);
+        let damka = ((cell.color === 1 && pathString.indexOf(":1") > 0) || (cell.color === 0 && pathString.indexOf(":8") > 0) || cell.damka);
 
         for (let i = 0; i < directions.length; i++) {
 
@@ -196,7 +196,7 @@ export default class Checkers extends App {
                 let vars = this.checkTheChecker(oldcells, possibilities, x, y, directions[i], cell.color);
                 if (vars !== false) {
                     possibilities[vars.place] = {
-                        damka: ((cell.color === "white" && vars.place[2] === '1') || (cell.color === "black" && vars.place[2] === '8')),
+                        damka: ((cell.color === 1 && vars.place[2] === '1') || (cell.color === 0 && vars.place[2] === '8')),
                         kills: [...possibilities[koords].kills, vars.kill],
                         path: [...possibilities[koords].path, vars.place],
                         len: possibilities[koords].len + vars.len,
@@ -230,13 +230,13 @@ export default class Checkers extends App {
 
         if (oldcells[koords].damka !== true) {
             if (mustEat === false) {
-                if (oldcells[koords].color === "white") {
+                if (oldcells[koords].color === 1) {
                     closestCells = [
                         (x - 1) + ":" + (y - 1),//left up
                         (x + 1) + ":" + (y - 1),//right up
                     ];
                 }
-                if (oldcells[koords].color === "black") {
+                if (oldcells[koords].color === 0) {
                     closestCells = [
                         (x - 1) + ":" + (y + 1),//left down
                         (x + 1) + ":" + (y + 1),//right down
@@ -266,7 +266,7 @@ export default class Checkers extends App {
         } else {
             for (let i in closestCells) {
                 let k = closestCells[i];
-                let damka = ((oldcells[koords].color === "white" && k[2] === '1') || (oldcells[koords].color === "black" && k[2] === '8'));
+                let damka = ((oldcells[koords].color === 1 && k[2] === '1') || (oldcells[koords].color === 0 && k[2] === '8'));
                 if (typeof (oldcells[k]) !== "undefined" && oldcells[k].checker === false) possibilities[k] = {
                     damka: damka,
                     kills: [],
@@ -306,7 +306,7 @@ export default class Checkers extends App {
         if (window.loft.usersettings.difficulty > 3) {
             for (let c in iicells) {
                 for (let k in cells) {
-                    if (cells[k].color && cells[k].color !== color) {
+                    if (cells[k].color !== false && cells[k].color !== color) {
                         for (let p in cells[k].possibilities) {
                             if (cells[k].possibilities[p].path.indexOf(iicells[c].to) > 0 && cells[k].possibilities[p].kills.length > 0) {
                                 iicells[c].effectivity += cells[k].possibilities[p].effectivity;
@@ -330,7 +330,7 @@ export default class Checkers extends App {
 
             if (typeof (c.type) !== "undefined") this.rampage(0, c.type);
 
-            this.doStep(c.to, c.from, true, false);
+            this.doStep(c.to, c.from, true, true, true);
         } else {
             if (!force) {
                 this.iiStep(color, true, dbstep);
@@ -419,7 +419,7 @@ export default class Checkers extends App {
         kek = this.regeneratePossibilities(kek);
 
         for (let k in kek) {
-            if (kek[k].color && kek[k].color !== kek[possibility.to].color) {
+            if (kek[k].color !== false && kek[k].color !== kek[possibility.to].color) {
                 for (let p in kek[k].possibilities) {
                     if (watchEnemy) {
                         if (kek[k].possibilities[p].kills.indexOf(possibility.to) >= 0) {
@@ -473,19 +473,19 @@ export default class Checkers extends App {
         return iicells;
     }
 
-    countDoneCheckers = (cells, c) => {
-        let o = {
-            black: { cells: 0, done: 12, possibilities: 0 },
-            white: { cells: 0, done: 12, possibilities: 0 }
-        };
+    countDoneCheckers = (cells) => {
+        let o = [
+            { cells: 0, done: 12, possibilities: 0 },
+            { cells: 0, done: 12, possibilities: 0 }
+        ];
         for (let k in cells) {
-            if (cells[k].color) {
+            if (cells[k].color !== false) {
                 o[cells[k].color].cells++;
                 o[cells[k].color].possibilities += Object.keys(cells[k].possibilities).length;
             }
         }
-        o.black.done = 12 - o.white.cells;
-        o.white.done = 12 - o.black.cells;
+        o[0].done = 12 - o[1].cells;
+        o[1].done = 12 - o[0].cells;
         return o;
     }
 
@@ -520,11 +520,11 @@ export default class Checkers extends App {
                 if (debug) {
                     if ((y + x) % 2 === 1) {
                         if (y > 5 && y < 9) {
-                            color = "white";
+                            color = 1;
                             checker = `${color}${key}`;
                         }
                         if (y > 0 && y < 4) {
-                            color = "black";
+                            color = 0;
                             checker = `${color}${key}`;
                         }
                         if ((x === 4 && y === 3) || (x === 6 && y === 3) || (x === 5 && y === 6) || (x === 7 && y === 6) || (x === 8 && y === 7)) {
@@ -532,24 +532,24 @@ export default class Checkers extends App {
                             color = false;
                         }
                         if ((x === 1 && y === 2) || (x === 7 && y === 2)) {
-                            checker = "white" + key;
-                            color = "white";
+                            color = 1;
                             damka = true;
+                            checker = `${color}${key}`;
                         }
                         if ((x === 2 && y === 7)) {
-                            checker = "black" + key;
-                            color = "black";
+                            color = 0;
                             damka = true;
+                            checker = `${color}${key}`;
                         }
                     }
                 } else {
                     if ((y + x) % 2 === 1) {
                         if (y > 5 && y < 9) {
-                            color = "white";
+                            color = 1;
                             checker = `${color}${key}`;
                         }
                         if (y > 0 && y < 4) {
-                            color = "black";
+                            color = 0;
                             checker = `${color}${key}`;
                         }
                     }
@@ -565,36 +565,36 @@ export default class Checkers extends App {
     setTargetCells = () => {
 
         let targetCells = {
-            b: ["1:8", "2:8", "3:8", "4:8", "5:8", "6:8", "7:8", "8:8"],
-            w: ["1:1", "2:1", "3:1", "4:1", "5:1", "6:1", "7:1", "8:1"],
-            black: {},
-            white: {},
-            blackreverse: {},
-            whitereverse: {},
+            c0: ["1:8", "2:8", "3:8", "4:8", "5:8", "6:8", "7:8", "8:8"],
+            c1: ["1:1", "2:1", "3:1", "4:1", "5:1", "6:1", "7:1", "8:1"],
+            color0: {},
+            color1: {},
+            color0reverse: {},
+            color1reverse: {},
             lessPriorityCells: {}
         };
 
-        for (let i in targetCells.b) {
-            let key = targetCells.b[i];
+        for (let i in targetCells.с0) {
+            let key = targetCells.с0[i];
             let [x, y] = key.split(":");
-            targetCells.black[key] = { x: x, y: y };
+            targetCells.color0[key] = { x: x, y: y };
         }
-        targetCells.b.reverse();
-        for (let i in targetCells.b) {
-            let key = targetCells.b[i];
+        targetCells.c0.reverse();
+        for (let i in targetCells.с0) {
+            let key = targetCells.с0[i];
             let [x, y] = key.split(":");
-            targetCells.blackreverse[key] = { x: x, y: y };
+            targetCells.color0reverse[key] = { x: x, y: y };
         }
-        for (let i in targetCells.w) {
-            let key = targetCells.w[i];
+        for (let i in targetCells.с1) {
+            let key = targetCells.с1[i];
             let [x, y] = key.split(":");
-            targetCells.white[key] = { x: x, y: y };
+            targetCells.color1[key] = { x: x, y: y };
         }
-        targetCells.w.reverse();
-        for (let i in targetCells.w) {
-            let key = targetCells.w[i];
+        targetCells.c1.reverse();
+        for (let i in targetCells.с1) {
+            let key = targetCells.с1[i];
             let [x, y] = key.split(":");
-            targetCells.whitereverse[key] = { x: x, y: y };
+            targetCells.color1reverse[key] = { x: x, y: y };
         }
 
         return targetCells;

@@ -15,7 +15,7 @@ Math.diagonalEffectivity = (c1, c2, color = "any", playstage = 1) => {
     let dia1 = c1.x - c1.y;
     let dia2 = c2.x - c2.y;
     let dd = Math.abs(dia1 - dia2);
-    if ((dia1 > dia2 && color === "white") || (dia1 < dia2 && color === "black")) diagonalCorrection = -1;
+    if ((dia1 > dia2 && color === 1) || (dia1 < dia2 && color === 0)) diagonalCorrection = -1;
     if (dia1 === dia2) diagonalCorrection = playstage === 3 ? 1 : 0;
     let lessPriorityCellsCorrection = 1 / (Math.abs(4.5 - c2.x) * Math.abs(4.5 - c2.y) / 4);
     lessPriorityCellsCorrection = 1;
@@ -35,7 +35,7 @@ Math.pround = (x, p = 0) => {
 
 Math.pifagorColored = (c1, c2, color = "any") => {
     let dx = 0, dy = 0, directionCorrection = 1;
-    if (color === "black") {
+    if (color === 0) {
         dx = c1.x - c2.x;
         dy = c2.y - c1.y;
     } else {

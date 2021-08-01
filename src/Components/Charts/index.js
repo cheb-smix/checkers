@@ -100,9 +100,9 @@ export default class Charts extends React.Component {
             this.ctx.font = this.font;
             this.ctx.lineWidth = 0.1; 
             this.ctx.beginPath();
-            this.ctx.fillStyle = 'white';//this.legendColor;  
+            this.ctx.fillStyle = '#fff';//this.legendColor;  
             this.ctx.fillText(Math.pround((max - n * minmaxinc), 1), xmin - 3, y - 3); 
-            this.ctx.strokeStyle = 'white'; 
+            this.ctx.strokeStyle = '#fff'; 
             this.ctx.moveTo(xmin - 5, y); 
             this.ctx.lineTo(xmax, y);
             this.ctx.stroke(); 
@@ -114,9 +114,9 @@ export default class Charts extends React.Component {
             if (!xlabel) {
                 this.ctx.textAlign = "center";
                 this.ctx.font = this.font;
-                this.ctx.strokeStyle = 'white'; 
+                this.ctx.strokeStyle = '#fff'; 
                 this.ctx.lineWidth = 0.1; 
-                this.ctx.fillStyle = 'white';//this.legendColor; 
+                this.ctx.fillStyle = '#fff';//this.legendColor; 
                 for (let n = 0; n <= this.xsplit; n++) {
                     let x = xmin + widthInc * n;
                     this.ctx.beginPath();
@@ -176,7 +176,7 @@ export default class Charts extends React.Component {
             this.ctx.fillRect(x, y, Math.abs(heightInc / 4), Math.abs(heightInc / 4));
 
             this.ctx.textAlign = "start";
-            this.ctx.fillStyle = 'white';//this.legendColor;  
+            this.ctx.fillStyle = '#fff';//this.legendColor;  
             let text = LLegend[i].length > 18 ? LLegend[i].substr(0, 17) + '..' : LLegend[i];
             this.ctx.fillText(text, x + 10, y + heightInc / 4); 
         }
