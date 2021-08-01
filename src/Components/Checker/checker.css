@@ -9,22 +9,22 @@
     background-repeat: no-repeat;
     background-size: 110% 110%;
 }
-.black{
+.color0{
     background-image: url("./black.checker.png");
 }
-.uchecker.black.damka{
+.uchecker.color0.damka{
     background-image: url("./black.damka.png");
 }
-.uchecker.black.animated{
+.uchecker.color0.animated{
     background-image: url("./black-animated.gif");
 }
-.white{
+.color1{
     background-image: url("./white.checker.png");
 }
-.uchecker.white.damka{
+.uchecker.color1.damka{
     background-image: url("./white.damka.png");
 }
-.uchecker.white.animated{
+.uchecker.color1.animated{
     background-image: url("./white-animated.gif");
 }
 .uchecker.active{
@@ -34,7 +34,7 @@
     background-image: url("./active.damka.png");
 }
 
-.uchecker.black > i.fa {
+.uchecker.color0 > i.fa {
     color: #888888;
 }
 .uchecker > i.fa {

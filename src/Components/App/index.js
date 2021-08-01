@@ -33,7 +33,7 @@ export default class App extends React.Component {
                 username: window.loft.user_info.username,
             },
             status: window.loft.constants.STATUS_IN_GAME,
-            color: "white",
+            color: 1,
             done: 0,
             possibilities: 10,
             statistics: {
@@ -63,7 +63,7 @@ export default class App extends React.Component {
                 username: false,
             },
             status: window.loft.constants.STATUS_IN_GAME,
-            color: "black",
+            color: 0,
             done: 0,
             possibilities: 10,
         },
@@ -132,14 +132,14 @@ export default class App extends React.Component {
 
         if (window.loft.usersettings.mode === "bot") {
             if (Math.random() > 0.5) {
-                state.playerInfo.color = "white";
-                opponentInfo.color = "black";
+                state.playerInfo.color = 1;
+                opponentInfo.color = 0;
             } else {
-                state.playerInfo.color = "black";
-                opponentInfo.color = "white";
+                state.playerInfo.color = 0;
+                opponentInfo.color = 1;
             }
             state.opponentInfo = opponentInfo;
-            state.playersStep = state.playerInfo.color === "white";
+            state.playersStep = state.playerInfo.color === 1;
         }
 
         state.targetCells = this.setTargetCells();
@@ -157,11 +157,11 @@ export default class App extends React.Component {
                         }
                     },
                     error: () => {
-                        if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
+                        if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep(0), 300);
                     }
                 });
             } else {
-                if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep("black"), 300);
+                if (this.state.autochess || !state.playersStep) setTimeout(() => this.botStep(0), 300);
             }
         }
 
@@ -253,7 +253,7 @@ export default class App extends React.Component {
     }
 
     startGame = (game) => {
-        let playersStep = game.players.player.color === "white";
+        let playersStep = game.players.player.color === 1;
 
         let { playerInfo, opponentInfo } = this.state;
 
@@ -286,7 +286,7 @@ export default class App extends React.Component {
             newState.online = true;
             newState.opponentInfo = game.players.opponent;
         } else {
-            opponentInfo.color = playersStep ? "black" : "white";
+            opponentInfo.color = playersStep ? 0 : 1;
             newState.opponentInfo = opponentInfo;
         }
 
@@ -317,7 +317,7 @@ export default class App extends React.Component {
                 }
             }, 1000);
         } else {
-            if (this.state.autochess || !playersStep) setTimeout(() => this.botStep("black"), 300);
+            if (this.state.autochess || !playersStep) setTimeout(() => this.botStep(0), 300);
         }
     }
 
@@ -389,7 +389,7 @@ export default class App extends React.Component {
             this.doStep(
                 stepData.lastStep.to,
                 stepData.lastStep.from,
-                stepData.lastStep.color !== (this.state.playerInfo.color === "white" ? 1 : 0),
+                stepData.lastStep.color !== this.state.playerInfo.color,
                 false
             );
             return;
@@ -410,7 +410,7 @@ export default class App extends React.Component {
                     this.iiStep(color);
                 } else {
                     if (this.state.cells[res.botstep.from].color === color && React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
-                        this.doStep(res.botstep.to, res.botstep.from, true, false, true);
+                        this.doStep(res.botstep.to, res.botstep.from, true, true, true);
                     } else {
                         this.iiStep(color);
                     }
@@ -482,7 +482,7 @@ export default class App extends React.Component {
         }
         if (React.isset(data.game)) {
             clearInterval(this.state.searchingOnlineOpponent);
-            let playersStep = data.game.players.player.color === 'white';
+            let playersStep = data.game.players.player.color === 1;
             let colorInfo = Lang(`${data.game.players.player.color}IsYours`);
 
             let {playerInfo, opponentInfo} = this.state;
@@ -665,6 +665,7 @@ export default class App extends React.Component {
     }
 
     doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true, botstep = false) => {
+        console.log(write);
         if (write) {
             if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, botstep);
         }
@@ -736,9 +737,9 @@ export default class App extends React.Component {
             }
         }
         if (window.loft.isCheckers) {
-            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.white.damka`).length;
-            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.black.damka`).length;
-            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.black,.ucell .uchecker.white`).length;
+            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.color1.damka`).length;
+            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.color0.damka`).length;
+            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.color0,.ucell .uchecker.color1`).length;
             if (totalWhiteDamkas || totalBlackDamkas) {
                 if (totalWhiteDamkas > gameTotalStat.TWD || totalBlackDamkas > gameTotalStat.TBD || totalCheckers < gameTotalStat.TC) {
                     gameTotalStat = {
@@ -778,15 +779,15 @@ export default class App extends React.Component {
         for (let y = 1; y < 9; y++) {
             for (let x = 1; x < 9; x++) {
                 let k = x + ":" + y;
-                if (colors) mask += cells[k].color ? (cells[k].color === "black" ? "0" : "1") : "_";
-                else mask += cells[k].color ? "1" : "0";
+                if (colors) mask += cells[k].color === false ? "_" : cells[k].color;
+                else mask += cells[k].color === false ? 0 : 1;
             }
         }
         return mask;
     }
 
     botStep = (lastStepColor) => {
-        let color = this.state.autochess ? (lastStepColor === "white" ? "black" : "white") : (this.state.playerInfo.color === "white" ? "black" : "white");
+        let color = this.state.autochess ? (lastStepColor === 1 ? 0 : 1) : (this.state.playerInfo.color === 1 ? 0 : 1);
 
         let gamestatuschecked = ((lastStepColor === this.state.playerInfo.color && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) || (lastStepColor === this.state.opponentInfo.color && this.state.opponentInfo.status === window.loft.constants.STATUS_IN_GAME));
 
@@ -797,7 +798,7 @@ export default class App extends React.Component {
 
                 if (rndBOOL && window.loft.AjaxAvailable && !this.state.autochess) {
                     if (this.state.botStepBuffer && React.isset(this.state.botStepBuffer.from)) {
-                        this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, false, true);
+                        this.doStep(this.state.botStepBuffer.to, this.state.botStepBuffer.from, true, true, true);
                         this.setStateUpdate({ botStepBuffer: null });
                     } else if (this.state.botStepBuffer === null) {
                         this.iiStep(color);
@@ -855,8 +856,8 @@ export default class App extends React.Component {
 
             this.theStep(koordsto, koordsfrom, newPlayersStep);
 
-            let ant1 = this.state.playerInfo.color === "black" ? "animate__revbounce" : "animate__bounce";
-            let ant2 = this.state.playerInfo.color === "black" ? "animate__revshakeX" : "animate__shakeX";
+            let ant1 = this.state.playerInfo.color === 0 ? "animate__revbounce" : "animate__bounce";
+            let ant2 = this.state.playerInfo.color === 0 ? "animate__revshakeX" : "animate__shakeX";
 
             let k = document.querySelectorAll(".uchecker");
             for (let n = 0; n < k.length; n++) {
@@ -925,7 +926,7 @@ export default class App extends React.Component {
         let lastStepColor = cells[koordsfrom].color;
 
         checker.style.opacity = 0;
-        stepper.className = "uchecker " + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
+        stepper.className = "uchecker color" + cells[koordsfrom].color + (cells[koordsfrom].damka ? " damka" : "");
         stepper.style.transform = `translate(${checker.offsetLeft}px, ${checker.offsetTop}px)`;
         stepper.style.display = "block";
 
@@ -945,7 +946,7 @@ export default class App extends React.Component {
     clearPlayerInfoAfterGameOver = () => {
         let { playerInfo } = this.state;
         playerInfo.status = window.loft.constants.STATUS_IN_GAME;
-        playerInfo.color = "white";
+        playerInfo.color = 1;
         playerInfo.done = 0;
         playerInfo.possibilities = 0;
         playerInfo.lastGameStat = {
@@ -967,7 +968,7 @@ export default class App extends React.Component {
                 },
                 name: "bot" + Math.round(Math.random() * 1000 + 1000),
                 status: window.loft.constants.STATUS_IN_GAME,
-                color: "black",
+                color: 0,
                 done: 0,
                 possibilities: 10,
             },
@@ -1004,12 +1005,12 @@ export default class App extends React.Component {
                     let color = false;
                     let checker = false;
                     if(b.mask[i]==="0"){
-                        color = "black";
-                        checker = "black";
+                        color = 0;
+                        checker = 0;
                     }
                     if(b.mask[i]==="1"){
-                        color = "white";
-                        checker = "white";
+                        color = 1;
+                        checker = 1;
                     }
                     cells[x+":"+y] = {x:x,y:y,k:i+1,checker:checker,color:color};
                 }
@@ -1131,14 +1132,14 @@ export default class App extends React.Component {
         if (Object.keys(this.state.cells).length > 0) {
             renderedField = Object.keys(this.state.cells).map((koords) => {
                 let { x, y, k, color, checker, possibilities } = this.state.cells[koords];
-                let damka = (((color === "black" && y === 8) || (color === "white" && y === 1) || this.state.cells[koords].damka) && window.loft.isCheckers);
+                let damka = (((color === 0 && y === 8) || (color === 1 && y === 1) || this.state.cells[koords].damka) && window.loft.isCheckers);
                 let active = koords === this.state.selectedChecker;
                 return (<Cell onCheckerClick={this.onCheckerClick} x={x} y={y} key={k} k={k} checker={checker} damka={damka} color={color} active={active} variable={possibilities} />);
             });
         }
 
         let fieldClass = "";
-        if (this.state.playerInfo.color === "black") fieldClass = "forBlacks";
+        if (this.state.playerInfo.color === 0) fieldClass = "forBlacks";
 
         return (
             <div className="ucon">
@@ -1161,7 +1162,7 @@ export default class App extends React.Component {
                 <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield">
                         <div className="ufcn">
-                            <div className="uchecker black" id="stepper">&nbsp;</div>
+                            <div className="uchecker color0" id="stepper">&nbsp;</div>
                             {renderedField}
                         </div>
                         <Fanfara

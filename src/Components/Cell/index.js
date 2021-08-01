@@ -14,7 +14,7 @@ export default class Cell extends React.Component{
         if(checker !== false){
             classNames += " withchecker";
             return (
-                <div onClick={()=>onCheckerClick(koords)} koords={koords} className={classNames} x={x} y={y} k={k} variable={p}><Checker key={checker} k={k} color={color} checker={checker} active={active} damka={damka} /><div className="empty" >&nbsp;</div></div>
+                <div onClick={()=>onCheckerClick(koords)} koords={koords} className={classNames} x={x} y={y} k={k} variable={p}><Checker key={checker} k={k} color={`color${color}`} checker={checker} active={active} damka={damka} /><div className="empty" >&nbsp;</div></div>
             );
         }else{
             return (
