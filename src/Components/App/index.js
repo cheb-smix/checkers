@@ -425,12 +425,10 @@ export default class App extends React.Component {
     saveStepResults = (koordsto, koordsfrom, botstep) => {
         let { cells } = this.state;
         if (this.state.game_id) {
-            let kills = [];
             if (!React.isset(cells[koordsfrom].possibilities[koordsto])) {
                 console("WARNING!!! NO POSSIBILITY OR WHAT?", koordsto, cells[koordsfrom].possibilities);
-            } else {
-                kills = cells[koordsfrom].possibilities[koordsto].kills;
             }
+            
             this.act({
                 action: 'set-step',
                 data: {

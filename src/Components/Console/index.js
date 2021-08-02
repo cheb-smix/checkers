@@ -30,7 +30,6 @@ export default class Console extends React.Component{
                 <RoundProgressBar 
                     perc={Math.pround(Math.percent(this.props.timeoutCounter, window.loft.config.StepTimeLimit, 0, false), 2)} 
                     num={this.props.timeoutCounter} 
-                    tooltip={Lang("tillStepEndsText")}
                     theme="rpb-red"
                     size="6vh"
                     id="timeoutCounterRPB"
