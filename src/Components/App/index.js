@@ -87,6 +87,7 @@ export default class App extends React.Component {
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
+        timeoutCounter: window.loft.config.StepTimeLimit * 0.98,
 
         /* DEV FIELDS */
         botStepBuffer: null,
@@ -323,9 +324,11 @@ export default class App extends React.Component {
 
     checkTOI = (r) => {
         if (r > window.loft.config.StepTimeLimit * 2 / 3) {
-            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+            // this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")));
+            this.setState({timeoutCounter: window.loft.config.StepTimeLimit - r});
         }
         if (r > window.loft.config.StepTimeLimit) {
+            this.setState({timeoutCounter: window.loft.config.StepTimeLimit});
             if (!this.state.playersStep) {
                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
             }
@@ -422,20 +425,18 @@ export default class App extends React.Component {
     saveStepResults = (koordsto, koordsfrom, botstep) => {
         let { cells } = this.state;
         if (this.state.game_id) {
-            let kills = [];
             if (!React.isset(cells[koordsfrom].possibilities[koordsto])) {
                 console("WARNING!!! NO POSSIBILITY OR WHAT?", koordsto, cells[koordsfrom].possibilities);
-            } else {
-                kills = cells[koordsfrom].possibilities[koordsto].kills;
             }
+            
             this.act({
                 action: 'set-step',
                 data: {
                     mask: this.getDeskMask(this.state.cells, true),
                     from: koordsfrom,
                     to: koordsto,
-                    kills: kills.join('-'),
-                    path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
+                    // kills: kills.join('-'),
+                    // path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
                     game_id: this.state.game_id,
                     botstep: botstep,
                 },
@@ -515,9 +516,11 @@ export default class App extends React.Component {
                     if (this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
                         if (r > window.loft.config.StepTimeLimit * 2 / 3) {
-                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+                            // this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+                            this.setState({timeoutCounter: window.loft.config.StepTimeLimit - r});
                         }
                         if (r > window.loft.config.StepTimeLimit) {
+                            this.setState({timeoutCounter: window.loft.config.StepTimeLimit});
                             if (!this.state.playersStep) {
                                 this.socketSend({ action: "TIMEOUTOPPO" });
                                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
@@ -665,7 +668,6 @@ export default class App extends React.Component {
     }
 
     doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true, botstep = false) => {
-        console.log(write);
         if (write) {
             if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, botstep);
         }
@@ -1185,6 +1187,7 @@ export default class App extends React.Component {
                         opponent={this.state.opponentInfo.user.display_name}
                         searching={this.state.searchingOnlineOpponent}
                         count={this.state.searchingOnlineCounter}
+                        timeoutCounter={this.state.timeoutCounter}
                     />
                 </div>
             </div>

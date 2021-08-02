@@ -2,39 +2,44 @@ import "./index.css";
 import React from 'react';
 export default class RoundProgressBar extends React.Component{
 
-    timeout = React.isset(this.props.timeout) ? this.props.timeout : 300;
+    timeout = this.props.timeout ? this.props.timeout : 300;
 
-    progressView = () => {   
+    progressView = (current = false) => {   
         setTimeout(() => {
             document.querySelectorAll('.diagram').forEach((box, i) => {
-                setTimeout(() => {
-                    let deg = (360 * (box.dataset.percent > 200 ? 200 : box.dataset.percent) / 100) + 180;
-                    box.classList.add('shown');
+                if (!current || box.id === this.props.id) {
                     setTimeout(() => {
-                        if (box.dataset.percent > 150) {
-                            box.classList.add('over_150');
-                        } else if (box.dataset.percent > 100) {
-                            box.classList.add('over_100');
-                        } else if (box.dataset.percent >= 50) {
-                            box.classList.add('over_50');
-                        } else {
-                            box.classList.remove('over_50');
-                            box.classList.remove('over_100');
-                            box.classList.remove('over_150');
-                        }
-                        box.querySelector('.piece.right').style.transform = 'rotate('+deg+'deg)';
-                    }, 200);
-                }, i * this.timeout);
+                        let deg = (360 * (box.dataset.percent > 200 ? 200 : box.dataset.percent) / 100) + 180;
+                        box.classList.add('shown');
+                        setTimeout(() => {
+                            if (box.dataset.percent > 150) {
+                                box.classList.add('over_150');
+                            } else if (box.dataset.percent > 100) {
+                                box.classList.add('over_100');
+                            } else if (box.dataset.percent >= 50) {
+                                box.classList.add('over_50');
+                            } else {
+                                box.classList.remove('over_50');
+                                box.classList.remove('over_100');
+                                box.classList.remove('over_150');
+                            }
+                            box.querySelector('.piece.right').style.transform = 'rotate('+deg+'deg)';
+                        }, 200);
+                    }, i * this.timeout);
+                }
             });
         }, 50);
     }
     
+    componentDidUpdate = () => {
+        this.progressView(true);
+    }
 
     render(){
-        if (this.props.last === 'true') this.progressView();
+        if (this.props.last === 'true' && !this.props.intervalUpdate) this.progressView();
         let classes = 'diagram progress tooltip';
-        if (this.props.forceColor) {
-            classes += ' greendiagram';
+        if (this.props.theme) {
+            classes += ` ${this.props.theme}`;
         }
         let number = this.props.perc;
         if (React.isset(this.props.num)) {
@@ -48,8 +53,16 @@ export default class RoundProgressBar extends React.Component{
                 if (`${number}`.length > 5) classes += ' hugetext';
             }
         }
+        let styles = {};
+        if (this.props.style) {
+            styles = this.props.style;
+        }
+        if (this.props.size) {
+            styles.width = this.props.size;
+            styles.height = this.props.size;
+        }
         return (
-            <div className={classes} data-tooltip={this.props.tooltip} data-percent={this.props.perc}>
+            <div id={this.props.id} className={classes} data-tooltip={this.props.tooltip} style={styles} data-percent={this.props.perc}>
                 <div className="piece left"></div>
                 <div className="piece right"></div>
                 <div className="text">

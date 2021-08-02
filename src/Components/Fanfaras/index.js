@@ -215,7 +215,7 @@ export default class Fanfara extends React.Component {
                 num={stat.level} 
                 text={stat.level > this.props.playerInfo.statistics.level ? Lang("newLevelText") : Lang("levelText")} 
                 tooltip={stat.level > this.props.playerInfo.statistics.level ? Lang("newLevelText") : Lang("levelText")}
-                forceColor="#cf0"
+                forceClasses="rpb-green"
             />);
         }
 

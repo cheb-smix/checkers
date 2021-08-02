@@ -6,8 +6,8 @@ Math.coefficient = (n1, n2, f = 0) => {
 }
 
 Math.percent = (n1, n2, f = 0, label = true) => {
-    if (label) return Math.coefficient(n1, n2, f) + "%";
-    return Math.coefficient(n1, n2, f);
+    if (label) return Math.coefficient(n1, n2, f) * 100 + "%";
+    return Math.coefficient(n1, n2, f) * 100;
 }
 
 Math.diagonalEffectivity = (c1, c2, color = "any", playstage = 1) => {
