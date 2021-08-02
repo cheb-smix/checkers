@@ -434,8 +434,8 @@ export default class App extends React.Component {
                     mask: this.getDeskMask(this.state.cells, true),
                     from: koordsfrom,
                     to: koordsto,
-                    kills: kills.join('-'),
-                    path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
+                    // kills: kills.join('-'),
+                    // path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
                     game_id: this.state.game_id,
                     botstep: botstep,
                 },
@@ -665,7 +665,6 @@ export default class App extends React.Component {
     }
 
     doStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false, write = true, botstep = false) => {
-        console.log(write);
         if (write) {
             if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, botstep);
         }
