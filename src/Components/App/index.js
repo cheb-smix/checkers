@@ -87,6 +87,7 @@ export default class App extends React.Component {
         searchingOnlineOpponent: false,
         searchingOnlineCounter: 0,
         timeoutCheckInterval: false,
+        timeoutCounter: window.loft.config.StepTimeLimit * 0.98,
 
         /* DEV FIELDS */
         botStepBuffer: null,
@@ -323,9 +324,11 @@ export default class App extends React.Component {
 
     checkTOI = (r) => {
         if (r > window.loft.config.StepTimeLimit * 2 / 3) {
-            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+            // this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")));
+            this.setState({timeoutCounter: window.loft.config.StepTimeLimit - r});
         }
         if (r > window.loft.config.StepTimeLimit) {
+            this.setState({timeoutCounter: window.loft.config.StepTimeLimit});
             if (!this.state.playersStep) {
                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
             }
@@ -515,9 +518,11 @@ export default class App extends React.Component {
                     if (this.state.online && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME && this.state.lastStepTime > 0) {
                         let r = Math.floor(new Date().getTime() / 1000) - this.state.lastStepTime;
                         if (r > window.loft.config.StepTimeLimit * 2 / 3) {
-                            this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+                            // this.consoleLog((this.state.playersStep ? Lang("yourTurnText") : Lang("enemyTurnText")) + (window.loft.config.StepTimeLimit - r));
+                            this.setState({timeoutCounter: window.loft.config.StepTimeLimit - r});
                         }
                         if (r > window.loft.config.StepTimeLimit) {
+                            this.setState({timeoutCounter: window.loft.config.StepTimeLimit});
                             if (!this.state.playersStep) {
                                 this.socketSend({ action: "TIMEOUTOPPO" });
                                 this.suggestNewOneGame(Lang("enemyLostByTimeout"));
@@ -1184,6 +1189,7 @@ export default class App extends React.Component {
                         opponent={this.state.opponentInfo.user.display_name}
                         searching={this.state.searchingOnlineOpponent}
                         count={this.state.searchingOnlineCounter}
+                        timeoutCounter={this.state.timeoutCounter}
                     />
                 </div>
             </div>

@@ -63,8 +63,17 @@ export default class Checkers extends App {
                         }
                     }
 
-                    if (cells[nkoords].possibilities[p].kills.length > 0) {
+                    let kills = cells[nkoords].possibilities[p].kills
+
+                    if (kills.length > 0) {
                         mustEat[cells[nkoords].color] = nkoords;
+                        if (kills.length > 1) {
+                            for (let p2 in cells[nkoords].possibilities) {
+                                if (cells[nkoords].possibilities[p2].kills.length < kills.length && cells[nkoords].possibilities[p2].kills.indexOf(kills[0]) >= 0) {
+                                    poss2delete[p2] = 1;
+                                }
+                            }
+                        }
                     } else {
                         if (cells[nkoords].damka) {
                             cells[nkoords].possibilities[p].effectivity *= 0.5;
@@ -126,7 +135,7 @@ export default class Checkers extends App {
             && c[k1].color !== color && p[x + ':' + y].kills.indexOf(k2) < 0) ? { place: k2, kill: k1, len: 2 } : false;
     }
 
-    checkTheDamka = (c, p, x, y, direction = "left up", color, freeRide = false) => {
+    checkTheDamka = (c, p, x, y, direction = "left up", color, checker, freeRide = false) => {
         let vars = [];
         let xe = -1;
         let ye = -1;
@@ -139,15 +148,15 @@ export default class Checkers extends App {
 
         for (let n = 1; n < 8; n++) {
             let k1 = (x + (n * xe)) + ":" + (y + (n * ye));
-            if (typeof (c[k1]) === "undefined" || c[k1].color === color) break;
-            if (c[k1].color === false) {
+            if (typeof (c[k1]) === "undefined" || (c[k1].color === color && c[k1].checker !== checker)) break;
+            if (c[k1].color === false || c[k1].checker === checker) {
                 if (freeRide) vars.push({ place: k1, kill: [], len: n });
                 continue;
             }
-            if (p[x + ':' + y].kills.indexOf(k1) >= 0) break;
+            if (p[x + ':' + y].kills.indexOf(k1) >= 0) continue;
             if (freeRide) break;
             let blocker = false;
-            for (let m = n + 1; m < 7; m++) {
+            for (let m = n + 1; m < 8; m++) {
                 let k2 = (x + (m * xe)) + ":" + (y + (m * ye));
 
                 if (typeof (p[k2]) !== "undefined") continue;
@@ -176,7 +185,7 @@ export default class Checkers extends App {
         for (let i = 0; i < directions.length; i++) {
 
             if (damka) {
-                let vars = this.checkTheDamka(oldcells, possibilities, x, y, directions[i], cell.color);
+                let vars = this.checkTheDamka(oldcells, possibilities, x, y, directions[i], cell.color, cell.checker);
 
                 for (let k in vars) {
                     possibilities[vars[k].place] = {
@@ -248,7 +257,7 @@ export default class Checkers extends App {
             if (mustEat === false) {
                 let directions = ["left up", "right up", "left down", "right down"];
                 for (let i = 0; i < directions.length; i++) {
-                    let vars = this.checkTheDamka(oldcells, possibilities, x, y, directions[i], oldcells[koords].color, true);
+                    let vars = this.checkTheDamka(oldcells, possibilities, x, y, directions[i], oldcells[koords].color, oldcells[koords].checker, true);
                     for (let k in vars) {
                         possibilities[vars[k].place] = {
                             damka: true,
@@ -279,6 +288,7 @@ export default class Checkers extends App {
                 };
             }
         }
+        
         delete possibilities[koords];
 
         return possibilities;
@@ -517,15 +527,22 @@ export default class Checkers extends App {
                 let checker = false;
                 let color = false;
                 let damka = false;
+
+                // if (x === 6 && y === 3 || x === 4 && y === 3) {
+                //     color = 1;
+                //     damka = true
+                // }
+                // if (x === 1 && y === 2 || x === 3 && y === 4 || x === 5 && y === 4 || x === 2 && y === 5 || x === 6 && y === 5 || x === 1 && y === 4 || x === 7 && y === 2 ) {
+                //     color = 0;
+                // }
+
                 if (debug) {
                     if ((y + x) % 2 === 1) {
                         if (y > 5 && y < 9) {
                             color = 1;
-                            checker = `${color}${key}`;
                         }
                         if (y > 0 && y < 4) {
                             color = 0;
-                            checker = `${color}${key}`;
                         }
                         if ((x === 4 && y === 3) || (x === 6 && y === 3) || (x === 5 && y === 6) || (x === 7 && y === 6) || (x === 8 && y === 7)) {
                             checker = false;
@@ -534,26 +551,25 @@ export default class Checkers extends App {
                         if ((x === 1 && y === 2) || (x === 7 && y === 2)) {
                             color = 1;
                             damka = true;
-                            checker = `${color}${key}`;
                         }
                         if ((x === 2 && y === 7)) {
                             color = 0;
                             damka = true;
-                            checker = `${color}${key}`;
                         }
                     }
                 } else {
                     if ((y + x) % 2 === 1) {
                         if (y > 5 && y < 9) {
                             color = 1;
-                            checker = `${color}${key}`;
                         }
                         if (y > 0 && y < 4) {
                             color = 0;
-                            checker = `${color}${key}`;
                         }
                     }
                 }
+
+                if (color !== false) checker = `${color}${key}`;
+
                 cells[x + ":" + y] = { x: x, y: y, k: key, checker: checker, color: color, possibilities: {}, active: false, damka: damka };
                 key++;
             }

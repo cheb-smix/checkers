@@ -2,16 +2,39 @@
     --dia-size: 30vw;
     --dia-marging: 1vw;
     --dia-bord: 4%;
-    --perc-font-size: 8vw;
+    --perc-font-size: 150%;
     --regular-font-size: 3.2vw;
 }
 
-.greendiagram, .greendiagram .piece:before {
-    background: #0f0 !important;
+.diagram.rpb-green,
+.diagram.over_50.rpb-green .left::before {
+    background: rgb(0, 168, 0);
 }
-.greendiagram .text span {
-    color: #0f0 !important;
+.diagram.rpb-green .left::before,
+.diagram.rpb-green .right::before {
+    background: rgb(0, 43, 0);
 }
+
+.diagram.rpb-red,
+.diagram.rpb-red.over_50 .left::before {
+    background: var(--neon-text-color);
+}
+.diagram.rpb-red .left::before,
+.diagram.rpb-red .right::before {
+    background: rgb(51, 0, 0);
+}
+
+.diagram.rpb-red,
+.diagram.rpb-red.over_50 .left::before {
+    background: var(--theme-main-color);
+}
+.diagram.rpb-red .left::before,
+.diagram.rpb-red .right::before {
+    background: rgb(78, 38, 0);
+}
+
+
+
 .diagram.hugetext .text b {
     font-size: calc(var(--perc-font-size) - 2vw);
 }
@@ -44,10 +67,10 @@
     z-index: 3;
 }
 .diagram .piece {
-    width: calc(var(--dia-size) + 4px);
-    height: calc(var(--dia-size) + 4px);
-    left: -2px;
-    top: -2px;
+    width: 104%;/*calc(var(--dia-size) + 4px);*/
+    height: 104%;/*calc(var(--dia-size) + 4px);*/
+    left: -2%;/*-2px;*/
+    top: -2%;/*-2px;*/
     overflow: hidden;
     position: absolute;
     transition: transform 1s ease;
@@ -128,6 +151,18 @@
 .diagram.over_100.tooltip::after, .diagram.over_150.tooltip::after {
     color: var(--theme-secondary-color);
     font-size: var(--regular-font-size);
+}
+
+
+
+.rpb-green .text {
+    color: #0f0 !important;
+}
+.rpb-red .text {
+    color: var(--neon-text-color) !important;
+}
+.rpb-orange .text {
+    color: var(--theme-main-color) !important;
 }
 
 
