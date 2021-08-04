@@ -73,7 +73,6 @@
     top: -2%;/*-2px;*/
     overflow: hidden;
     position: absolute;
-    transition: transform 1s ease;
 }
 .diagram .piece::before {
     content: '';
@@ -86,6 +85,9 @@
     transform: rotate(0deg);
     z-index: 2;
     border-radius: 50%;
+}
+.diagram.shown .piece {
+    transition: transform 1s ease;
 }
 .diagram .piece.right {
     transform: rotate(180deg);
