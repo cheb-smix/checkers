@@ -71,7 +71,6 @@ window.loft = {
             level: 1,
         }
     },
-    gamesPlayed: [],
     serverInfo: {
         avgwaittime: {cnt: 0, ttl: 0, avg: 0},
         playersstat: {total: 0, searching: 0, in_game: 0},

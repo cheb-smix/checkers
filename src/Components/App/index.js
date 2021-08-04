@@ -23,6 +23,10 @@ export default class App extends React.Component {
     STATUS_WON = 7;
     STATUS_DRAW = 8;
 
+    timer = null;
+    clicks = 0;
+    delay = 200;
+
     state = {
         /* USERS DYNAMIC INFO */
         cells: {},
@@ -58,9 +62,6 @@ export default class App extends React.Component {
         botspeed: 1,
         playstage: 1,
         consoleText: "",
-        gameTotalStat: {
-            TWD: 0, TBD: 0, TC: 24, MC: 0
-        },
         rampageCode: "",
         rampageTO: null,
         targetCells: {},
@@ -658,7 +659,7 @@ export default class App extends React.Component {
     }
 
     theStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false) => {
-        let { playerInfo, opponentInfo, bestMove, cells, gameTotalStat } = this.state;
+        let { playerInfo, opponentInfo, bestMove, cells, game_status } = this.state;
         let { color } = cells[koordsfrom];
         let hops = cells[koordsfrom].possibilities[koordsto].path.length;
 
@@ -709,32 +710,15 @@ export default class App extends React.Component {
             if (playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
         }
 
-        if (this.state.online === false && (playerInfo.done > 10 || opponentInfo.done > 10 || playerInfo.possibilities === 0 || opponentInfo.possibilities === 0)) {
+        if (!window.loft.AjaxAvailable && (playerInfo.done > 10 || opponentInfo.done > 10 || playerInfo.possibilities === 0 || opponentInfo.possibilities === 0)) {
             let o = this.checkOfflineGameStatus(playerInfo, opponentInfo);
             if (o !== false) {
                 playerInfo = o.playerInfo;
                 opponentInfo = o.opponentInfo;
+                game_status = o.game_status
             }
         }
-        if (window.loft.isCheckers) {
-            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.color1.damka`).length;
-            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.color0.damka`).length;
-            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.color0,.ucell .uchecker.color1`).length;
-            if (totalWhiteDamkas || totalBlackDamkas) {
-                if (totalWhiteDamkas > gameTotalStat.TWD || totalBlackDamkas > gameTotalStat.TBD || totalCheckers < gameTotalStat.TC) {
-                    gameTotalStat = {
-                        TWD: totalWhiteDamkas, TBD: totalBlackDamkas, TC: totalCheckers, MC: 0
-                    }
-                }
-                if (totalWhiteDamkas === gameTotalStat.TWD && totalBlackDamkas === gameTotalStat.TBD && totalCheckers === gameTotalStat.TC) {
-                    gameTotalStat.MC++;
-                    if (gameTotalStat.MC === 15) {
-                        playerInfo.status = window.loft.constants.STATUS_DONE;
-                        opponentInfo.status = window.loft.constants.STATUS_DONE;
-                    }
-                }
-            }
-        }
+
         let newstate = {}
         if (hops > 2) newstate = this.rampage(hops, "", true);
         Noise(hops);
@@ -747,7 +731,7 @@ export default class App extends React.Component {
         newstate.consoleText = consoleText;
         newstate.selectedChecker = false;
         newstate.cells = cells;
-        newstate.gameTotalStat = gameTotalStat;
+        newstate.game_status = game_status;
 
         this.setStateUpdate(newstate);
 
@@ -1006,6 +990,15 @@ export default class App extends React.Component {
     // Main user action
 
     onCheckerClick = (koords) => {
+        this.clicks++;
+        if (this.clicks === 1) {
+            this.timer = setTimeout( () => {
+                this.clicks = 0;
+            }, this.delay);
+        } else {
+            return; // dodge multiclicks
+        }     
+
         let { cells } = this.state;
 
         if (React.isset(cells[koords]) && this.state.playersStep && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) {

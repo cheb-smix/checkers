@@ -8,6 +8,8 @@ import Charts from '../Charts';
 
 export default class Fanfara extends React.Component {
 
+    gamesPlayed = [];
+
     calcExpForLevel = (LVL = 1) => {
         return LVL > 1 ? Math.floor((window.loft.config.MLTPLR + LVL) * LVL ) : 0;
         //return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
@@ -18,6 +20,27 @@ export default class Fanfara extends React.Component {
         let u = document.getElementById("ufield");
         f.style.top = 0 + "px";
         f.style.left = u.offsetLeft + "px";
+    }
+
+    componentDidUpdate = () => {
+        if (this.gamesPlayed.indexOf(this.props.game_id) < 0) {
+            this.gamesPlayed.push(this.props.game_id);
+
+            window.loft.user_info.stat.total_games++;
+            if (this.props.playerInfo.status === window.loft.constants.STATUS_WON) {
+                window.loft.user_info.stat.total_wins++;
+            } else if (this.props.playerInfo.status === window.loft.constants.STATUS_FAIL) {
+                window.loft.user_info.stat.total_failes++;
+            } else {
+                window.loft.user_info.stat.total_draws++;
+            }
+            window.loft.user_info.stat.total_steps += window.loft.user_info.lastGameStat.steps;
+            window.loft.user_info.stat.total_hops += window.loft.user_info.lastGameStat.hops;
+            window.loft.user_info.stat.total_kills += window.loft.user_info.lastGameStat.kills;
+            window.loft.user_info.stat.experience += window.loft.user_info.lastGameStat.points;
+            window.loft.user_info.coins += window.loft.user_info.lastGameStat.coins;
+            if (window.loft.user_info.lastGameStat.level > 1) window.loft.user_info.stat.level = window.loft.user_info.lastGameStat.level;
+        }
     }
 
     render() {
@@ -110,17 +133,18 @@ export default class Fanfara extends React.Component {
             let stat = window.loft.user_info.lastGameStat;
 
             if (stat.points) {
+                let crntLevelPoint = this.calcExpForLevel(window.loft.user_info.stat.level);
                 let nextLevelPoint = this.calcExpForLevel(window.loft.user_info.stat.level + 1);
-                let sdiff = nextLevelPoint - window.loft.user_info.stat.experience + stat.points;
-                sdiff = Math.round(100 * sdiff / nextLevelPoint);
-                let initPerc = Math.round(100 * (nextLevelPoint - window.loft.user_info.stat.experience) / nextLevelPoint);
+                let sdiff = window.loft.user_info.stat.experience - crntLevelPoint;
+                sdiff = Math.round(100 * sdiff / (nextLevelPoint - crntLevelPoint));
+                let initPerc = Math.round(100 * (window.loft.user_info.stat.experience - crntLevelPoint - stat.points) / (nextLevelPoint - crntLevelPoint));
 
                 stattext.push(<RoundProgressBar 
                     key={stattext.length} 
                     index={stattext.length}
                     initPerc={initPerc}
                     perc={sdiff} 
-                    num={window.loft.user_info.stat.experience + stat.points} 
+                    num={window.loft.user_info.stat.experience} 
                     text={Lang("pointsStatText").replace("$", stat.points)} 
                     tooltip={Lang("youveGotExpirience").replace("$", stat.points)}
                 />);
@@ -129,11 +153,11 @@ export default class Fanfara extends React.Component {
                     key={stattext.length} 
                     index={stattext.length}
                     initPerc={initPerc}
+                    theme="rpb-green"
                     perc={sdiff} 
                     num={stat.level} 
-                    text={stat.level > window.loft.user_info.stat.level ? Lang("newLevelText") : Lang("levelText")} 
-                    tooltip={stat.level > window.loft.user_info.stat.level ? Lang("newLevelText") : Lang("levelText")}
-                    forceClasses="rpb-green"
+                    text={sdiff > 100 ? Lang("newLevelText") : Lang("levelText")} 
+                    tooltip={sdiff > 100 ? Lang("newLevelText") : Lang("levelText")}
                 />);
             }
 
@@ -247,33 +271,7 @@ export default class Fanfara extends React.Component {
                 stattext.push(buttons);
             }    
 
-            if (window.loft.gamesPlayed.indexOf(this.props.game_id) < 0) {
-                window.loft.gamesPlayed.push(this.props.game_id);
-
-                if (noise) Noise(noise);
-
-                setTimeout(() => {
-                    window.loft.user_info.stat.total_games++;
-                    if (playerInfo.status === window.loft.constants.STATUS_WON) {
-                        window.loft.user_info.stat.total_wins++;
-                    } else if (playerInfo.status === window.loft.constants.STATUS_FAIL) {
-                        window.loft.user_info.stat.total_failes++;
-                    } else {
-                        window.loft.user_info.stat.total_draws++;
-                    }
-                    window.loft.user_info.stat.total_steps += stat.steps;
-                    window.loft.user_info.stat.total_hops += stat.hops;
-                    window.loft.user_info.stat.total_kills += stat.kills;
-                    window.loft.user_info.stat.experience += stat.points;
-                    window.loft.user_info.coins += stat.coins;
-                    if (stat.level > 1) window.loft.user_info.stat.level = stat.level;
-
-                    for (let k in window.loft.user_info.lastGameStat) {
-                        if (k === 'level') continue;
-                        window.loft.user_info.lastGameStat[k] = 0;
-                    }
-                }, 400);
-            }
+            if (noise) Noise(noise);
         }
         
         return (
