@@ -23,6 +23,10 @@ export default class App extends React.Component {
     STATUS_WON = 7;
     STATUS_DRAW = 8;
 
+    timer = null;
+    clicks = 0;
+    delay = 200;
+
     state = {
         /* USERS DYNAMIC INFO */
         cells: {},
@@ -36,26 +40,6 @@ export default class App extends React.Component {
             color: 1,
             done: 0,
             possibilities: 10,
-            statistics: {
-                total_games: 0,
-                total_wins: 0,
-                total_failes: 0,
-                total_draws: 0,
-                total_steps: 0,
-                total_hops: 0,
-                total_kills: 0,
-                experience: 0,
-                level: 1,
-            },
-            lastGameStat: {
-                kills: 0,
-                steps: 0,
-                hops: 0,
-                points: 0,
-                coins: 0,
-                time: 0,
-                level: 1,
-            }
         },
         opponentInfo: {
             user: {
@@ -78,9 +62,6 @@ export default class App extends React.Component {
         botspeed: 1,
         playstage: 1,
         consoleText: "",
-        gameTotalStat: {
-            TWD: 0, TBD: 0, TC: 24, MC: 0
-        },
         rampageCode: "",
         rampageTO: null,
         targetCells: {},
@@ -93,6 +74,7 @@ export default class App extends React.Component {
         botStepBuffer: null,
         autochess: false,
         game_id: 0,
+        game_status: window.loft.constants.STATUS_ACTIVE,
     };
 
     componentDidMount() {
@@ -125,7 +107,6 @@ export default class App extends React.Component {
 
         playerInfo.user.display_name = window.loft.user_info.display_name;
         playerInfo.user.username = window.loft.user_info.username;
-        if (React.isset(window.loft.user_info.stat)) playerInfo.statistics = window.loft.user_info.stat;
 
         if (this.state.autochess) playerInfo.user.display_name = "bot" + Math.round(Math.random() * 1000 + 1000);
 
@@ -343,7 +324,7 @@ export default class App extends React.Component {
             data: { game_id: this.state.game_id },
             success: (res) => {
                 if (res.success) {
-                    this.procedureStepData(res);
+                    this.procedureResData(res);
                 } else {
                     console.log(res);
                 }
@@ -352,51 +333,65 @@ export default class App extends React.Component {
         });
     }
 
-    procedureStepData = (stepData) => {
-        if (React.isset(stepData.game_results)) {
+    procedureResData = (res) => {
 
-            console.log(stepData.game_results, window.loft.constants);
+        if (React.isset(res.chart) && !React.empty(res.chart)) {
+            for (let k in res.chart) {
+                for (let d in res.chart[k]) {
+                    window.loft.chart[k][d] = res.chart[k][d];
+                }
+            }
+        }
 
-            if (stepData.game_results.status === window.loft.constants.STATUS_NOMANS) {
+        if (React.isset(res.botstep) && !React.empty(res.botstep)) {
+            if (React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
+                this.setStateUpdate({ botStepBuffer: res.botstep });
+            }
+        }
 
+        if (React.isset(res.lastGameStat)) {
+            for (let k in res.lastGameStat) window.loft.user_info.lastGameStat[k] = res.lastGameStat[k];
+        }
+
+        if (React.isset(res.game_results)) {
+            if (res.game_results.status === window.loft.constants.STATUS_NOMANS) {
                 let { playerInfo, opponentInfo } = this.state;
                 playerInfo.status = window.loft.constants.STATUS_DRAW;
                 opponentInfo.status = window.loft.constants.STATUS_DRAW;
-                this.setStateUpdate({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                this.setStateUpdate({ 
+                    playerInfo: playerInfo, 
+                    opponentInfo: opponentInfo,
+                    game_status: res.game_results.status
+                });
                 clearInterval(this.INT);
-
-            } else if (stepData.game_results.status === window.loft.constants.STATUS_FINISHED) {
-
+            } else if (res.game_results.status === window.loft.constants.STATUS_FINISHED) {
                 let { playerInfo, opponentInfo } = this.state;
-                if (React.isset(stepData.game_results.winner)) {
+                if (React.isset(res.game_results.winner)) {
                     playerInfo.status = window.loft.constants.STATUS_WON;
                     opponentInfo.status = window.loft.constants.STATUS_FAIL;
-                } else if (React.isset(stepData.game_results.looser)) {
+                } else if (React.isset(res.game_results.looser)) {
                     playerInfo.status = window.loft.constants.STATUS_FAIL;
                     opponentInfo.status = window.loft.constants.STATUS_WON;
                 }
-                this.setStateUpdate({ playerInfo: playerInfo, opponentInfo: opponentInfo });
+                this.setStateUpdate({ 
+                    playerInfo: playerInfo, 
+                    opponentInfo: opponentInfo,
+                    game_status: res.game_results.status
+                });
                 clearInterval(this.INT);
-
             }
-
-            return;
-
         }
 
-        if (React.isset(stepData.lastStep)) {
-
+        if (React.isset(res.lastStep)) {
             this.setStateUpdate({
-                lastStepTime: stepData.lastStep.timestamp,
+                lastStepTime: res.lastStep.timestamp,
             });
             this.doStep(
-                stepData.lastStep.to,
-                stepData.lastStep.from,
-                stepData.lastStep.color !== this.state.playerInfo.color,
+                res.lastStep.to,
+                res.lastStep.from,
+                res.lastStep.color !== this.state.playerInfo.color,
                 false
             );
-            return;
-
         }
     }
 
@@ -445,23 +440,7 @@ export default class App extends React.Component {
                     if (!res.success) {
                         alert(res.errors.shift());
                     } else {
-                        if (React.isset(res.chart) && !React.empty(res.chart)) {
-                            for (let k in res.chart) {
-                                for (let d in res.chart[k]) {
-                                    window.loft.chart[k][d] = res.chart[k][d];
-                                }
-                            }
-                        }
-                        if (React.isset(res.botstep) && !React.empty(res.botstep)) {
-                            if (React.isset(this.state.cells[res.botstep.from].possibilities[res.botstep.to])) {
-                                this.setStateUpdate({ botStepBuffer: res.botstep });
-                            }
-                        }
-                        if (React.isset(res.lastGameStat)) {
-                            let { playerInfo } = this.state;
-                            playerInfo.lastGameStat = res.lastGameStat;
-                            this.setStateUpdate({ playerInfo: playerInfo });
-                        }
+                        this.procedureResData(res);
                     }
                 }
             });
@@ -680,7 +659,7 @@ export default class App extends React.Component {
     }
 
     theStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false) => {
-        let { playerInfo, opponentInfo, bestMove, cells, gameTotalStat } = this.state;
+        let { playerInfo, opponentInfo, bestMove, cells, game_status } = this.state;
         let { color } = cells[koordsfrom];
         let hops = cells[koordsfrom].possibilities[koordsto].path.length;
 
@@ -731,32 +710,15 @@ export default class App extends React.Component {
             if (playerInfo.done > 9 || opponentInfo.done > 9) playstage = 3;
         }
 
-        if (this.state.online === false && (playerInfo.done > 10 || opponentInfo.done > 10 || playerInfo.possibilities === 0 || opponentInfo.possibilities === 0)) {
+        if (!window.loft.AjaxAvailable && (playerInfo.done > 10 || opponentInfo.done > 10 || playerInfo.possibilities === 0 || opponentInfo.possibilities === 0)) {
             let o = this.checkOfflineGameStatus(playerInfo, opponentInfo);
             if (o !== false) {
                 playerInfo = o.playerInfo;
                 opponentInfo = o.opponentInfo;
+                game_status = o.game_status
             }
         }
-        if (window.loft.isCheckers) {
-            let totalWhiteDamkas = document.querySelectorAll(`.ucell .uchecker.color1.damka`).length;
-            let totalBlackDamkas = document.querySelectorAll(`.ucell .uchecker.color0.damka`).length;
-            let totalCheckers = document.querySelectorAll(`.ucell .uchecker.color0,.ucell .uchecker.color1`).length;
-            if (totalWhiteDamkas || totalBlackDamkas) {
-                if (totalWhiteDamkas > gameTotalStat.TWD || totalBlackDamkas > gameTotalStat.TBD || totalCheckers < gameTotalStat.TC) {
-                    gameTotalStat = {
-                        TWD: totalWhiteDamkas, TBD: totalBlackDamkas, TC: totalCheckers, MC: 0
-                    }
-                }
-                if (totalWhiteDamkas === gameTotalStat.TWD && totalBlackDamkas === gameTotalStat.TBD && totalCheckers === gameTotalStat.TC) {
-                    gameTotalStat.MC++;
-                    if (gameTotalStat.MC === 15) {
-                        playerInfo.status = window.loft.constants.STATUS_DONE;
-                        opponentInfo.status = window.loft.constants.STATUS_DONE;
-                    }
-                }
-            }
-        }
+
         let newstate = {}
         if (hops > 2) newstate = this.rampage(hops, "", true);
         Noise(hops);
@@ -769,7 +731,7 @@ export default class App extends React.Component {
         newstate.consoleText = consoleText;
         newstate.selectedChecker = false;
         newstate.cells = cells;
-        newstate.gameTotalStat = gameTotalStat;
+        newstate.game_status = game_status;
 
         this.setStateUpdate(newstate);
 
@@ -951,15 +913,6 @@ export default class App extends React.Component {
         playerInfo.color = 1;
         playerInfo.done = 0;
         playerInfo.possibilities = 0;
-        playerInfo.lastGameStat = {
-            kills: 0,
-            steps: 0,
-            hops: 0,
-            points: 0,
-            coins: 0,
-            time: 0,
-            level: playerInfo.statistics.level,
-        };
 
         this.setStateUpdate({
             playersStep: true,
@@ -981,14 +934,6 @@ export default class App extends React.Component {
             consoleText: Lang("disconnected") + ". " + Lang("yourTurnText")
         });
         window.loft.showModal(false);
-    }
-
-    updatePI = () => {
-        let { playerInfo: pi } = this.state;
-        pi.statistics.experience += pi.lastGameStat.points;
-        pi.statistics.level = pi.lastGameStat.level;
-        //for (let k in pi.lastGameStat) if (k !== "level") pi.lastGameStat[k] = 0;
-        this.setStateUpdate({ playerInfo: pi });
     }
 
     showBestMove = () => {
@@ -1045,6 +990,15 @@ export default class App extends React.Component {
     // Main user action
 
     onCheckerClick = (koords) => {
+        this.clicks++;
+        if (this.clicks === 1) {
+            this.timer = setTimeout( () => {
+                this.clicks = 0;
+            }, this.delay);
+        } else {
+            return; // dodge multiclicks
+        }     
+
         let { cells } = this.state;
 
         if (React.isset(cells[koords]) && this.state.playersStep && this.state.playerInfo.status === window.loft.constants.STATUS_IN_GAME) {
@@ -1170,13 +1124,13 @@ export default class App extends React.Component {
                         <Fanfara
                             playerInfo={this.state.playerInfo}
                             opponentInfo={this.state.opponentInfo}
-                            bestMove={this.state.bestMove}
-                            continueWithSameOpponent={this.continueWithSameOpponent}
-                            searchNewOpponent={this.searchNewOpponent}
+                            // continueWithSameOpponent={this.continueWithSameOpponent}
+                            // searchNewOpponent={this.searchNewOpponent}
                             quit={this.quit}
-                            updatePI={this.updatePI}
                             rampage={this.rampage}
-                            showBestMove={this.showBestMove}
+                            // showBestMove={this.showBestMove}
+                            game_id={this.state.game_id}
+                            game_status={this.state.game_status}
                         />
                     </div>
                     <Console

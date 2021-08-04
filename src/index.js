@@ -45,7 +45,32 @@ window.loft = {
     //timezoneOffset: new Date().getTimezoneOffset(),
     connectionType: "unknown",
     _eventHandlers: {},
-    user_info: {},
+    user_info: {
+        id: 0,
+        username: "guest",
+        display_name: "Guest",
+        coins: 0,
+        stat: {
+            total_games:  0,
+            total_wins:   0,
+            total_failes: 0,
+            total_draws:  0,
+            total_steps:  0,
+            total_hops:   0,
+            total_kills:  0,
+            experience:   0,
+            level:        1
+        },
+        lastGameStat: {
+            kills: 0,
+            steps: 0,
+            hops: 0,
+            points: 0,
+            coins: 0,
+            time: 0,
+            level: 1,
+        }
+    },
     serverInfo: {
         avgwaittime: {cnt: 0, ttl: 0, avg: 0},
         playersstat: {total: 0, searching: 0, in_game: 0},
@@ -59,10 +84,10 @@ window.loft = {
     chart: {},
 };
 
-// if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
+if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
     window.loft.wsserver = "ws://192.168.31.168:1988";
     window.loft.apiserver = "http://192.168.31.168:3333/game/";
-// }
+}
 
 window.loft.usersettings = window.loft.settings.getSettings();
 window.loft.localization = new Localization();
@@ -137,7 +162,7 @@ async function checkConnection()
     if (res) {
         for (let k in res.config) window.loft.config[k] = res.config[k];
         for (let k in res.serverInfo) window.loft.serverInfo[k] = res.serverInfo[k];
-        window.loft.user_info = res.user_info;
+        for (let k in res.user_info) window.loft.user_info[k] = res.user_info[k];
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
         window.loft.devInfo = res.devInfo;

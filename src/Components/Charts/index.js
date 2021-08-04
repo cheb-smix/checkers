@@ -1,5 +1,6 @@
 import "./index.css";
 import React from 'react';
+import Lang from '../Localization';
 
 export default class Charts extends React.Component {
     height      = this.props.height ? this.props.height : '15vh';
@@ -26,21 +27,24 @@ export default class Charts extends React.Component {
 
     inited      = false;
     shown       = false;
+    initCnt     = 0;
 
     init = () => {
         this.canvas = document.getElementById('canvas'); 
         this.ctx = this.canvas.getContext('2d');
 
         let interval = setInterval(() => {
-            this.cwidth = window.getComputedStyle(this.canvas).getPropertyValue('width');
-            if (this.cwidth !== '100%') {
+            let LCW = window.getComputedStyle(this.canvas).getPropertyValue('width');
+            if (LCW !== '100%' && LCW !== this.cwidth) {
+                this.cwidth = LCW;
                 this.cheight = window.getComputedStyle(this.canvas).getPropertyValue('height');
                 this.canvas.setAttribute('width', this.cwidth);
                 this.canvas.setAttribute('height', this.cheight);
                 this.canvas.style.transform = 'perspective(900px) rotate3d(100, 0, 0, 0deg) scale(1)';
                 this.shown = true;
-                clearInterval(interval);
+                if (this.initCnt > 5) clearInterval(interval);
                 this.show();
+                this.initCnt++;
             }
         }, 100);
     }
@@ -51,7 +55,7 @@ export default class Charts extends React.Component {
         let w = parseInt(this.cwidth);
         let h = parseInt(this.cheight);
 
-        this.padding = this.padding.split(' ');
+        if (typeof(this.padding) === 'string') this.padding = this.padding.split(' ');
         let ymax = h * parseInt(this.padding[0]) / 100;
         let ymin = h - ymax;
         let xmin = w * parseInt(this.padding[1]) / 100;
@@ -162,22 +166,23 @@ export default class Charts extends React.Component {
             this.ctx.stroke(); 
         }
 
-        this.ctx.fillStyle = this.bgColor;
-        this.ctx.fillRect(xmax - widthInc * 1.3, ymax / 2, widthInc * 1.3 + xmin / 2, heightInc * 0.95 * LLegend.length);
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        this.ctx.fillRect(xmax - widthInc * 1.9, ymax / 2, widthInc * 1.9 + xmin / 2, heightInc * 0.95 * LLegend.length);
         this.ctx.strokeStyle = this.legendColor;
         this.ctx.lineWidth = 2.0; 
-        this.ctx.strokeRect(xmax - widthInc * 1.3, ymax / 2, widthInc * 1.3 + xmin / 2, heightInc * 0.95 * LLegend.length);
+        this.ctx.strokeRect(xmax - widthInc * 1.9, ymax / 2, widthInc * 1.9 + xmin / 2, heightInc * 0.95 * LLegend.length);
 
         for (let i = 0; i < LLegend.length; i++) {
             let y = ymax / 4 + (heightInc * (i + 1)) * 0.8;
-            let x = xmax - widthInc * 1.2;
+            let x = xmax - widthInc * 1.8;
 
             this.ctx.fillStyle = this.colors[i];
             this.ctx.fillRect(x, y, Math.abs(heightInc / 4), Math.abs(heightInc / 4));
 
             this.ctx.textAlign = "start";
             this.ctx.fillStyle = '#fff';//this.legendColor;  
-            let text = LLegend[i].length > 18 ? LLegend[i].substr(0, 17) + '..' : LLegend[i];
+            let text = Lang(LLegend[i] + "ChartText");
+            text = text.length > 18 ? text.substr(0, 17) + '..' : text;
             this.ctx.fillText(text, x + 10, y + heightInc / 4); 
         }
     }

@@ -503,18 +503,21 @@ export default class Checkers extends App {
         if (opponentInfo.status === window.loft.constants.STATUS_WON || playerInfo.status === window.loft.constants.STATUS_WON) return false;
 
         let changes = false;
+        let game_status = window.loft.constants.STATUS_ACTIVE;
         if ((playerInfo.done === 12 || opponentInfo.possibilities === 0) && playerInfo.status === window.loft.constants.STATUS_IN_GAME) {
             changes = true;
             playerInfo.status = window.loft.constants.STATUS_WON;
             opponentInfo.status = window.loft.constants.STATUS_FAIL;
+            game_status = window.loft.constants.STATUS_FINISHED;
         }
         if ((opponentInfo.done === 12 || playerInfo.possibilities === 0) && opponentInfo.status === window.loft.constants.STATUS_IN_GAME) {
             changes = true;
             playerInfo.status = window.loft.constants.STATUS_FAIL;
             opponentInfo.status = window.loft.constants.STATUS_WON;
+            game_status = window.loft.constants.STATUS_FINISHED;
         }
 
-        if (changes) return { playerInfo: playerInfo, opponentInfo: opponentInfo };
+        if (changes) return { playerInfo: playerInfo, opponentInfo: opponentInfo, game_status: game_status };
 
         return false;
     }
