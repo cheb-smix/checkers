@@ -10,6 +10,7 @@ import "animate.css/animate.css";
 import Settings from './Components/Setting/settings';
 import postData from './Funcs/PostDataFuncs';
 import './Funcs/Math';
+import './Funcs/Addons';
 import { Localization } from './Components/Localization';
 
 window.loft = {

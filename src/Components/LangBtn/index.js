@@ -2,31 +2,6 @@ import React from 'react';
 import './lang.css';
 
 export default class LangBtn extends React.Component {
-    state = {
-        langs: [
-            {
-                title: "English",
-                code: "en-US",
-                lkey: "en",
-            },
-            {
-                title: "Русский",
-                code: "ru-RU",
-                lkey: "ru",
-            },
-            {
-                title: "Español",
-                code: "es-ES",
-                lkey: "es",
-            },
-            {
-                title: "Português",
-                code: "pt-PT",
-                lkey: "pt",
-            },
-        ],
-    }
-
     toggle = () => {
         document.getElementById('langChooser').classList.toggle('closed');
     }
@@ -37,13 +12,13 @@ export default class LangBtn extends React.Component {
     }
 
     render(){
-        let availableLangs = this.state.langs.map((lang, l) => {
-            return (<li code={lang.code} key={l} lkey={lang.lkey} onClick={this.setLng}>{lang.title}</li>);
+        let availableLangs = Object.keys(window.loft.localization.langTitles).map((key, index) => {
+            return (<li code={key} key={index} onClick={this.setLng}>{window.loft.localization.langTitles[key]}</li>);
         });
 
         return (
             <div id="langChooser" className="closed">
-                <div className='current' lkey={window.loft.localization.getLanguage()} onClick={this.toggle}></div>
+                <div className='current' code={window.loft.localization.getLanguage()} onClick={this.toggle}></div>
                 <ul>{availableLangs}</ul>
             </div>
         );

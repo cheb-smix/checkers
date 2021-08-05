@@ -1,5 +1,3 @@
-import React from 'react';
-
 Math.coefficient = (n1, n2, f = 0) => {
     n2 = n2 !== 0 ? n2 : 1;
     return f ? (n1 / n2).toFixed(f) : (n1 / n2);
@@ -87,12 +85,4 @@ Math.findBezier = (b0 = null, c1, c2, c3 = null) => {
     }
 
     return {n1: {x: x1, y: y1}, n2: {x: x2, y: y2}};
-}
-
-React.isset = (variable) => {
-    return typeof (variable) !== 'undefined';
-}
-
-React.empty = (variable) => {
-    return (variable === '' || !variable || !Object.keys(variable).length);
 }

@@ -9,6 +9,13 @@ export class Localization
         "pt": ["pt"],
     };
 
+    langTitles = {
+        "en": "English",
+        "ru": "Русский",
+        "es": "Español",
+        "pt": "Português"
+    };
+
     langpack = {
         en:{
             // Common
