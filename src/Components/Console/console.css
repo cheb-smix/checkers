@@ -11,7 +11,7 @@
     left: 0;
     width: 100%;
     height: 20vh;
-    z-index: 15;
+    z-index: var(--rampage-layer-depth);
 }
 #consoleParentino{
     position: relative;
@@ -64,7 +64,7 @@
 .neonconsole {
     position: absolute;
     top: 0;
-    z-index: -1;
+    z-index: var(--background-layer-depth);
     font-size: 2.3vh;
     font-style: italic;
     font-family: NeonFont;
@@ -87,7 +87,7 @@
 .altneonconsole{
     position: absolute;
     top: 0;
-    z-index: -1;
+    z-index: var(--background-layer-depth);
     font-size: 2.2vh;
     font-style: italic;
     font-family: NeonFont;

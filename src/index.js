@@ -28,7 +28,11 @@ window.loft = {
         Debug: false,
         StepTimeLimit: 30,
         AnimationSpeed: 45,
-        EpicStepNum: 4,
+        EpicStepNum: {
+            checkers: 3,
+            giveaway: 3,
+            corners: 4
+        },
         BASE: 2,
         MLTPLR: 150,
         INC: 0.3
@@ -166,22 +170,22 @@ async function checkConnection()
         for (let k in res.user_info) window.loft.user_info[k] = res.user_info[k];
         window.loft.isGuest = res.isGuest;
         window.loft.AjaxAvailable = true;
-        window.loft.devInfo = res.devInfo;
+        // window.loft.devInfo = res.devInfo;
+        window.loft.device = res.device;
 
         window.loft.settings.set("config", res.config, 3600 * 24 * 3);
         window.loft.settings.set("user_info", res.user_info, 3600 * 24);
         window.loft.settings.set("serverInfo", res.serverInfo, 360);
 
         if (!React.empty(res.chart)) {
+            window.loft.chart.length = 0;
             for (let k in res.chart) {
                 if (!React.isset(window.loft.chart[k])) window.loft.chart[k] = {};
                 for (let d in res.chart[k]) {
                     window.loft.chart[k][d] = res.chart[k][d];
                 }
+                window.loft.chart.length = Object.keys(window.loft.chart[k]).length;
             }
-
-            
-
             window.loft.settings.set("chart", res.chart, 3600 * 20);
         }
 

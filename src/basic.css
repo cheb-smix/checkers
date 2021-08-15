@@ -22,6 +22,15 @@
     --cell-size: 6vw;
     --checker-size: 4.5vw;
     --regular-text-size: 16px;
+
+    --modal-layer-depth: 200;
+    --modal-bg-layer-depth: 190;
+    --appheader-layer-depth: 150;
+    --navigator-layer-depth: 130;
+    --fanfaras-layer-depth: 100;
+    --rampage-layer-depth: 20;
+    --stepper-layer-depth: 2;
+    --background-layer-depth: -1;
 }
 @media (orientation: portrait), (min-aspect-ratio: 10/6){
   :root{

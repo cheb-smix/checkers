@@ -94,6 +94,7 @@ export class Localization
             timeStatText:       "Game time $",
             newLevelText:       "New level!",
             pointsStatText:     "Current experience",
+            newGame:            "New game",
             // Console
             searchingTheEnemy:  "Searching an opponent",
             approxWaitTime:     "Estimated waiting time: $ sec.",
@@ -235,6 +236,7 @@ export class Localization
             timeStatText:       "Время игры $",
             newLevelText:       "Новый уровень!",
             pointsStatText:     "Текущий опыт",
+            newGame:            "Новая игра",
             // Console
             searchingTheEnemy:  "Поиск противника",
             approxWaitTime:     "Примерное время ожидания: $ сек.",
@@ -376,6 +378,7 @@ export class Localization
             timeStatText: "Tiempo de juego $",
             newLevelText: "Nuevo nivel!",
             pointsStatText: "Experiencia actual",
+            newGame: "Nuevo juego",
             // Console
             searchingTheEnemy: "buscar al enemigo",
             approxWaitTime: "tiempo de espera Aproximado: $ seg.",
@@ -515,6 +518,7 @@ export class Localization
             timeStatText: "Tempo do jogo $",
             newLevelText: "Novo nivel!",
             pointsStatText: "Experiência actual",
+            newGame: "Novo jogo",
             // Console
             searchingTheEnemy: "Encontrar um adversário",
             approxWaitTime: "Tempo limite aproximado: сек seg.",

@@ -9,6 +9,7 @@ export default class Button extends React.Component{
     buttonAction = () => {
         Noise("menu-click");
         if (this.props.action !== "") {
+            console.log("ACTION!");
             this.props.action();
         }
         if (this.props.href !== "") Routing(this.props.href);
