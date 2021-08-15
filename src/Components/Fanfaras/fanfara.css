@@ -1,4 +1,4 @@
-.exp{
+/* .exp{
     border: 2px rgba(30,104,153) solid;
     border-bottom: 6px rgba(30,104,153) solid;
     height: 35px;
@@ -18,7 +18,7 @@
     font-family: ForwardExtra-Light;
     font-weight: bold;
     padding-top: 8px;
-}
+} */
 #fanfara{
     width: 48vw;
     font-family: ForwardExtra-Light;
@@ -28,7 +28,7 @@
     text-align: center;
     display: block;
     position: absolute;
-    z-index: 5;
+    z-index: var(--fanfaras-layer-depth);
 }
 #fanfara h3{
     margin: 0px 0px 10px 0px;

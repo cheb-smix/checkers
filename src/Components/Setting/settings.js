@@ -81,7 +81,7 @@ export default class Settings {
     get = (key = '') => {
         let item = JSON.parse(localStorage.getItem(key));
         if (item) {
-            if (!item.expiry || item.expiry > new Date().getTime()) {
+            if (!item.expiry || item.expiry === 0 || item.expiry > new Date().getTime()) {
                 return item.value;
             } else {
                 localStorage.removeItem(key);
@@ -91,7 +91,7 @@ export default class Settings {
     }
 
     set = (key, value = '', expiry = 0) => {
-        let item = {value: value, expiry: new Date().getTime() + expiry * 1000};
+        let item = {value: value, expiry: (expiry ? new Date().getTime() + expiry * 1000 : 0)};
         if (value === "") {
             localStorage.removeItem(key);
         } else {

@@ -34,6 +34,18 @@ export default class Setting extends React.Component{
                         />
                     </div>
                     <div className="col-md-6 col-12">
+                        <Droplist
+                            id="language"
+                            items={window.loft.localization.langTitles}
+                            selected={window.loft.usersettings.language}
+                            placeholder="Language"
+                            onSelect={(name, value) => {
+                                window.loft.localization.set(value, false);
+                                window.loft.settings.saveSetting(name, value);
+                            }}
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
                         <Slider
                             id="soundvolume"
                             placeholder={Lang("soundSetting")}

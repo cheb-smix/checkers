@@ -4,7 +4,7 @@
     align-items: baseline;
     justify-content: space-between;
     position: fixed;
-    z-index: 50;
+    z-index: var(--appheader-layer-depth);
     top: 0;
 }
 .fa-chess{
@@ -18,7 +18,7 @@
     flex-direction: column;*/
     top: 1.8em;
     left: 0;
-    z-index: 8;
+    z-index: var(--navigator-layer-depth);
     /*background: rgba(0,0,0,0.9);*/
     width: 100%;
     height: var(--field-size);
@@ -28,7 +28,7 @@
     top: 0;
     left: 0;
     position: absolute;
-    z-index: -1;
+    z-index: var(--background-layer-depth);
     background: rgba(0,0,0,0.9);
     width: 100%;
     height: var(--field-size);

@@ -182,7 +182,7 @@ export default class Charts extends React.Component {
             this.ctx.textAlign = "start";
             this.ctx.fillStyle = '#fff';//this.legendColor;  
             let text = Lang(LLegend[i] + "ChartText");
-            text = text.length > 18 ? text.substr(0, 17) + '..' : text;
+            text = text.length > 12 ? text.substr(0, 12) + '.' : text;
             this.ctx.fillText(text, x + 10, y + heightInc / 4); 
         }
     }

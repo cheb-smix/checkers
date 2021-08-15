@@ -54,15 +54,24 @@ export default class Fanfara extends React.Component {
         let opponentCheckersUnDone = 12 - opponentInfo.done;
         let ppercent = Math.round(playersCheckersUnDone * 100 / 12);
         let opercent = Math.round(opponentCheckersUnDone * 100 / 12);
-
+        
         let buttons =
             <div key={-1} className="container" style={{ height: "auto" }}>
                 <div className="row">
                     <div className="col-12">
                         <Button
+                            action={this.props.newGame}
+                            href=""
+                            value={Lang("newGame")}
+                            theme="neon"
+                            strong="true"
+                        />
+                    </div>
+                    <div className="col-12">
+                        <Button
                             action=""
                             href="/home"
-                            value={Lang("closeText")}
+                            value={Lang("homePageText")}
                             theme="grey"
                             strong="true"
                         />
@@ -277,7 +286,7 @@ export default class Fanfara extends React.Component {
         return (
             <div className={"status" + this.props.game_status} id="fanfara"><br />
                 <h3>{header}{playerInfo.display_name ? ', ' + playerInfo.display_name : ''}</h3>
-                { Object.keys(window.loft.chart).length > 0 ? 
+                { window.loft.chart.length > 1 ? 
                 <Charts 
                 data={window.loft.chart} 
                 colors={['#f40', 'green', '#08f', '#eeff00']}

@@ -50,15 +50,15 @@
     border-color: white;
     transform: translate(8px, calc((var(--flag-size) - 1em) / 2));
 }
-#langChooser > ul > li[lkey=en]::after, #langChooser > .current[lkey=en] {
+#langChooser > ul > li[code=en]::after, #langChooser > .current[code=en] {
     background-image: url('./us.png');
 }
-#langChooser > ul > li[lkey=ru]::after, #langChooser > .current[lkey=ru] {
+#langChooser > ul > li[code=ru]::after, #langChooser > .current[code=ru] {
     background-image: url('./ru.png');
 }
-#langChooser > ul > li[lkey=es]::after, #langChooser > .current[lkey=es] {
+#langChooser > ul > li[code=es]::after, #langChooser > .current[code=es] {
     background-image: url('./es.png');
 }
-#langChooser > ul > li[lkey=pt]::after, #langChooser > .current[lkey=pt] {
+#langChooser > ul > li[code=pt]::after, #langChooser > .current[code=pt] {
     background-image: url('./pt.png');
 }
