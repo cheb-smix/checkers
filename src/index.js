@@ -128,8 +128,7 @@ if (window.cordova) {
 
 async function DOMLoaded()
 {
-    document.getElementById("version").style.display = 'block';
-    document.getElementById("version").innerHTML = window.loft.apiserver + '<br>' + document.getElementById("version").innerHTML;
+    console.log("Using", window.loft.apiserver);
     await checkConnection();
     ReactDOM.render(
         <Router history={window.loft.history}>
@@ -157,10 +156,7 @@ async function checkConnection()
         window.loft.connectionType = navigator.connection.type || navigator.connection.effectiveType;
     } 
 
-    if (["none", "unknown"].indexOf(window.loft.connectionType) >= 0) {
-        document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
-        return;
-    }
+    if (["none", "unknown"].indexOf(window.loft.connectionType) >= 0) return;
 
     let res = await postData({url: window.loft.apiserver + "config"});
     
@@ -197,7 +193,6 @@ async function checkConnection()
                 for (let k in ls) window.loft[localsetts[i]][k] = ls[k];
             }
         }
-        document.getElementById("version").innerHTML = 'Offline mode<br>' + document.getElementById("version").innerHTML;
     }
 }
 

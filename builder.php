@@ -21,6 +21,7 @@ class Builder
     ];
     private $GLFOLDER = '';
     private $TMPFOLDER = '';
+    private $GLFILES = [];
 
     public function __construct()
     {
@@ -110,8 +111,8 @@ class Builder
 
         $this->GLFOLDER = realpath('./src/Components/Gameslogic');
         $this->TMPFOLDER = realpath('../');
-        $FILES = scandir($GLFOLDER);
-        foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->GLFOLDER/$file", "$this->TMPFOLDER/$file");
+        $this->GLFILES = scandir($this->GLFOLDER);
+        foreach ($this->GLFILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->GLFOLDER/$file", "$this->TMPFOLDER/$file");
     }
 
     private function mainSequence()
@@ -127,7 +128,7 @@ class Builder
             $content = file_get_contents($file);
             $content = str_replace("/static/", "static/", $content);
             $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
-            $content = str_replace('<script>', '<script>const version = ' . implode(".", $dev_info["version"]) . ", const lastUpdate = '" . $dev_info["lastUpdate"] . "';", $content);
+            $content = str_replace('<script id="app-ver-scr">', '<script id="app-ver-scr">const appVersion = "' . implode(".", $this->dev_info["version"]) . '"; const appLastUpdate = "' . $this->dev_info["lastUpdate"] . '";', $content);
             file_put_contents($file, $content);
         }
 
@@ -197,7 +198,7 @@ class Builder
 
         $this->printer("Returning gamelogic");
 
-        foreach ($FILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->TMPFOLDER/$file", "$this->GLFOLDER/$file");
+        foreach ($this->GLFILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->TMPFOLDER/$file", "$this->GLFOLDER/$file");
 
         $appFile = preg_replace("/\/*('[a-z]+',)/", "$1", $appFile);   
         $appFile = preg_replace("/\/*import ([a-zA-Z]+ from \"\.\/Components\/Gameslogic\/[a-z]+\";)/", "import $1", $appFile);
