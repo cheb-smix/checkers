@@ -795,9 +795,9 @@ export default class App extends React.Component {
         let dx = x1 - (x1 - x2) / 2;
         let dy = y1 - (y1 - y2) / 2;
 
-        if (index === hops - 1 && hops > window.loft.config.EpicStepNum[window.loft.usersettings.game] && Math.random() > 0.5 && !cells[koordsfrom].damka) {
+        if (index === hops - 1 && hops >= window.loft.config.EpicStepNum[window.loft.usersettings.game] && Math.random() > 0.5 && !cells[koordsfrom].damka) {
 
-            if (hops > window.loft.config.EpicStepNum[window.loft.usersettings.game] + 2 || Math.random() > 0.5) {
+            if (Math.random() > hops / (window.loft.config.EpicStepNum[window.loft.usersettings.game] * 2)) {
                 Noise("epic-rock");
             } else {
                 Noise("epic");

@@ -153,7 +153,7 @@ export default class Checkers extends App {
                 if (freeRide) vars.push({ place: k1, kill: [], len: n });
                 continue;
             }
-            if (p[x + ':' + y].kills.indexOf(k1) >= 0) continue;
+            if (p[x + ':' + y].kills.indexOf(k1) >= 0) break; // continue - дамка может есть назад
             if (freeRide) break;
             let blocker = false;
             for (let m = n + 1; m < 8; m++) {
