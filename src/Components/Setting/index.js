@@ -90,6 +90,11 @@ export default class Setting extends React.Component{
                         />
                     </div> : ""}
                 </div>
+                <div className="row" style={{position: "absolute", bottom: 0, width: "100%", color: "grey", fontSize: "12px"}}>
+                    <div className="col-12">
+                        <span>App v.{window.app.version} of {window.app.lastUpdate.split("GMT").shift()}</span>
+                    </div>
+                </div>
             </div>
         );
     };

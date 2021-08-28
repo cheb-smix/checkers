@@ -44,9 +44,10 @@ async function xhr(o = {})
                 reject(new Error('Request failed'));
             }
 
+            o.data.appVersion = window.app.version;
+
             if(typeof(o.data) === "object") {
                 o.data = object2string(o.data);
-                //o.data = JSON.stringify(o.data);
             }
             xhr.send(o.data);
 
@@ -74,6 +75,7 @@ async function xhr(o = {})
 
 async function fatch(o = {})
 {
+    o.data.appVersion = window.app.version;
     let response = await custom_fetch(o.url, {
         method: o.method,
         headers: o.headers,

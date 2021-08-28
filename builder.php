@@ -139,7 +139,9 @@ class Builder
             $content = file_get_contents($file);
             $content = str_replace("/static/", "static/", $content);
             $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
-            $content = str_replace('<script id="app-ver-scr">', '<script id="app-ver-scr">const appVersion = "' . implode(".", $this->dev_info["version"]) . '"; const appLastUpdate = "' . $this->dev_info["lastUpdate"] . '";', $content);
+            $content = str_replace('<script id="app-ver-scr">([^"]+")([0-9.]+)', '<script id="app-ver-scr">$1' . implode(".", $this->dev_info["version"]), $content);
+            $content = str_replace('<script id="app-ver-scr">([^(]+)([^\}]+)', '<script id="app-ver-scr">$1"' . implode(".", $this->dev_info["lastUpdate"]) . '"', $content);
+
             if ($content) file_put_contents($file, $content);
         }
 
