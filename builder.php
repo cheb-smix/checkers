@@ -7,6 +7,7 @@ class Builder
     private $release = false;
     private $path = '';
     private $app = '';
+    private $help = false;
 
     private $cordova_workfolder = '';
     private $dev_info_file = './.dev_info';
@@ -37,6 +38,16 @@ class Builder
                     $this->$k = $v;
                 }
             }
+        }
+
+        if ($this->help) {
+            $this->printer("Flag\t\t| Description");
+            $this->printer("--app\t\t| Use --app=checkers to specify app to build");
+            $this->printer("--path\t\t| Use --path=/path/to/cordova to specify cordova workfolder to build");
+            $this->printer("--release\t| Use --release to build a release version");
+            $this->printer("--simulate\t| Use --simulate to simulate app after building");
+            $this->printer("--build-only\t| Use --build-only to skip ReactJS building steps and build current cordova project");
+            exit;
         }
     }
 
@@ -129,7 +140,7 @@ class Builder
             $content = str_replace("/static/", "static/", $content);
             $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
             $content = str_replace('<script id="app-ver-scr">', '<script id="app-ver-scr">const appVersion = "' . implode(".", $this->dev_info["version"]) . '"; const appLastUpdate = "' . $this->dev_info["lastUpdate"] . '";', $content);
-            file_put_contents($file, $content);
+            if ($content) file_put_contents($file, $content);
         }
 
         $this->printer("Rebuilding build/static/css/*.css");
@@ -137,7 +148,7 @@ class Builder
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
             $content = str_replace("/static/", "../", $content);
-            file_put_contents($file, $content);
+            if ($content) file_put_contents($file, $content);
         }
 
         $this->printer("Rebuilding build/static/js/main.*.chunk.js");
@@ -145,7 +156,7 @@ class Builder
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
             $content = str_replace("window.loft.device={}", "window.loft.device=device", $content);
-            file_put_contents($file, $content);
+            if ($content) file_put_contents($file, $content);
         }
     }
 
@@ -189,7 +200,7 @@ class Builder
 
     private function saveDevInfo()
     {
-        file_put_contents($this->dev_info_file, json_encode($this->dev_info));
+        if ($this->dev_info) file_put_contents($this->dev_info_file, json_encode($this->dev_info));
     }
 
     private function rollbackGameLogic()
@@ -200,11 +211,13 @@ class Builder
 
         foreach ($this->GLFILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->TMPFOLDER/$file", "$this->GLFOLDER/$file");
 
+        $appFile = file_get_contents('./src/App.js');
+
         $appFile = preg_replace("/\/*('[a-z]+',)/", "$1", $appFile);   
         $appFile = preg_replace("/\/*import ([a-zA-Z]+ from \"\.\/Components\/Gameslogic\/[a-z]+\";)/", "import $1", $appFile);
         $appFile = preg_replace("/\/*(<Route   path='\/[a-z]+')/", "$1", $appFile);
 
-        file_put_contents('./src/App.js', $appFile);
+        if ($appFile) file_put_contents('./src/App.js', $appFile);
     }
 
     private function simulateProposal()
