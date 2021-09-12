@@ -1,24 +1,3 @@
-/* .exp{
-    border: 2px rgba(30,104,153) solid;
-    border-bottom: 6px rgba(30,104,153) solid;
-    height: 35px;
-    width: 100%;
-    position: relative;
-    font-size: 15px;
-    border-radius: 7px;
-}
-.exp>.progress{
-    height: 30px;
-    background: #06c;
-    z-index: -1;
-    position: absolute;
-    color: #fff;
-    text-align: center;
-    transition: none;
-    font-family: ForwardExtra-Light;
-    font-weight: bold;
-    padding-top: 8px;
-} */
 #fanfara{
     width: 48vw;
     font-family: ForwardExtra-Light;
@@ -29,6 +8,7 @@
     display: block;
     position: absolute;
     z-index: var(--fanfaras-layer-depth);
+    min-height: 90vh;
 }
 #fanfara h3{
     margin: 0px 0px 10px 0px;

@@ -1,18 +1,38 @@
 # Installations
 - Install ReactJS
-- Run "composer install"
-- Install Cordova, Java (JRE), SDK (for simulations), (maybe Android Studio, maybe Gradle)
-- Install plugins (cordova plugin add): 
-    - cordova-plugin-device
-    - cordova-plugin-whitelist
-    - cordova-plugin-network-information
-    - cordova-plugin-vibration
-    - cordova-plugin-screen-orientation
-- Set android:usesCleartextTraffic="true" at android manifest
-- Configure config.xml
-- Add platforms (android, ios)
-- Install cordova-simulate (sudo npm install -g cordova-simulate)
-- Cordova-simulate usage: simulate --device=Nexus10 --dir=<DIR> --target=opera
+- Run `npm install`
+- Run `sudo npm install -g cordova` to install cordova (To create a new project you can use `cordova create hello com.example.hello HelloWorld`)
+- Clone git@github.com:cheb-smix/checkers_cordova_project.git
+- [Outdated] Install plugins (cordova plugin add): 
+  [Outdated]   - cordova-plugin-device
+  [Outdated]   - cordova-plugin-whitelist
+  [Outdated]   - cordova-plugin-network-information
+  [Outdated]   - cordova-plugin-vibration
+  [Outdated]   - cordova-plugin-screen-orientation
+- Use `cordova platform add android` to add android platform (the above-mentioned plugins will be installed automatically)
+- Use `sudo apt install android-sdk` to install Android SDK
+- Install java using `sudo apt install openjdk-8-jdk`
+- Set java using `sudo update-alternatives --config javac` (set it to /usr/lib/jvm/java-8-openjdk-amd64/bin/javac)
+- Learn how to install that on https://android.tutorials24x7.com/blog/how-to-install-android-sdk-tools-on-ubuntu-20-04
+- Download cmdline-tools from https://developer.android.com/studio?pkg=tools#downloads
+- Unzip it to `~/android-sdk/cmdline-tools/tools`
+- Get platform-tools from https://developer.android.com/studio/releases/platform-tools
+- Unzip it to `~/android-sdk/platform-tools`
+- Get Gradle from https://gradle.org/releases/
+    - `sudo mkdir /opt/gradle`
+    - `sudo unzip -d /opt/gradle gradle-7.2-bin.zip`
+- Edit ~/.bashrc :
+    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    export ANDROID_SDK_ROOT=~/android-sdk
+    export PATH=${ANDROID_SDK_ROOT}/platform-tools:/opt/gradle/gradle-7.2/bin:${ANDROID_SDK_ROOT}/cmdline-tools/tools:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${PATH}
+- Run `source ~/.bashrc`
+- Run `sdkmanager --update`
+- Run `sdkmanager "build-tools;29.0.2"` for Android Build Tools installation
+- You can use `sdkmanager --list` to get list of installed and available packages
+- [Outdated] Set android:usesCleartextTraffic="true" at android manifest 
+- [Outdated] Configure config.xml
+- Install cordova-simulate (`sudo npm install -g cordova-simulate`)
+- Cordova-simulate usage: `simulate --device=Nexus10 --dir=<DIR> --target=opera`
 
 # Порядок билда
 1. npm run build
