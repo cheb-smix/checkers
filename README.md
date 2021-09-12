@@ -4,11 +4,11 @@
 - Run `sudo npm install -g cordova` to install cordova (To create a new project you can use `cordova create hello com.example.hello HelloWorld`)
 - Clone git@github.com:cheb-smix/checkers_cordova_project.git
 - [Outdated] Install plugins (cordova plugin add): 
-  [Outdated]   - cordova-plugin-device
-  [Outdated]   - cordova-plugin-whitelist
-  [Outdated]   - cordova-plugin-network-information
-  [Outdated]   - cordova-plugin-vibration
-  [Outdated]   - cordova-plugin-screen-orientation
+    - [Outdated] cordova-plugin-device
+    - [Outdated] cordova-plugin-whitelist
+    - [Outdated] cordova-plugin-network-information
+    - [Outdated] cordova-plugin-vibration
+    - [Outdated] cordova-plugin-screen-orientation
 - Use `cordova platform add android` to add android platform (the above-mentioned plugins will be installed automatically)
 - Use `sudo apt install android-sdk` to install Android SDK
 - Install java using `sudo apt install openjdk-8-jdk`
@@ -21,7 +21,7 @@
 - Get Gradle from https://gradle.org/releases/
     - `sudo mkdir /opt/gradle`
     - `sudo unzip -d /opt/gradle gradle-7.2-bin.zip`
-- Edit ~/.bashrc :
+- Edit `~/.bashrc`:
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
     export ANDROID_SDK_ROOT=~/android-sdk
     export PATH=${ANDROID_SDK_ROOT}/platform-tools:/opt/gradle/gradle-7.2/bin:${ANDROID_SDK_ROOT}/cmdline-tools/tools:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${PATH}
