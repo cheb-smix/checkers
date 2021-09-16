@@ -201,6 +201,7 @@ class Builder
 
         if ($this->release) {
             $res = `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers
+            rm {$this->cordova_workfolder}checkers.apk
             zipalign -v 4 {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk {$this->cordova_workfolder}checkers.apk`;
 
             $this->printer($res);
