@@ -10,7 +10,7 @@
 
 # production
 /build
-.dev_info
+.workfolder
 .apk
 
 # misc

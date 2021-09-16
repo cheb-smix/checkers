@@ -34,6 +34,13 @@
 - Install cordova-simulate (`sudo npm install -g cordova-simulate`)
 - Cordova-simulate usage: `simulate --device=Nexus10 --dir=<DIR> --target=opera`
 
+# Порядок подписания приложения
+- Отличное описание: https://habr.com/ru/post/324350/
+- `cordova build --release` to build a release app version
+- `keytool -genkey -v -keystore checkers.keystore -alias checkers -keyalg RSA -keysize 2048 -validity 10000` to generate keystore file
+- `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers` to sign apk
+- `zipalign -v 4 ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers.apk` to optimize apk
+
 # Порядок билда
 1. npm run build
 2. build/index.html > "/static/" to "static/"
