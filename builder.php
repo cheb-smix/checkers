@@ -2,15 +2,17 @@
 
 class Builder
 {
-    private $buildOnly = false;
+    private $buildonly = false;
     private $simulate = false;
     private $release = false;
     private $path = '';
     private $app = '';
     private $help = false;
+    private $debug = false;
 
     private $cordova_workfolder = '';
     private $dev_info_file = './.dev_info';
+    private $workfolder_file = './.workfolder';
     private $dev_info = [
         "version" => [
             "major"     => 1,
@@ -46,7 +48,7 @@ class Builder
             $this->printer("--path\t\t| Use --path=/path/to/cordova to specify cordova workfolder to build");
             $this->printer("--release\t| Use --release to build a release version");
             $this->printer("--simulate\t| Use --simulate to simulate app after building");
-            $this->printer("--build-only\t| Use --build-only to skip ReactJS building steps and build current cordova project");
+            $this->printer("--buildonly\t| Use --build-only to skip ReactJS building steps and build current cordova project");
             exit;
         }
     }
@@ -54,6 +56,8 @@ class Builder
     public function init()
     {
         $this->printer("Build process initiated with next params: " . var_export((array)$this, true));
+
+        if ($this->debug) exit;
 
         $this->checkWorkfolder();
         $this->rebuildForApp();
@@ -72,7 +76,7 @@ class Builder
     {
         $this->dev_info = (file_exists($this->dev_info_file) && $dev_info = json_decode(file_get_contents($this->dev_info_file), true)) ? $dev_info : $this->dev_info;
 
-        $this->cordova_workfolder = isset($this->dev_info["cordova_workfolder"]) ? $this->dev_info["cordova_workfolder"] : "";
+        $this->cordova_workfolder = (file_exists($this->workfolder_file) && $cordova_workfolder = file_get_contents($this->workfolder_file)) ? $cordova_workfolder : $this->cordova_workfolder;
     }
 
     private function checkWorkfolder()
@@ -80,7 +84,7 @@ class Builder
         if ($this->path && strtolower(readline("Continue with cordova workfolder '$this->path'? ")) == "y") {
             $this->cordova_workfolder = $this->path;
         } else {
-            if (!file_exists($this->dev_info_file)) {
+            if (!file_exists($this->workfolder_file)) {
                 $this->cordova_workfolder = readline("Enter new cordova workfolder: ");
             }
         }
@@ -93,7 +97,6 @@ class Builder
         }
 
         $this->printer("Cordova workfolder initiated at " . $this->cordova_workfolder);
-        $this->dev_info["cordova_workfolder"] = $this->cordova_workfolder;
     }
 
     private function rebuildForApp()
@@ -128,7 +131,7 @@ class Builder
 
     private function mainSequence()
     {
-        if ($this->buildOnly) return;
+        if ($this->buildonly) return;
 
         $this->printer("Building ReactJS App");
         $this->printer(`npm run build`);
@@ -164,7 +167,7 @@ class Builder
 
     private function clearOldProject()
     {
-        if ($this->buildOnly) return;
+        if ($this->buildonly) return;
 
         $this->printer("Removing subfolder of cordova/www/");
         $files = scandir("{$this->cordova_workfolder}www");
@@ -177,7 +180,7 @@ class Builder
 
     private function copyNewProject()
     {
-        if ($this->buildOnly) return;
+        if ($this->buildonly) return;
 
         $this->printer("Copy build folder to cordova/www");
         $this->printer(`mv ./build ./www`);
@@ -189,20 +192,31 @@ class Builder
     {
         $this->printer("Cordova build");
 
+        $buildCmd = "cordova build" . ($this->release ? " --release" : "");
+
         $res = `cd {$this->cordova_workfolder}
-        cordova build`;
+        $buildCmd`;
 
         $this->printer($res);
 
-        $res = explode($this->cordova_workfolder, $res);
-        $res = str_replace("\n", "", array_pop($res));
+        if ($this->release) {
+            $res = `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers
+            zipalign -v 4 {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk {$this->cordova_workfolder}checkers.apk`;
 
-        $this->printer(`cp {$this->cordova_workfolder}$res ./app-debug.apk`);
+            $this->printer($res);
+            $this->printer(`cp {$this->cordova_workfolder}checkers.apk ./checkers.apk`);
+        } else {
+            $res = explode($this->cordova_workfolder, $res);
+            $res = str_replace("\n", "", array_pop($res));
+
+            $this->printer(`cp {$this->cordova_workfolder}$res ./app-debug.apk`);
+        }
     }
 
     private function saveDevInfo()
     {
         if ($this->dev_info) file_put_contents($this->dev_info_file, json_encode($this->dev_info));
+        if ($this->cordova_workfolder) file_put_contents($this->workfolder_file, $this->cordova_workfolder);
     }
 
     private function rollbackGameLogic()
