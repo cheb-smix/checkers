@@ -190,28 +190,36 @@ class Builder
 
     private function mainCordovaBuild()
     {
+        /*
+                jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers
+                zipalign -v 4 {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk {$this->cordova_workfolder}checkers.apk
+        */
+
         $this->printer("Cordova build");
 
-        $buildCmd = "cordova build" . ($this->release ? " --release" : "");
+        if ($this->release) {
+            $appFileName = "app-release.aab";
+            $relString = "--release";
+        } else {
+            $appFileName = "app-debug.apk";
+            $relString = "";
+        }
 
-        $res = `cd {$this->cordova_workfolder}
-        $buildCmd`;
+        $res = `
+            cd {$this->cordova_workfolder}
+            cordova run android --buildConfig {$relString}
+        `;
 
         $this->printer($res);
 
-        if ($this->release) {
-            $res = `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers
-            rm {$this->cordova_workfolder}checkers.apk
-            zipalign -v 4 {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk {$this->cordova_workfolder}checkers.apk`;
+        $res = explode($this->cordova_workfolder, $res);
+        $res = array_pop($res);
+        $res = explode("\n", $res);
+        $res = array_shift($res);
 
-            $this->printer($res);
-            $this->printer(`cp {$this->cordova_workfolder}checkers.apk ./checkers.apk`);
-        } else {
-            $res = explode($this->cordova_workfolder, $res);
-            $res = str_replace("\n", "", array_pop($res));
-
-            $this->printer(`cp {$this->cordova_workfolder}$res ./app-debug.apk`);
-        }
+        $this->printer("Copiing to project folder");
+        $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}");
+        $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
     }
 
     private function saveDevInfo()
