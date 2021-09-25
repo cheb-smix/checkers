@@ -159,7 +159,7 @@ export default class AppHeader extends React.Component {
         if (this.state.naviActive === null) uhcclass = "hidden fa-2x";
 
         let accDiv = <React.Fragment>
-            <div className="uhicon" onClick={this.gameButClick} onMouseDown={() => Noise("menu-click")} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching ? <i style={{ width: "35px" }}> {this.props.count}</i> : ""}</div>
+            {window.loft.config.onlineAvailable ? <div className="uhicon" onClick={this.gameButClick} onMouseDown={() => Noise("menu-click")} title={gametitle}><i className={gameclass}></i><span> {gametitle}</span>{this.props.searching ? <i style={{ width: "35px" }}> {this.props.count}</i> : ""}</div> : ''}
             <div className="uhicon" onClick={this.settingsClick} onMouseDown={() => Noise("menu-click")}><i className="fa fa-sliders-h"></i><span> {Lang("settingsText")}</span></div>
         </React.Fragment>;
 

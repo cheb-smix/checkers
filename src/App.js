@@ -6,6 +6,7 @@ import {
     withRouter
 } from "react-router-dom";
 
+import About from "./Components/About";
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
 
@@ -92,6 +93,7 @@ class App extends Component{
             }, false);
         }
         window.loft.showModal = this.showModal;
+        window.loft.hideModal = this.hideModal;
         window.loft.nextTrack = this.setNewTrack;
         window.loft.musicEnabled = this.state.playlist.length > 0;
 
@@ -112,6 +114,7 @@ class App extends Component{
                     }
                     
                     <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />
+                    <Route path='/about' render={(props) => <About {...props} modal={false} />} />
                     <Redirect from='/' to='/home'/>
                 </Switch>
                 <Modal closer={this.hideModal} modal={this.state.modal}/>

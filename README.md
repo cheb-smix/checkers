@@ -1,7 +1,10 @@
+? cordova plugin add cordova-plugin-app-version
+
 # Installations
 - Install ReactJS
 - Run `npm install`
 - Run `sudo npm install -g cordova` to install cordova (To create a new project you can use `cordova create hello com.example.hello HelloWorld`)
+- [Outdated] `npm install -g cordova-check-plugins` to install cordova plugins
 - Clone git@github.com:cheb-smix/checkers_cordova_project.git
 - [Outdated] Install plugins (cordova plugin add): 
     - [Outdated] cordova-plugin-device
@@ -9,6 +12,8 @@
     - [Outdated] cordova-plugin-network-information
     - [Outdated] cordova-plugin-vibration
     - [Outdated] cordova-plugin-screen-orientation
+    - [Outdated] cordova-custom-config [to be able to insert meta-data into manifest]
+    - [Outdated] cordova-plugin-localization-strings [to have app name locales in the device app list]
 - Use `cordova platform add android` to add android platform (the above-mentioned plugins will be installed automatically)
 - Use `sudo apt install android-sdk` to install Android SDK
 - Install java using `sudo apt install openjdk-8-jdk`
@@ -29,8 +34,7 @@
 - Run `sdkmanager --update`
 - Run `sdkmanager "build-tools;29.0.2"` for Android Build Tools installation
 - You can use `sdkmanager --list` to get list of installed and available packages
-- [Outdated] Set android:usesCleartextTraffic="true" at android manifest 
-- [Outdated] Configure config.xml
+- Also you can use `avdmanager list` to get list of available emulators
 - Install cordova-simulate (`sudo npm install -g cordova-simulate`)
 - Cordova-simulate usage: `simulate --device=Nexus10 --dir=<DIR> --target=opera`
 
@@ -38,8 +42,9 @@
 - Отличное описание: https://habr.com/ru/post/324350/
 - `cordova build --release` to build a release app version
 - `keytool -genkey -v -keystore checkers.keystore -alias checkers -keyalg RSA -keysize 2048 -validity 10000` to generate keystore file
-- `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers` to sign apk
-- `zipalign -v 4 ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers.apk` to optimize apk
+- [Outdated] `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers` to sign apk
+- [Outdated] `zipalign -v 4 ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers.apk` to optimize apk
+- `cordova run android --buildConfig [--release]` to build signed App Bundle
 
 # Порядок билда
 1. npm run build

@@ -26,6 +26,8 @@ class Builder
     private $TMPFOLDER = '';
     private $GLFILES = [];
 
+    private $errCnt = 0;
+
     public function __construct()
     {
         $this->loadDevInfo();
@@ -53,24 +55,53 @@ class Builder
         }
     }
 
+
     public function init()
     {
-        $this->printer("Build process initiated with next params: " . var_export((array)$this, true));
+        set_error_handler("Builder::customError");
+
+        // $this->printer("Build process initiated with next params: " . var_export((array)$this, true));
 
         if ($this->debug) exit;
 
         $this->checkWorkfolder();
-        $this->rebuildForApp();
-        $this->mainSequence();
-        $this->clearOldProject();
-        $this->copyNewProject();
+
+        if (!$this->buildonly) {
+
+            $this->dev_info["version"]["build"]++;
+            if ($micro = (int)($this->dev_info["version"]["build"] / 300)) {
+                $this->dev_info["version"]["build"] = $this->dev_info["version"]["build"] % 300;
+                $this->dev_info["version"]["micro"] = $this->dev_info["version"]["micro"] + $micro;
+            }
+            if ($minor = (int)($this->dev_info["version"]["micro"] / 99)) {
+                $this->dev_info["version"]["micro"] = $this->dev_info["version"]["micro"] % 99;
+                $this->dev_info["version"]["minor"] = $this->dev_info["version"]["minor"] + $minor;
+            }
+            $this->dev_info["lastUpdate"] = date('Y-m-d H:i:s T');
+
+            if ($this->app) {
+                $this->rebuildForApp();
+            }
+            $this->mainSequence();
+            $this->clearOldProject();
+            $this->copyNewProject();
+        }
+
         $this->mainCordovaBuild();
         $this->saveDevInfo();
-        $this->rollbackGameLogic();
+
+        if ($this->app && !$this->buildonly) {
+            $this->rollbackGameLogic();
+        }
+
         $this->simulateProposal();
 
-        $this->printer("Build sequence is done!");
+        if ($this->errCnt) $this->printer("Build sequence is failed with $this->errCnt errors!", "fail");
+        else $this->printer("Build sequence is done!\n", "success");
     }
+
+
+
 
     private function loadDevInfo()
     {
@@ -96,16 +127,14 @@ class Builder
             $this->cordova_workfolder .= "/";
         }
 
-        $this->printer("Cordova workfolder initiated at " . $this->cordova_workfolder);
+        $this->printer("Cordova workfolder initiated at " . $this->cordova_workfolder, "info");
     }
 
     private function rebuildForApp()
     {
-        if (!$this->app) return;
-
         $className = strtoupper(substr($this->app, 0, 1)) . substr($this->app, 1);
 
-        $this->printer("Making ReactJS App Split for " . $this->app);
+        $this->printer("Making ReactJS App Split for " . $this->app, "info");
         
         $appFile = file_get_contents('./src/App.js');
 
@@ -126,29 +155,31 @@ class Builder
         $this->GLFOLDER = realpath('./src/Components/Gameslogic');
         $this->TMPFOLDER = realpath('../');
         $this->GLFILES = scandir($this->GLFOLDER);
-        foreach ($this->GLFILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->GLFOLDER/$file", "$this->TMPFOLDER/$file");
+        foreach ($this->GLFILES as $file) {
+            if (stristr($file, '.js') and $file != "$this->app.js") {
+                rename("$this->GLFOLDER/$file", "$this->TMPFOLDER/$file");
+            }
+        }
     }
 
     private function mainSequence()
     {
-        if ($this->buildonly) return;
-
-        $this->printer("Building ReactJS App");
+        $this->printer("Building ReactJS App", "info");
         $this->printer(`npm run build`);
 
-        $this->printer("Rebuilding build/index.html");
+        $this->printer("Rebuilding build/index.html", "info");
         $files = $this->getFolderFilesByMask("./build/", "index.html");
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
             $content = str_replace("/static/", "static/", $content);
             $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
-            $content = str_replace('<script id="app-ver-scr">([^"]+")([0-9.]+)', '<script id="app-ver-scr">$1' . implode(".", $this->dev_info["version"]), $content);
-            $content = str_replace('<script id="app-ver-scr">([^(]+)([^\}]+)', '<script id="app-ver-scr">$1"' . implode(".", $this->dev_info["lastUpdate"]) . '"', $content);
-
+            $content = preg_replace('/(<meta name="app-internal-version" content=)"([^"]+)/', '$1"' . implode(".", $this->dev_info["version"]), $content);
+            $content = preg_replace('/(<meta name="app-internal-last-update" content=)"([^"]+)/', '$1"' . $this->dev_info["lastUpdate"], $content);
+            
             if ($content) file_put_contents($file, $content);
         }
 
-        $this->printer("Rebuilding build/static/css/*.css");
+        $this->printer("Rebuilding build/static/css/*.css", "info");
         $files = $this->getFolderFilesByMask("./build/static/css/", "*.css");
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
@@ -156,7 +187,7 @@ class Builder
             if ($content) file_put_contents($file, $content);
         }
 
-        $this->printer("Rebuilding build/static/js/main.*.chunk.js");
+        $this->printer("Rebuilding build/static/js/main.*.chunk.js", "info");
         $files = $this->getFolderFilesByMask("./build/static/js/", "main.*.chunk.js");
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
@@ -167,9 +198,7 @@ class Builder
 
     private function clearOldProject()
     {
-        if ($this->buildonly) return;
-
-        $this->printer("Removing subfolder of cordova/www/");
+        $this->printer("Removing subfolder of cordova/www/", "info");
         $files = scandir("{$this->cordova_workfolder}www");
         foreach ($files as $i => $file) {
             if ($file != "." && $file != ".." && is_dir("{$this->cordova_workfolder}www" . DIRECTORY_SEPARATOR . $file) && !is_link("{$this->cordova_workfolder}www/$file")) {
@@ -180,9 +209,7 @@ class Builder
 
     private function copyNewProject()
     {
-        if ($this->buildonly) return;
-
-        $this->printer("Copy build folder to cordova/www");
+        $this->printer("Copy build folder to cordova/www", "info");
         $this->printer(`mv ./build ./www`);
         $this->printer(`cp -r ./www {$this->cordova_workfolder}`);
         $this->printer(`mv ./www ./build`);
@@ -190,12 +217,7 @@ class Builder
 
     private function mainCordovaBuild()
     {
-        /*
-                jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers
-                zipalign -v 4 {$this->cordova_workfolder}platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk {$this->cordova_workfolder}checkers.apk
-        */
-
-        $this->printer("Cordova build");
+        $this->printer("Cordova build", "info");
 
         if ($this->release) {
             $appFileName = "app-release.aab";
@@ -217,8 +239,8 @@ class Builder
         $res = explode("\n", $res);
         $res = array_shift($res);
 
-        $this->printer("Copiing to project folder");
-        $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}");
+        $this->printer("Copiing to project folder", "info");
+        $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}", "console");
         $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
     }
 
@@ -230,11 +252,14 @@ class Builder
 
     private function rollbackGameLogic()
     {
-        if (!$this->app) return;
+        $this->printer("Returning gamelogic", "info");
 
-        $this->printer("Returning gamelogic");
-
-        foreach ($this->GLFILES as $file) if (stristr($file, '.js') and $file != "$this->app.js") rename("$this->TMPFOLDER/$file", "$this->GLFOLDER/$file");
+        $this->GLFILES = scandir($this->TMPFOLDER);
+        foreach ($this->GLFILES as $file) {
+            if (stristr($file, '.js') and $file != "$this->app.js") {
+                rename("$this->TMPFOLDER/$file", "$this->GLFOLDER/$file");
+            }
+        }
 
         $appFile = file_get_contents('./src/App.js');
 
@@ -247,8 +272,8 @@ class Builder
 
     private function simulateProposal()
     {
-        $this->printer("NOW YOU CAN SIMULATE YOUR APP USING FOLLOWING CMD:");
-        $this->printer("simulate --device=Nexus10 --dir=$this->cordova_workfolder --target=opera\n");
+        $this->printer("NOW YOU CAN SIMULATE YOUR APP USING FOLLOWING CMD:", "info");
+        $this->printer("simulate --device=Nexus10 --dir=$this->cordova_workfolder --target=opera\n", "console");
 
         if ($this->simulate) {
             $this->printer(`simulate --device=Nexus10 --dir=$this->cordova_workfolder --target=opera`);
@@ -274,23 +299,51 @@ class Builder
                     } else {
                         $this->printer(" - Removing file " . $dir. DIRECTORY_SEPARATOR . $object) ;
                         if (!unlink($dir. DIRECTORY_SEPARATOR .$object)) {
-                            $this->printer("FAILED!");
+                            $this->printer("FAILED!", "fail");
                         }
                     }
                 } 
             }
-            $this->printer(" - Removing folder $dir");
+            $this->printer(" - Removing folder $dir", "info");
 
             if (!rmdir($dir)) {
-                $this->printer("FAILED!");
+                $this->printer("FAILED!", "fail");
             }
         } 
     }
 
-    private function printer($s)
+    private function printer($s, $style = "")
     {
+        // https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+        $colors = [
+            "error"         => "\n\e[97;5;1;101m",
+            "fail"          => "\e[91;1;107m",
+            "warning"       => "\e[93;1m",
+            "info"          => "\e[36m",
+            "success"       => "\e[92m",
+            "console"       => "\e[96m",
+            "default"       => "\e[0m",
+        ];
+
+        if ($style) {
+            if (!isset($colors[$style])) {
+                $style = "default";
+            }
+            echo $colors[$style];
+
+            if ($style == "error" or $style == "fail") $this->errCnt++;
+        }
         echo $s;
+        if ($style) echo $colors["default"];
         echo "\n";
+    }
+
+    private function customError($errno, $errstr, $errfile, $errline)
+    {
+        $this->errCnt++;
+        $this->printer("Error: [$errno]", "error");
+        $this->printer("$errstr in '$errfile' on line №$errline.", "fail");
     }
 }
 

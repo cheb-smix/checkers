@@ -13,6 +13,11 @@ import './Funcs/Math';
 import './Funcs/Addons';
 import { Localization } from './Components/Localization';
 
+window.app = {
+    version: document.querySelector('meta[name="app-internal-version"]').content,
+    lastUpdate: document.querySelector('meta[name="app-internal-last-update"]').content
+};
+
 window.loft = {
     wsserver: "wss://ws.smix-soft.ru:8080",
     apiserver: "https://smix-soft.ru/api/v2/game/",
@@ -35,7 +40,8 @@ window.loft = {
         },
         BASE: 2,
         MLTPLR: 150,
-        INC: 0.3
+        INC: 0.3,
+        docsURL: "https://smix-soft.ru/api/v2/docs/{docname}/{gamename}/{lang}",
     },
     constants: {
         STATUS_ACTIVE  : "A",
@@ -89,10 +95,10 @@ window.loft = {
     chart: {},
 };
 
-if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
-    window.loft.wsserver = "ws://192.168.31.168:1988";
-    window.loft.apiserver = "http://192.168.31.168/game/";
-}
+// if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
+//     window.loft.wsserver = "ws://192.168.31.168:1988";
+//     window.loft.apiserver = "http://192.168.31.168/game/";
+// }
 
 window.loft.usersettings = window.loft.settings.getSettings();
 window.loft.localization = new Localization();
@@ -146,7 +152,7 @@ function onDeviceReady()
     document.addEventListener("resume", onResume, false);
     document.addEventListener("online", onOnline, false);
     document.addEventListener("offline", onOffline, false);
-    window.loft.device = {};
+    // window.loft.device = {};
     DOMLoaded();
 }
 

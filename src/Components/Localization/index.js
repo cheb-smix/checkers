@@ -154,6 +154,14 @@ export class Localization
             disconnected:       "Disconnected",
             serversUnavailable: "Servers unavailable",
             findAnewGame:       "Search for a new game?",
+            // About
+            foreignVersionText: "External Version",
+            internalVersionText:"Internal Version",
+            foreignLastUpdateText:"External Last Update",
+            internalLastUpdateText:"Internal Last Update",
+            privacyPolicyText:  "Privacy Policy",
+            termsConditionsText:"Terms and Conditions",
+            aboutText:          "App Info",
         },
     
     
@@ -296,6 +304,14 @@ export class Localization
             disconnected:       "Отключен",
             serversUnavailable: "Серверы не доступен",
             findAnewGame:       "Найти новую игру?",
+            // About
+            foreignVersionText: "Версия приложения",
+            internalVersionText:"Внутренняя версия",
+            foreignLastUpdateText:"Последнее обновление",
+            internalLastUpdateText:"Внутреннее последнее обновление",
+            privacyPolicyText:  "Политика конфиденциальности",
+            termsConditionsText:"Условия и положения",
+            aboutText:          "О приложении",
         },
 
 
@@ -438,6 +454,14 @@ export class Localization
             disconnected: "Desconectado",
             serversUnavailable: "los Servidores no están disponibles",
             findAnewGame: "¿Encontrar un nuevo juego?",
+            // About
+            foreignVersionText:     "Versión Externa",
+            internalVersionText:    "Versión Interna",
+            foreignLastUpdateText:  "Última Actualización Externa",
+            internalLastUpdateText: "Última Actualización Interna",
+            privacyPolicyText:      "Política De Privacidad",
+            termsConditionsText:    "Términos y Condiciones",
+            aboutText:              "Acerca de la aplicación",
         },
 
 
@@ -578,6 +602,14 @@ export class Localization
             disconnected: "Desativado",
             serversUnavailable: "Servidores não disponíveis",
             findAnewGame: "Encontrar um novo jogo?",
+            // About
+            foreignVersionText:     "Versão Externa",
+            internalVersionText:    "Versão Interna",
+            foreignLastUpdateText:  "Última Actualização Externa",
+            internalLastUpdateText: "Última Actualização Interna",
+            privacyPolicyText:      "Privacidade",
+            termsConditionsText:    "Termos e Condições",
+            aboutText:              "Sobre o aplicativo",
         }
     };
 

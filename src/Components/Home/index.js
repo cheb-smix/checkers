@@ -76,33 +76,8 @@ export default class Home extends React.Component{
                     </React.Fragment>
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
-
-                {/* <Charts 
-                data={window.loft.chart} 
-                colors={['#f40', 'green', '#08f', '#eeff00']}
-                font="1.4vh Federo"
-                dots="false"
-                /> */}
-{/* 
-                <RoundProgressBar perc="15" />
-                <RoundProgressBar perc="43" />
-                <RoundProgressBar perc="58" />
-                <RoundProgressBar perc="120" />
-
-                <RoundProgressBar perc="149" />
-                <RoundProgressBar perc="165" />
-                <RoundProgressBar perc="205" />
-                <RoundProgressBar perc="-214" last="true"/> */}
-
+                <Button action="" href="/about" value={Lang("aboutText")} />
             </div>
         );
     };
 }
-
-/*
-<Button 
-                    action={()=>window.loft.settings.saveSetting("mode", "local")} 
-                    href={this.getGameRoute()} 
-                    value={Lang("playByBlueTooth")} 
-                />
-                */

@@ -3,6 +3,8 @@ import Lang from '../Components/Localization';
 import postData from "./PostDataFuncs";
 import sha1 from "./Sha1";
 
+import {privacyPolicy, termsConditions} from "../Components/About";
+
 export default class Acc
 {
     constructor(setAppState = () => {}) {
@@ -202,6 +204,24 @@ export default class Acc
                             value={Lang("signUpText")} 
                             theme="neon"
                             strong="true"
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={privacyPolicy} 
+                            href="" 
+                            value={Lang("privacyPolicyText")} 
+                            theme="white"
+                            strong="false"
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={termsConditions} 
+                            href="" 
+                            value={Lang("termsConditionsText")} 
+                            theme="white"
+                            strong="false"
                         />
                     </div>
                 </div>
