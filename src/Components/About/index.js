@@ -15,7 +15,7 @@ export function privacyPolicy()
         <div className="container">
             <div className="row">
                 <div className="col-12">
-                    <iframe src={url} title={Lang("privacyPolicyText")}></iframe>
+                    <iframe src={url} title={Lang("privacyPolicyText")} onerror="alert(JSON.stringify(event))"></iframe>
                 </div>
                 <div className="col-md-6 col-12">
                     <Button
@@ -32,7 +32,7 @@ export function privacyPolicy()
     );
 }
 
-export function termsConditions()
+export async function termsConditions()
 {
     let url = window.loft.config.docsURL
         .replace("{docname}", "terms-and-conditions")
@@ -72,6 +72,7 @@ export default class About extends React.Component{
                     <tr><td>{Lang("foreignLastUpdateText")}</td><td>2021.09.24</td></tr>
                     <tr><td>{Lang("internalVersionText")}</td><td>{window.app.version}</td></tr>
                     <tr><td>{Lang("internalLastUpdateText")}</td><td>{window.app.lastUpdate}</td></tr>
+                    <tr><td>{Lang("connectionTypeText")}</td><td>{window.loft.connectionType}</td></tr>
                     </tbody>
                 </table>
                 <div className="col-md-6 col-12">

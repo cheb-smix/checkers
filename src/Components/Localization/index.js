@@ -162,6 +162,7 @@ export class Localization
             privacyPolicyText:  "Privacy Policy",
             termsConditionsText:"Terms and Conditions",
             aboutText:          "App Info",
+            connectionTypeText: "Connection type",
         },
     
     
@@ -312,6 +313,7 @@ export class Localization
             privacyPolicyText:  "Политика конфиденциальности",
             termsConditionsText:"Условия и положения",
             aboutText:          "О приложении",
+            connectionTypeText: "Тип подключения",
         },
 
 
@@ -462,6 +464,7 @@ export class Localization
             privacyPolicyText:      "Política De Privacidad",
             termsConditionsText:    "Términos y Condiciones",
             aboutText:              "Acerca de la aplicación",
+            connectionTypeText:     "Tipo de conexión",
         },
 
 
@@ -610,6 +613,7 @@ export class Localization
             privacyPolicyText:      "Privacidade",
             termsConditionsText:    "Termos e Condições",
             aboutText:              "Sobre o aplicativo",
+            connectionTypeText:     "Tipo de ligação",
         }
     };
 

@@ -1,5 +1,11 @@
 <?php
 
+namespace checkers;
+
+require_once "lib/Telegram.php";
+
+use checkers\lib\Telegram;
+
 class Builder
 {
     private $buildonly = false;
@@ -9,6 +15,7 @@ class Builder
     private $app = '';
     private $help = false;
     private $debug = false;
+    private $telegram = false;
 
     private $cordova_workfolder = '';
     private $dev_info_file = './.dev_info';
@@ -50,7 +57,13 @@ class Builder
             $this->printer("--path\t\t| Use --path=/path/to/cordova to specify cordova workfolder to build");
             $this->printer("--release\t| Use --release to build a release version");
             $this->printer("--simulate\t| Use --simulate to simulate app after building");
-            $this->printer("--buildonly\t| Use --build-only to skip ReactJS building steps and build current cordova project");
+            $this->printer("--buildonly\t| Use --buildonly to skip ReactJS building steps and build current cordova project");
+            $this->printer("--telegram\t| Use --telegram to get telegram bot updates");
+            exit;
+        }
+
+        if ($this->telegram) {
+            print_r(Telegram::checkUpdates());
             exit;
         }
     }
@@ -242,6 +255,9 @@ class Builder
         $this->printer("Copiing to project folder", "info");
         $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}", "console");
         $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
+
+        $this->printer("Sending file via Telegram", "success");
+        Telegram::sendAdminNotices("New version " . implode(".", $this->dev_info["version"]) . " has been released " . $this->dev_info["lastUpdate"], ["v" . implode(".", $this->dev_info["version"]) => $this->cordova_workfolder . $res]);
     }
 
     private function saveDevInfo()

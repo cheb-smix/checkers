@@ -129,6 +129,7 @@ window.loft.removeAllListeners = (targetNode, event) => {
 if (window.cordova) {
     document.addEventListener("deviceready", onDeviceReady, false);
 } else {
+    alert("WINDOW IS NOT CORDOVA!");
     document.addEventListener("DOMContentLoaded", DOMLoaded, false);
 } 
 
@@ -161,12 +162,11 @@ async function checkConnection()
     if (typeof(navigator.connection) !== "undefined") {
         window.loft.connectionType = navigator.connection.type || navigator.connection.effectiveType;
     } 
-
-    if (["none", "unknown"].indexOf(window.loft.connectionType) >= 0) return;
-
-    let res = await postData({url: window.loft.apiserver + "config"});
     
-    if (res) {
+    let connected = ["none", "unknown"].indexOf(window.loft.connectionType) < 0;
+    let res = connected ? await postData({url: window.loft.apiserver + "config"}) : null;
+    
+    if (connected && res) {
         for (let k in res.config) window.loft.config[k] = res.config[k];
         for (let k in res.serverInfo) window.loft.serverInfo[k] = res.serverInfo[k];
         for (let k in res.user_info) window.loft.user_info[k] = res.user_info[k];
@@ -190,7 +190,6 @@ async function checkConnection()
             }
             window.loft.settings.set("chart", res.chart, 3600 * 20);
         }
-
     } else {
         let localsetts = ["config", "user_info", "serverInfo", "chart"];
         for (let i in localsetts) {
