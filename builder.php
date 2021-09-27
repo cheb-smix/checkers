@@ -19,18 +19,15 @@ class Builder
     private $telegram = false;
     private $silent = false;
 
+    private $major = false;
+    private $minor = false;
+    private $patch = false;
+    private $version = '';
+
     private $cordova_workfolder = '';
     private $dev_info_file = './.dev_info';
     private $workfolder_file = './.workfolder';
-    private $dev_info = [
-        "version" => [
-            "major"     => 1,
-            "minor"     => 3,
-            "micro"     => 50,
-            "build"     => 101,
-        ],
-        "lastUpdate"=> "",
-    ];
+    private $dev_info;
     private $GLFOLDER = '';
     private $TMPFOLDER = '';
     private $GLFILES = [];
@@ -39,6 +36,16 @@ class Builder
 
     public function __construct()
     {
+        $this->dev_info = (object)[
+            "version"       => (object)[
+                "major" => 1,
+                "minor" => 0,
+                "patch" => 2,
+            ],
+            "build"         => 2019,
+            "lastUpdate"    => "",
+        ];
+        
         $this->loadDevInfo();
 
         foreach(getopt("", array_map(function($item) { return "$item::";}, array_keys(get_class_vars(get_class($this))))) as $k => $v) {
@@ -63,6 +70,11 @@ class Builder
             $this->printer("--buildonly\t| Use --buildonly to skip ReactJS building steps and build current cordova project");
             $this->printer("--telegram\t| Use --telegram to get telegram bot updates");
             $this->printer("--silent\t| Use --silent to disable telegram informer for the build");
+
+            $this->printer("--major\t| Use it to increase major version number");
+            $this->printer("--minor\t| Use it to increase minor version number");
+            $this->printer("--patch\t| Use it to increase patch version number");
+            $this->printer("--version\t| Use --version to set version manually");
             exit;
         }
 
@@ -75,7 +87,7 @@ class Builder
 
     public function init()
     {
-        set_error_handler("Builder::customError");
+        set_error_handler([$this, 'customError']);
 
         // $this->printer("Build process initiated with next params: " . var_export((array)$this, true));
 
@@ -85,20 +97,33 @@ class Builder
 
         if (!$this->buildonly) {
 
-            $this->dev_info["version"]["build"]++;
-            if ($micro = (int)($this->dev_info["version"]["build"] / 300)) {
-                $this->dev_info["version"]["build"] = $this->dev_info["version"]["build"] % 300;
-                $this->dev_info["version"]["micro"] = $this->dev_info["version"]["micro"] + $micro;
+            $this->dev_info->build++;
+            $this->dev_info->lastUpdate = date('Y-m-d H:i:s', strtotime("-3 HOURS")) . " UTC+0";
+
+            if ($this->release) {
+                if ($this->version) {
+                    $v = explode(".", $this->version);
+                    if (count($v) == 3) { 
+                        $this->dev_info->version->major = (int)$v[0];
+                        $this->dev_info->version->minor = (int)$v[1];
+                        $this->dev_info->version->patch = (int)$v[2];
+                    }
+                } elseif ($this->major) {
+                    $this->dev_info->version->major++;
+                    $this->dev_info->version->minor = 0;
+                    $this->dev_info->version->patch = 0;
+                } elseif ($this->minor) {
+                    $this->dev_info->version->minor++;
+                    $this->dev_info->version->patch = 0;
+                } elseif ($this->patch) {
+                    $this->dev_info->version->patch++;
+                }
             }
-            if ($minor = (int)($this->dev_info["version"]["micro"] / 99)) {
-                $this->dev_info["version"]["micro"] = $this->dev_info["version"]["micro"] % 99;
-                $this->dev_info["version"]["minor"] = $this->dev_info["version"]["minor"] + $minor;
-            }
-            $this->dev_info["lastUpdate"] = date('Y-m-d H:i:s T');
 
             if ($this->app) {
                 $this->rebuildForApp();
             }
+
             $this->mainSequence();
             $this->clearOldProject();
             $this->copyNewProject();
@@ -122,7 +147,9 @@ class Builder
 
     private function loadDevInfo()
     {
-        $this->dev_info = (file_exists($this->dev_info_file) && $dev_info = json_decode(file_get_contents($this->dev_info_file), true)) ? $dev_info : $this->dev_info;
+        if (file_exists($this->dev_info_file) && $dev_info = json_decode(file_get_contents($this->dev_info_file), true)) {
+            $this->dev_info = (object) array_merge((array) $this->dev_info, $dev_info);
+        }
 
         $this->cordova_workfolder = (file_exists($this->workfolder_file) && $cordova_workfolder = file_get_contents($this->workfolder_file)) ? $cordova_workfolder : $this->cordova_workfolder;
     }
@@ -190,8 +217,9 @@ class Builder
             $content = file_get_contents($file);
             $content = str_replace("/static/", "static/", $content);
             $content = str_replace('id="cordova-scr">', 'id="cordova-scr" src="cordova.js">', $content);
-            $content = preg_replace('/(<meta name="app-internal-version" content=)"([^"]+)/', '$1"' . implode(".", $this->dev_info["version"]), $content);
-            $content = preg_replace('/(<meta name="app-internal-last-update" content=)"([^"]+)/', '$1"' . $this->dev_info["lastUpdate"], $content);
+            $content = preg_replace('/(<meta name="app-version" content=)"([^"]+)/', '$1"' . implode('.', (array) $this->dev_info->version), $content);
+            $content = preg_replace('/(<meta name="app-build" content=)"([^"]+)/', '$1"' . $this->dev_info->build, $content);
+            $content = preg_replace('/(<meta name="app-last-update" content=)"([^"]+)/', '$1"' . $this->dev_info->lastUpdate, $content);
             
             if ($content) file_put_contents($file, $content);
         }
@@ -234,6 +262,25 @@ class Builder
 
     private function mainCordovaBuild()
     {
+        $currentVersion = implode(".", (array) $this->dev_info->version);
+        $this->printer("Checking app version. Current is $currentVersion", "info");
+
+        $cordovaConfigFile = file_get_contents($this->cordova_workfolder . 'config.xml');
+        preg_match('/(<widget id="ru.smixsoft.checkers" version=")(\d+.\d+.\d+)/', $cordovaConfigFile, $match);
+        if (!isset($match[2])) {
+            $this->printer("App version not found at cordova config.xml!!!", "error");
+            var_dump($match);
+            exit;
+        }
+        if ($currentVersion == $match[2]) {
+            $this->printer("App version not changed", "success");
+        } else {
+            $this->printer("Changing app version [$currentVersion : {$match[2]}]", "info");
+            $cordovaConfigFile = preg_replace('/(<widget id="ru.smixsoft.checkers" version=)"(\d+.\d+.\d+)/', '$1"' . $currentVersion, $cordovaConfigFile);
+            if ($cordovaConfigFile) file_put_contents($this->cordova_workfolder . 'config.xml', $cordovaConfigFile);
+        }
+
+
         $this->printer("Cordova build", "info");
 
         $options = [ $this->emulator ? "--emulator" : "--device" ];
@@ -265,7 +312,7 @@ class Builder
 
         if (!$this->silent) {
             $this->printer("Sending file via Telegram", "success");
-            Telegram::sendAdminNotices("New version " . implode(".", $this->dev_info["version"]) . " has been built " . $this->dev_info["lastUpdate"], ["v" . implode(".", $this->dev_info["version"]) => $this->cordova_workfolder . $res]);
+            Telegram::sendAdminNotices("New build " . $this->dev_info->build . " has been built " . $this->dev_info->lastUpdate, ["version $currentVersion build " . $this->dev_info->build => $this->cordova_workfolder . $res]);
         }
     }
 

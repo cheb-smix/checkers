@@ -68,10 +68,9 @@ export default class About extends React.Component{
                 
                 <table>
                     <tbody>
-                    <tr><td>{Lang("foreignVersionText")}</td><td>1.0.1</td></tr>
-                    <tr><td>{Lang("foreignLastUpdateText")}</td><td>2021.09.24</td></tr>
-                    <tr><td>{Lang("internalVersionText")}</td><td>{window.app.version}</td></tr>
-                    <tr><td>{Lang("internalLastUpdateText")}</td><td>{window.app.lastUpdate}</td></tr>
+                    <tr><td>{Lang("versionText")}</td><td>{window.app.version}</td></tr>
+                    <tr><td>{Lang("buildText")}</td><td>{window.app.build}</td></tr>
+                    <tr><td>{Lang("lastUpdateText")}</td><td>{window.app.lastUpdate}</td></tr>
                     <tr><td>{Lang("connectionTypeText")}</td><td>{window.loft.connectionType}</td></tr>
                     </tbody>
                 </table>

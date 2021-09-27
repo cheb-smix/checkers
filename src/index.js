@@ -14,8 +14,9 @@ import './Funcs/Addons';
 import { Localization } from './Components/Localization';
 
 window.app = {
-    version: document.querySelector('meta[name="app-internal-version"]').content,
-    lastUpdate: document.querySelector('meta[name="app-internal-last-update"]').content
+    version: document.querySelector('meta[name="app-version"]').content,
+    build: document.querySelector('meta[name="app-build"]').content,
+    lastUpdate: document.querySelector('meta[name="app-last-update"]').content
 };
 
 window.loft = {
@@ -24,6 +25,7 @@ window.loft = {
     settings: new Settings(),
     localization: null,
     device: {},
+    AppVersion: {},
     devInfo: {},
     history: window.cordova ? createHashHistory() : createBrowserHistory(),
     sounds: {},
