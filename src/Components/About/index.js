@@ -15,7 +15,7 @@ export function privacyPolicy()
         <div className="container">
             <div className="row">
                 <div className="col-12">
-                    <iframe src={url} title={Lang("privacyPolicyText")} onerror="alert(JSON.stringify(event))"></iframe>
+                    <iframe src={url} title={Lang("privacyPolicyText")}></iframe>
                 </div>
                 <div className="col-md-6 col-12">
                     <Button

@@ -10,12 +10,14 @@ class Builder
 {
     private $buildonly = false;
     private $simulate = false;
+    private $emulator = false;
     private $release = false;
     private $path = '';
     private $app = '';
     private $help = false;
     private $debug = false;
     private $telegram = false;
+    private $silent = false;
 
     private $cordova_workfolder = '';
     private $dev_info_file = './.dev_info';
@@ -57,8 +59,10 @@ class Builder
             $this->printer("--path\t\t| Use --path=/path/to/cordova to specify cordova workfolder to build");
             $this->printer("--release\t| Use --release to build a release version");
             $this->printer("--simulate\t| Use --simulate to simulate app after building");
+            $this->printer("--emulator\t| Use --emulator to emulate app after building");
             $this->printer("--buildonly\t| Use --buildonly to skip ReactJS building steps and build current cordova project");
             $this->printer("--telegram\t| Use --telegram to get telegram bot updates");
+            $this->printer("--silent\t| Use --silent to disable telegram informer for the build");
             exit;
         }
 
@@ -204,7 +208,7 @@ class Builder
         $files = $this->getFolderFilesByMask("./build/static/js/", "main.*.chunk.js");
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
-            $content = str_replace("window.loft.device={}", "window.loft.device=device", $content);
+            $content = str_replace("window.loft.device={}", 'window.loft.device=device', $content);
             if ($content) file_put_contents($file, $content);
         }
     }
@@ -232,17 +236,20 @@ class Builder
     {
         $this->printer("Cordova build", "info");
 
+        $options = [ $this->emulator ? "--emulator" : "--device" ];
+
         if ($this->release) {
             $appFileName = "app-release.aab";
-            $relString = "--release";
+            $options[] = "--release";
         } else {
             $appFileName = "app-debug.apk";
-            $relString = "";
         }
+
+        $options = implode(' ', $options);
 
         $res = `
             cd {$this->cordova_workfolder}
-            cordova run android --buildConfig {$relString}
+            cordova run android --buildConfig {$options}
         `;
 
         $this->printer($res);
@@ -256,8 +263,10 @@ class Builder
         $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}", "console");
         $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
 
-        $this->printer("Sending file via Telegram", "success");
-        Telegram::sendAdminNotices("New version " . implode(".", $this->dev_info["version"]) . " has been released " . $this->dev_info["lastUpdate"], ["v" . implode(".", $this->dev_info["version"]) => $this->cordova_workfolder . $res]);
+        if (!$this->silent) {
+            $this->printer("Sending file via Telegram", "success");
+            Telegram::sendAdminNotices("New version " . implode(".", $this->dev_info["version"]) . " has been built " . $this->dev_info["lastUpdate"], ["v" . implode(".", $this->dev_info["version"]) => $this->cordova_workfolder . $res]);
+        }
     }
 
     private function saveDevInfo()

@@ -435,7 +435,7 @@ export default class App extends React.Component {
 
                 success: (res) => {
                     if (!res.success) {
-                        alert(res.errors.shift());
+                        // alert(res.errors.shift());
                     } else {
                         this.procedureResData(res);
                     }

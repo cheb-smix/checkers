@@ -129,7 +129,6 @@ window.loft.removeAllListeners = (targetNode, event) => {
 if (window.cordova) {
     document.addEventListener("deviceready", onDeviceReady, false);
 } else {
-    alert("WINDOW IS NOT CORDOVA!");
     document.addEventListener("DOMContentLoaded", DOMLoaded, false);
 } 
 
@@ -153,7 +152,7 @@ function onDeviceReady()
     document.addEventListener("resume", onResume, false);
     document.addEventListener("online", onOnline, false);
     document.addEventListener("offline", onOffline, false);
-    // window.loft.device = {};
+    window.loft.device = {};
     DOMLoaded();
 }
 
