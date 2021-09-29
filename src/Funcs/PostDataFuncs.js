@@ -10,7 +10,8 @@ export default async function postData(obj = {})
     
     o.headers["Content-Type"] = 'application/x-www-form-urlencoded';
     // o.headers["Content-Type"] = 'application/json';
-    if (Object.keys(window.loft.device).length > 0) o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    o.headers['App-User-Agent'] = JSON.stringify(window.loft.device);
+    
     if (window.loft.atoken) o.headers['A-Token'] = window.loft.atoken;
     
     console.log("using", window.loft.reqtype, o);
@@ -44,8 +45,6 @@ async function xhr(o = {})
                 reject(new Error('Request failed'));
             }
 
-            o.data.appVersion = window.app.version;
-
             if(typeof(o.data) === "object") {
                 o.data = object2string(o.data);
             }
@@ -75,7 +74,6 @@ async function xhr(o = {})
 
 async function fatch(o = {})
 {
-    o.data.appVersion = window.app.version;
     let response = await custom_fetch(o.url, {
         method: o.method,
         headers: o.headers,

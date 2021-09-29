@@ -114,8 +114,11 @@ class App extends Component{
                     }
                     
                     <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />
+
                     <Route path='/about' render={(props) => <About {...props} modal={false} />} />
+
                     <Redirect from='/' to='/home'/>
+
                 </Switch>
                 <Modal closer={this.hideModal} modal={this.state.modal}/>
             </React.Fragment>

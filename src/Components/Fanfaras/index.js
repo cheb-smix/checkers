@@ -61,7 +61,7 @@ export default class Fanfara extends React.Component {
                     <div className="col-12">
                         <Button
                             action={this.props.newGame}
-                            href=""
+                            href="#newgame"
                             value={Lang("newGame")}
                             theme="neon"
                             strong="true"

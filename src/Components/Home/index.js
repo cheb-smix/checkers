@@ -77,6 +77,7 @@ export default class Home extends React.Component{
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
                 <Button action="" href="/about" value={Lang("aboutText")} />
+                
             </div>
         );
     };

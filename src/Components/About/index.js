@@ -68,9 +68,9 @@ export default class About extends React.Component{
                 
                 <table>
                     <tbody>
-                    <tr><td>{Lang("versionText")}</td><td>{window.app.version}</td></tr>
-                    <tr><td>{Lang("buildText")}</td><td>{window.app.build}</td></tr>
-                    <tr><td>{Lang("lastUpdateText")}</td><td>{window.app.lastUpdate}</td></tr>
+                    <tr><td>{Lang("versionText")}</td><td>{window.loft.device.app.version}</td></tr>
+                    <tr><td>{Lang("buildText")}</td><td>{window.loft.device.app.build}</td></tr>
+                    <tr><td>{Lang("lastUpdateText")}</td><td>{window.loft.device.app.lastUpdate}</td></tr>
                     <tr><td>{Lang("connectionTypeText")}</td><td>{window.loft.connectionType}</td></tr>
                     </tbody>
                 </table>

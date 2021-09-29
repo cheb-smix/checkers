@@ -236,7 +236,8 @@ class Builder
         $files = $this->getFolderFilesByMask("./build/static/js/", "main.*.chunk.js");
         foreach ($files as $i => $file) {
             $content = file_get_contents($file);
-            $content = str_replace("window.loft.device={}", 'window.loft.device=device', $content);
+            // $content = str_replace("window.loft.device={}", 'window.loft.device=device', $content);
+            $content = str_replace('id:"{game.identifier}', 'id:"ru.smixsoft.' . ($this->app ? $this->app : 'checkers4in1'), $content);
             if ($content) file_put_contents($file, $content);
         }
     }
