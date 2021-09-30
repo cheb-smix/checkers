@@ -17,15 +17,6 @@ export default class Setting extends React.Component{
                 <div className="row">
                     <div className="col-md-6 col-12">
                         <Droplist
-                            id="animation"
-                            items={{"2":Lang("animationLevel2"),"1":Lang("animationLevel1"),"0":Lang("animationLevel0")}}
-                            selected={window.loft.usersettings.animation}
-                            placeholder={Lang("animationSetting")}
-                            onSelect={window.loft.settings.saveSetting}
-                        />
-                    </div>
-                    <div className="col-md-6 col-12">
-                        <Droplist
                             id="difficulty"
                             items={{"3":Lang("difficultyLevel3"),"2":Lang("difficultyLevel2"),"1":Lang("difficultyLevel1")}}
                             selected={window.loft.usersettings.difficulty}

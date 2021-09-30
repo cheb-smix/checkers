@@ -32,6 +32,14 @@
     --stepper-layer-depth: 2;
     --background-layer-depth: -1;
 }
+table {
+  font-family: Federo;
+  color: white;
+  padding: 10px;
+}
+table td {
+  padding: 2px 5px;
+}
 @media (orientation: portrait), (min-aspect-ratio: 10/6){
   :root{
       --field-size: 80vh;

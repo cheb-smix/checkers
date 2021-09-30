@@ -82,7 +82,7 @@ class App extends Component{
         document.querySelector("#musicplayer").volume = window.loft.usersettings.musicvolume / 100;
         this.setNewTrack();
         document.querySelector("#musicplayer").addEventListener("ended", this.setNewTrack);
-        document.querySelector(".App-logo").style.top = "15vh";
+        document.querySelector(".App-logo").style.top = "12vh";
 
         if (window.cordova) {
             window.loft.removeAllListeners(document, "backbutton");

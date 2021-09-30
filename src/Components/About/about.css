@@ -1,11 +1,3 @@
-.aboutPage table {
-    font-family: Federo;
-    color: white;
-    padding: 10px;
-}
-.aboutPage table td {
-    padding: 2px 5px;
-}
 iframe {
     width: 100%;
     height: 60vh;
