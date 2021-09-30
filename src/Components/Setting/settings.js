@@ -2,7 +2,7 @@ export default class Settings {
 
     constructor() {
         this.usersettings = {
-            animation: 1,
+            // animation: 1,
             difficulty: 1,
             fanfaravolume: 50,
             soundvolume: 70,
@@ -14,7 +14,7 @@ export default class Settings {
             language: 'auto',
         };
         this.defaultusersettings = {
-            animation: 1,
+            // animation: 1,
             difficulty: 1,
             fanfaravolume: 50,
             soundvolume: 70,

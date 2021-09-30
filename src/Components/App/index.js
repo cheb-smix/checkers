@@ -648,11 +648,11 @@ export default class App extends React.Component {
             if (window.loft.config.WriteSteps || this.state.online) this.saveStepResults(koordsto, koordsfrom, botstep);
         }
 
-        if (window.loft.usersettings.animation === '0') {
-            this.theStep(koordsto, koordsfrom, newPlayersStep);
-        } else {
+        // if (window.loft.usersettings.animation === '0') {
+        //     this.theStep(koordsto, koordsfrom, newPlayersStep);
+        // } else {
             this.stepAnimation(koordsto, koordsfrom, newPlayersStep);
-        }
+        // }
     }
 
     theStep = (koordsto, koordsfrom = this.state.selectedChecker, newPlayersStep = false) => {
