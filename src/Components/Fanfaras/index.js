@@ -267,17 +267,27 @@ export default class Fanfara extends React.Component {
                 />);
             }
 
-            if (stat.coins) {
-                stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
-            }
+            // if (stat.coins) {
+            //     stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
+            // }
 
             if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status !== window.loft.constants.STATUS_DONE && playerInfo.done === 12) {
                 header = Lang("congratulations");
                 stattext = [<p key="0" className="fanp">{Lang("lastEnemyStep")}</p>];
                 noise = "warning";
             } else {
+                if (window.loft.chart.length > 1) {
+                    stattext.unshift(<Charts 
+                        data={window.loft.chart} 
+                        colors={['#f40', 'green', '#08f', '#eeff00']}
+                        font="1.4vh Federo"
+                        dots="false"
+                        chart={this.props.game_status !== window.loft.constants.STATUS_ACTIVE}
+                        />
+                    );
+                }
+                stattext.unshift(buttons);
                 stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{podtext}</p>);
-                stattext.push(buttons);
             }    
 
             if (noise) Noise(noise);
@@ -286,14 +296,6 @@ export default class Fanfara extends React.Component {
         return (
             <div className={"status" + this.props.game_status} id="fanfara"><br />
                 <h3>{header}{playerInfo.display_name ? ', ' + playerInfo.display_name : ''}</h3>
-                { window.loft.chart.length > 1 ? 
-                <Charts 
-                data={window.loft.chart} 
-                colors={['#f40', 'green', '#08f', '#eeff00']}
-                font="1.4vh Federo"
-                dots="false"
-                chart={this.props.game_status !== window.loft.constants.STATUS_ACTIVE}
-                /> : '' }
                 {stattext}
             </div>
         );

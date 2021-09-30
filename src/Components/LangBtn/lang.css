@@ -21,6 +21,7 @@
 }
 #langChooser.closed {
     border-color: transparent;
+    background: transparent;
     height: calc(var(--flag-size) + 2em);
 }
 #langChooser .current, #langChooser > ul > li::after {

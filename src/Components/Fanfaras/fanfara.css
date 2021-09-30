@@ -9,6 +9,7 @@
     position: absolute;
     z-index: var(--fanfaras-layer-depth);
     min-height: 90vh;
+    padding-bottom: 15vh;
 }
 #fanfara h3{
     margin: 0px 0px 10px 0px;

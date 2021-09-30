@@ -17,8 +17,6 @@ export default class Button extends React.Component
 
         if (["#newgame", "/home"].indexOf(this.props.href) >= 0 && React.isset(window.AdMob)) {
 
-            if (this.props.href === '#newgame') this.props.href = '';
-
             let ISType = null;
 
             if (window.loft.connectionType === 'wifi' && React.isset(window.loft.config.ads.interstitialVideo.admob)) {
@@ -62,7 +60,7 @@ export default class Button extends React.Component
 
     trueAction = (immediate = false) => {
         if (this.props.action !== "") this.props.action();
-        if (this.props.href !== "") Routing(this.props.href, () => {}, immediate ? 0 : 700);
+        if (this.props.href !== "" && this.props.href.indexOf("#") < 0) Routing(this.props.href, () => {}, immediate ? 0 : 700);
     }
 
     render(){

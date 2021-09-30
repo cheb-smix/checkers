@@ -23,8 +23,9 @@ export default class Console extends React.Component{
             serverInfo = <span>{Lang("searchingTheEnemy")} {this.props.count}<br />{Lang("approxWaitTime").replace("$", avgtime)}<br />{Lang("playersOnServers").replace("$", window.loft.serverInfo.playersstat.total)}<br />{Lang("playersInSearch").replace("$", window.loft.serverInfo.playersstat.searching)}</span>
         }
         let consoleText = this.props.rampageCode === "" ? this.props.text : "";
-        let writeStepsBlock = "";
-        if(window.loft.config.WriteSteps) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
+        // let writeStepsBlock = "";
+        // if(window.loft.config.WriteSteps) writeStepsBlock = <span className="offlinespan oswithfa"> rec</span>;
+
         return (
             <div id="consoleParentino">
                 <RoundProgressBar 
@@ -41,9 +42,9 @@ export default class Console extends React.Component{
                     <td id="avgtime">{serverInfo}</td>
                     <td id="playerName">
                         <span className="onlinespan" style={{fontSize: "1.5em"}}>{this.props.player}</span><br />vs<br />{this.props.opponent}<br />
-                        <span className={this.props.online?"onlinespan oswithfa":"offlinespan oswithfa"}>{this.props.online?"online":"offline"}</span>
+                        {/* <span className={this.props.online?"onlinespan oswithfa":"offlinespan oswithfa"}>{this.props.online?"online":"offline"}</span>
                         {writeStepsBlock!==""?<br/>:""}
-                        {writeStepsBlock}
+                        {writeStepsBlock} */}
                     </td>
                     <td id="fps" style={{display: window.loft.config.Debug ? "block" : "none" }}></td>
                 </tr></tbody></table>
