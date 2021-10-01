@@ -77,6 +77,10 @@ export default class Home extends React.Component{
                 } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
                 <Button action="" href="/about" value={Lang("aboutText")} />
+
+                {
+                    window.loft.apiserver.indexOf('//192.168.') > 0 ? <h5 style={{color: 'red', fontSize: '10vmin'}}>Working with TEST SERVER!</h5> : ''
+                }
                 
             </div>
         );
