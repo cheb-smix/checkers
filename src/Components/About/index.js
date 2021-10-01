@@ -65,7 +65,7 @@ export default class About extends React.Component{
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated aboutPage">
                 <h5>{Lang("aboutText")}</h5>
-                
+                <div className="container">
                 <table>
                     <tbody>
                     <tr><td>{Lang("versionText")}</td><td>{window.loft.device.app.version}</td></tr>
@@ -74,14 +74,15 @@ export default class About extends React.Component{
                     <tr><td>{Lang("connectionTypeText")}</td><td>{window.loft.connectionType}</td></tr>
                     </tbody>
                 </table>
-                <div className="col-md-6 col-12">
+                <div className="col-12">
                 <Button action={privacyPolicy} href="" value={Lang("privacyPolicyText")} theme="neon" strong="true" />
                 </div>
-                <div className="col-md-6 col-12">
+                <div className="col-12">
                 <Button action={termsConditions} href="" value={Lang("termsConditionsText")} theme="neon" strong="true" />
                 </div>
-                <div className="col-md-6 col-12">
+                <div className="col-12">
                 <Button action="" href="/home" value={Lang("goBackText")} theme="grey" strong="true" />
+                </div>
                 </div>
             </div>
         );

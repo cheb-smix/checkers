@@ -18,10 +18,10 @@
     --neon-border-color: #08f;
     --neon-bg-color: #1e6899;
     --neon-bg-color-dark: #053352;
-    --field-size: 48vw;
-    --cell-size: 6vw;
-    --checker-size: 4.5vw;
-    --regular-text-size: 16px;
+    --field-size: 100vw;
+    --cell-size: 12.5vw;
+    --checker-size: 10.5vw;
+    --regular-text-size: 12px;
 
     --modal-layer-depth: 200;
     --modal-bg-layer-depth: 190;
@@ -36,25 +36,34 @@ table {
   font-family: Federo;
   color: white;
   padding: 10px;
+  font-size: var(--regular-text-size);
 }
 table td {
   padding: 2px 5px;
 }
-@media (orientation: portrait), (min-aspect-ratio: 10/6){
+@media (min-aspect-ratio: 6/10) { 
   :root{
-      --field-size: 80vh;
-      --cell-size: 10vh;
-      --checker-size: 8.5vh;
+      --field-size: 80vmin;
+      --cell-size: 10vmin;
+      --checker-size: 8.5vmin;
+      --regular-text-size: 20px;
+  }
+  h5 {
+    font-size: 25px;
+  }
+  .umaincon{
+    padding: 2vw;
   }
 }
-@media (orientation: portrait), (max-aspect-ratio: 10/13){
+
+/* @media (orientation: portrait), (max-aspect-ratio: 10/13){
   :root{
-      --field-size: 100vw;
-      --cell-size: 12.5vw;
-      --checker-size: 10.5vw;
-      --regular-text-size: 12px;
+    --field-size: 48vw;
+    --cell-size: 6vw;
+    --checker-size: 4.5vw;
+    --regular-text-size: 16px;
   }
-}
+} */
 html, body {
     overflow-x: hidden;
 }
@@ -95,8 +104,8 @@ input[type=text]:focus{
     margin-left: auto;
 }
 .container {
-    all: initial;
-    height: 100%;
+    /* all: initial; */
+    /* height: 100%; */
     width: 100%;
     margin: 0;
     padding: 0;

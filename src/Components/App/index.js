@@ -1113,23 +1113,24 @@ export default class App extends React.Component {
                 />
                 <div className="umaincon animate__fadeInRight animate__animated">
                     <div className={fieldClass} id="ufield">
-                        <div className="ufcn">
-                            <div className="uchecker color0" id="stepper">&nbsp;</div>
-                            {renderedField}
-                        </div>
-                        <Fanfara
-                            playerInfo={this.state.playerInfo}
-                            opponentInfo={this.state.opponentInfo}
-                            // continueWithSameOpponent={this.continueWithSameOpponent}
-                            // searchNewOpponent={this.searchNewOpponent}
-                            newGame={this.initiation}
-                            quit={this.quit}
-                            rampage={this.rampage}
-                            // showBestMove={this.showBestMove}
-                            game_id={this.state.game_id}
-                            game_status={this.state.game_status}
-                        />
+                            <div className="ufcn">
+                                <div className="uchecker color0" id="stepper">&nbsp;</div>
+                                {renderedField}
+                            </div>
                     </div>
+                    
+                    <Fanfara
+                                playerInfo={this.state.playerInfo}
+                                opponentInfo={this.state.opponentInfo}
+                                // continueWithSameOpponent={this.continueWithSameOpponent}
+                                // searchNewOpponent={this.searchNewOpponent}
+                                newGame={this.initiation}
+                                quit={this.quit}
+                                rampage={this.rampage}
+                                // showBestMove={this.showBestMove}
+                                game_id={this.state.game_id}
+                                game_status={this.state.game_status}
+                    />
                     <Console
                         text={this.state.consoleText}
                         online={this.state.online}

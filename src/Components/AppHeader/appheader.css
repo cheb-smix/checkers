@@ -94,7 +94,7 @@
 
 
 
-@media (orientation: portrait), (max-aspect-ratio: 10/13){
+/* @media (orientation: portrait), (max-aspect-ratio: 10/13){
 
 }
 @media (min-width: 580px){
@@ -104,7 +104,6 @@
     #uhiconcontainer{
         display: flex;
         flex-direction: row;
-        position: initial;
         top: initial;
         width: auto;
     }
@@ -112,6 +111,6 @@
         display: none;
     }
 
-}
+} */
 
 

@@ -10,7 +10,7 @@ import About from "./Components/About";
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
 
-import Corners from "./Components/Gameslogic/corners";
+//import Corners from "./Components/Gameslogic/corners";
 import Checkers from "./Components/Gameslogic/checkers";
 
 import './Funcs/fps';
@@ -20,7 +20,7 @@ import './basic.css';
 
 window.gvar = [
     'checkers', 
-    'corners',
+    //'corners',
 ];
 
 
@@ -110,7 +110,7 @@ class App extends Component{
                     <Route   path='/checkers' render={(props) => <Checkers {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
                     }
                     {
-                    <Route   path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
+                    //<Route   path='/corners' render={(props) => <Corners {...props} setAppState={this.setAppState} isGuest={this.state.isGuest} />} />
                     }
                     
                     <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />

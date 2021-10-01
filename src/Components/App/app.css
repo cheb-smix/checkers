@@ -10,14 +10,14 @@
     justify-content: stretch;
     flex-direction: column;
 }
-.umaincon{
-    padding: 2vw;
+.umaincon {
+    text-align: center;
 }
-.umaincon>*{
+/* .umaincon>*{
     display: flex;
     vertical-align: top;
-    justify-content: stretch;
-}
+    justify-content: center;
+} */
 #ufield{
     position: relative;
     width: 48vw;
@@ -95,18 +95,6 @@
     background: #485761;
     color: #0888dd;
     transform: scale(1);
-}
-
-@media (orientation: portrait), (max-aspect-ratio: 10/13){
-    #ufield{
-        display: block;
-    }
-    .umaincon{
-        padding: 0;
-    }
-    h5{
-        font-size: 16px;
-    }
 }
 #ufield{
     width: var(--field-size);

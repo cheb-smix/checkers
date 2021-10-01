@@ -15,12 +15,12 @@ export default class Fanfara extends React.Component {
         //return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
     }
 
-    componentDidMount = () => {
-        let f = document.getElementById("fanfara");
-        let u = document.getElementById("ufield");
-        f.style.top = 0 + "px";
-        f.style.left = u.offsetLeft + "px";
-    }
+    // componentDidMount = () => {
+    //     let f = document.getElementById("fanfara");
+    //     let u = document.getElementById("ufield");
+    //     f.style.top = 0 + "px";
+    //     f.style.left = u.offsetLeft + "px";
+    // }
 
     componentDidUpdate = () => {
         if (this.gamesPlayed.indexOf(this.props.game_id) < 0) {
@@ -58,7 +58,7 @@ export default class Fanfara extends React.Component {
         let buttons =
             <div key={-1} className="container" style={{ height: "auto" }}>
                 <div className="row">
-                    <div className="col-12">
+                    <div className="col-12 col-md-6">
                         <Button
                             action={this.props.newGame}
                             href="#newgame"
@@ -66,8 +66,9 @@ export default class Fanfara extends React.Component {
                             theme="neon"
                             strong="true"
                         />
+                        
                     </div>
-                    <div className="col-12">
+                    <div className="col-12 col-md-6">
                         <Button
                             action=""
                             href="/home"

@@ -95,8 +95,8 @@ window.loft = {
 };
 
 // if (!window.cordova && ["localhost", "192.168.31.168", "127.0.0.1", ""].indexOf(window.location.hostname) >= 0) {
-    // window.loft.wsserver = "ws://192.168.31.168:1988";
-    // window.loft.apiserver = "http://192.168.31.168/game/";
+    window.loft.wsserver = "ws://192.168.31.168:1988";
+    window.loft.apiserver = "http://192.168.31.168/game/";
 // }
 
 window.loft.usersettings = window.loft.settings.getSettings();
