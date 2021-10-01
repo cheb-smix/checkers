@@ -15,12 +15,12 @@ export default class Fanfara extends React.Component {
         //return LVL > 1 ? Math.floor(window.loft.config.MLTPLR * (Math.pow(window.loft.config.BASE, LVL * window.loft.config.INC))) : 0;
     }
 
-    componentDidMount = () => {
-        let f = document.getElementById("fanfara");
-        let u = document.getElementById("ufield");
-        f.style.top = 0 + "px";
-        f.style.left = u.offsetLeft + "px";
-    }
+    // componentDidMount = () => {
+    //     let f = document.getElementById("fanfara");
+    //     let u = document.getElementById("ufield");
+    //     f.style.top = 0 + "px";
+    //     f.style.left = u.offsetLeft + "px";
+    // }
 
     componentDidUpdate = () => {
         if (this.gamesPlayed.indexOf(this.props.game_id) < 0) {
@@ -58,16 +58,17 @@ export default class Fanfara extends React.Component {
         let buttons =
             <div key={-1} className="container" style={{ height: "auto" }}>
                 <div className="row">
-                    <div className="col-12">
+                    <div className="col-12 col-md-6">
                         <Button
                             action={this.props.newGame}
-                            href=""
+                            href="#newgame"
                             value={Lang("newGame")}
                             theme="neon"
                             strong="true"
                         />
+                        
                     </div>
-                    <div className="col-12">
+                    <div className="col-12 col-md-6">
                         <Button
                             action=""
                             href="/home"
@@ -267,17 +268,27 @@ export default class Fanfara extends React.Component {
                 />);
             }
 
-            if (stat.coins) {
-                stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
-            }
+            // if (stat.coins) {
+            //     stattext.push(<p key={stattext.length} className="fanp">{Lang("coinStatText").replace("$", stat.coins)}</p>);
+            // }
 
             if (playerInfo.status === window.loft.constants.STATUS_DONE && opponentInfo.status !== window.loft.constants.STATUS_DONE && playerInfo.done === 12) {
                 header = Lang("congratulations");
                 stattext = [<p key="0" className="fanp">{Lang("lastEnemyStep")}</p>];
                 noise = "warning";
             } else {
+                if (window.loft.chart.length > 1) {
+                    stattext.unshift(<Charts 
+                        data={window.loft.chart} 
+                        colors={['#f40', 'green', '#08f', '#eeff00']}
+                        font="1.4vh Federo"
+                        dots="false"
+                        chart={this.props.game_status !== window.loft.constants.STATUS_ACTIVE}
+                        />
+                    );
+                }
+                stattext.unshift(buttons);
                 stattext.unshift(<p key={stattext.length} style={{textAlign: "center"}} className="fanp">{podtext}</p>);
-                stattext.push(buttons);
             }    
 
             if (noise) Noise(noise);
@@ -286,14 +297,6 @@ export default class Fanfara extends React.Component {
         return (
             <div className={"status" + this.props.game_status} id="fanfara"><br />
                 <h3>{header}{playerInfo.display_name ? ', ' + playerInfo.display_name : ''}</h3>
-                { window.loft.chart.length > 1 ? 
-                <Charts 
-                data={window.loft.chart} 
-                colors={['#f40', 'green', '#08f', '#eeff00']}
-                font="1.4vh Federo"
-                dots="false"
-                chart={this.props.game_status !== window.loft.constants.STATUS_ACTIVE}
-                /> : '' }
                 {stattext}
             </div>
         );

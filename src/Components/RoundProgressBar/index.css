@@ -1,9 +1,18 @@
 :root{
-    --dia-size: 30vw;
-    --dia-marging: 1vw;
+    --dia-size: 30vmin;
+    --dia-marging: 1vmin;
     --dia-bord: 4%;
     --perc-font-size: 150%;
-    --regular-font-size: 3.2vw;
+    --regular-font-size: 3.2vmin;
+}
+@media (min-aspect-ratio: 6/10) {
+    :root{
+        --dia-size: 17vmin;
+        --dia-marging: 1vmin;
+        --dia-bord: 4%;
+        --perc-font-size: 150%;
+        --regular-font-size: 2vmin;
+    }
 }
 
 .diagram.rpb-green .text, .diagram.rpb-green .text span {
@@ -45,7 +54,7 @@
 
 
 .diagram.hugetext .text b {
-    font-size: calc(var(--perc-font-size) - 2vw);
+    font-size: calc(var(--perc-font-size) - 2vmin);
 }
 
 .diagram {

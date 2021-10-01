@@ -1,5 +1,7 @@
 #fanfara{
-    width: 48vw;
+    width: 100vmin;
+    left: 0;
+    top: 0;
     font-family: ForwardExtra-Light;
     font-weight: bold;
     background: rgba(0,0,0,0.9);
@@ -9,6 +11,7 @@
     position: absolute;
     z-index: var(--fanfaras-layer-depth);
     min-height: 90vh;
+    padding-bottom: 15vh;
 }
 #fanfara h3{
     margin: 0px 0px 10px 0px;
@@ -33,9 +36,3 @@
     color: var(--theme-secondary-color);
 }
  
-
-@media (orientation: portrait), (max-aspect-ratio: 10/13){
-    #fanfara{
-        width: 100vw;
-    }
-}

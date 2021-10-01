@@ -52,10 +52,10 @@ export class Localization
             SRChartText:        "Steps per game",
             TRChartText:        "Time per game",
             // Settings
-            animationSetting:   "Animation",
-            animationLevel0:    "No animation",
-            animationLevel1:    "Simplified",
-            animationLevel2:    "Extended",
+            // animationSetting:   "Animation",
+            // animationLevel0:    "No animation",
+            // animationLevel1:    "Simplified",
+            // animationLevel2:    "Extended",
             difficultySetting:  "Bot`s difficulty",
             difficultyLevel1:   "Easy",
             difficultyLevel2:   "Medium",
@@ -154,6 +154,14 @@ export class Localization
             disconnected:       "Disconnected",
             serversUnavailable: "Servers unavailable",
             findAnewGame:       "Search for a new game?",
+            // About
+            versionText:        "App Version",
+            buildText:          "Build",
+            lastUpdateText:     "Last Update",
+            privacyPolicyText:  "Privacy Policy",
+            termsConditionsText:"Terms and Conditions",
+            aboutText:          "App Info",
+            connectionTypeText: "Connection type",
         },
     
     
@@ -194,10 +202,10 @@ export class Localization
             SRChartText:        "Ходов за игру",
             TRChartText:        "Время игры",
             // Settings
-            animationSetting:   "Анимация",
-            animationLevel0:    "Без анимации",
-            animationLevel1:    "Упрощенная",
-            animationLevel2:    "Расширенная",
+            // animationSetting:   "Анимация",
+            // animationLevel0:    "Без анимации",
+            // animationLevel1:    "Упрощенная",
+            // animationLevel2:    "Расширенная",
             difficultySetting:  "Сложность бота",
             difficultyLevel1:   "Легко",
             difficultyLevel2:   "Средне",
@@ -296,6 +304,14 @@ export class Localization
             disconnected:       "Отключен",
             serversUnavailable: "Серверы не доступен",
             findAnewGame:       "Найти новую игру?",
+            // About
+            versionText:        "Версия приложения",
+            buildText:          "Сборка",
+            lastUpdateText:     "Последнее обновление",
+            privacyPolicyText:  "Политика конфиденциальности",
+            termsConditionsText:"Условия и положения",
+            aboutText:          "О приложении",
+            connectionTypeText: "Тип подключения",
         },
 
 
@@ -336,10 +352,10 @@ export class Localization
             SRChartText: "Movimientos por juego",
             TRChartText: "Tiempo de juego",
             // Settings
-            animationSetting: "Animación",
-            animationLevel0: "sin animación",
-            animationLevel1: "Simplificado",
-            animationLevel2: "Extendido",
+            // animationSetting: "Animación",
+            // animationLevel0: "sin animación",
+            // animationLevel1: "Simplificado",
+            // animationLevel2: "Extendido",
             difficultySetting: "la Complejidad del bot",
             difficultyLevel1: "Fácil",
             difficultyLevel2: "Medio",
@@ -438,6 +454,14 @@ export class Localization
             disconnected: "Desconectado",
             serversUnavailable: "los Servidores no están disponibles",
             findAnewGame: "¿Encontrar un nuevo juego?",
+            // About
+            versionText:            "Versión de la Aplicación",
+            buildText:              "Compilación de aplicaciones",
+            lastUpdateText:         "Última actualización",
+            privacyPolicyText:      "Política De Privacidad",
+            termsConditionsText:    "Términos y Condiciones",
+            aboutText:              "Acerca de la aplicación",
+            connectionTypeText:     "Tipo de conexión",
         },
 
 
@@ -476,10 +500,10 @@ export class Localization
             SRChartText: "Movimentos por jogo",
             TRChartText: "Hora do jogo",
             // Settings
-            animationSetting: "Animação",
-            animationLevel0: "Sem animação",
-            animationLevel1: "Simplificado",
-            animationLevel2: "Avançado",
+            // animationSetting: "Animação",
+            // animationLevel0: "Sem animação",
+            // animationLevel1: "Simplificado",
+            // animationLevel2: "Avançado",
             difficultySetting: "Complexidade do bot",
             difficultyLevel1: "Fácil",
             difficultyLevel2: "Médio",
@@ -578,6 +602,14 @@ export class Localization
             disconnected: "Desativado",
             serversUnavailable: "Servidores não disponíveis",
             findAnewGame: "Encontrar um novo jogo?",
+            // About
+            versionText:            "Application Version",
+            buildText:              "Compilação De Aplicações",
+            lastUpdateText:         "Última Actualização",
+            privacyPolicyText:      "Privacidade",
+            termsConditionsText:    "Termos e Condições",
+            aboutText:              "Sobre o aplicativo",
+            connectionTypeText:     "Tipo de ligação",
         }
     };
 

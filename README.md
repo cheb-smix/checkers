@@ -1,7 +1,10 @@
+? cordova plugin add cordova-plugin-app-version
+
 # Installations
 - Install ReactJS
 - Run `npm install`
 - Run `sudo npm install -g cordova` to install cordova (To create a new project you can use `cordova create hello com.example.hello HelloWorld`)
+- [Outdated] `npm install -g cordova-check-plugins` to install cordova plugins
 - Clone git@github.com:cheb-smix/checkers_cordova_project.git
 - [Outdated] Install plugins (cordova plugin add): 
     - [Outdated] cordova-plugin-device
@@ -9,6 +12,8 @@
     - [Outdated] cordova-plugin-network-information
     - [Outdated] cordova-plugin-vibration
     - [Outdated] cordova-plugin-screen-orientation
+    - [Outdated] cordova-custom-config [to be able to insert meta-data into manifest]
+    - [Outdated] cordova-plugin-localization-strings [to have app name locales in the device app list]
 - Use `cordova platform add android` to add android platform (the above-mentioned plugins will be installed automatically)
 - Use `sudo apt install android-sdk` to install Android SDK
 - Install java using `sudo apt install openjdk-8-jdk`
@@ -29,38 +34,56 @@
 - Run `sdkmanager --update`
 - Run `sdkmanager "build-tools;29.0.2"` for Android Build Tools installation
 - You can use `sdkmanager --list` to get list of installed and available packages
-- [Outdated] Set android:usesCleartextTraffic="true" at android manifest 
-- [Outdated] Configure config.xml
+- Also you can use `avdmanager list` to get list of available emulators
 - Install cordova-simulate (`sudo npm install -g cordova-simulate`)
 - Cordova-simulate usage: `simulate --device=Nexus10 --dir=<DIR> --target=opera`
 
-# Порядок подписания приложения
-- Отличное описание: https://habr.com/ru/post/324350/
-- `cordova build --release` to build a release app version
-- `keytool -genkey -v -keystore checkers.keystore -alias checkers -keyalg RSA -keysize 2048 -validity 10000` to generate keystore file
-- `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers` to sign apk
-- `zipalign -v 4 ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers.apk` to optimize apk
+# Signing app
+- [Outdated] `cordova build --release` to build a release app version
+- [Outdated] `keytool -genkey -v -keystore checkers.keystore -alias checkers -keyalg RSA -keysize 2048 -validity 10000` to generate keystore file
+- [Outdated] `jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore checkers.keystore ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers` to sign apk
+- [Outdated] `zipalign -v 4 ./platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk checkers.apk` to optimize apk
+- `cordova run android --buildConfig [--release]` to build signed App Bundle
 
-# Порядок билда
-1. npm run build
-2. build/index.html > "/static/" to "static/"
-3. build/static/css/*.css > "/static/" to "../"
-4. build/static/js/main.*.chunk.js > "window.loft.device={}" to "window.loft.device=device"
-5. (free to use action)
-6. (free to use action)
-7. remove folders in cordova/www/ (music, static, sound)
-8. copy build folder to cordova/www
-9. cordova build
+# Emulator creation
+- Get systems list using `sdkmanager --list | grep system-images`
+- Install one of them `sdkmanager --install "system-images;android-29;default;x86"`
+- Create ADV `echo "no" | avdmanager --verbose create avd --force --name "generic_10" --package "system-images;android-29;default;x86" --tag "default" --abi "x86"`
+    - Virtualization Technology must be on at BIOS settings
+    - Install cpu-checker `sudo apt-get install cpu-checker` 
+    - Run `egrep -c '(vmx|svm)' /proc/cpuinfo`
+    - Check KVM available using `sudo /usr/sbin/kvm-ok`
+    - Enable Virtualization Technology in BIOS if needed
+- Run emulator `~/android-sdk/emulator/emulator @generic_10`
+- Run cordova emulation at cordova workfolder using `cordova run android --emulator`
 
-# Запуск автобубилдера (При первом запуске запросит рабочую папку cordova)
-php build.php (workfolder=...) (steps=1234567) (app=corners)
-## Варианты запуска автобубилдера:
-- php build.php steps=12348   # Сборка реакта и копирование в cordova без удаления старых файлов с заменой на новые без билда cordova для дебага в cordova-simulate
-- php build.php steps=9       # Сборка только в cordova уже имеющегося в рабочей папке проекта
-- php build.php app=corners   # Сборка отдельного приложения (checkers, corners)
+# Builder struct
+1.  Checking workfolder
+2.  Incrementing release dev info
+3.  Building react project
+4.  Rebuilding app for particular build
+    - Removing included gamelogic at App.js
+    - Replacing other gamelogic files to ../
+5.  Rebuilding index.html
+    - All absolute links to relative
+    - Inserting cordova.js src
+    - Inserting internal version and lastUpdate date
+    - Rebuilding all absolute links to relative at all css and js files
+6.  Clearing old cordova/www project
+7.  Copying new www project
+8.  Building cordova project
+9.  Informing via telegram bot
+10. Saving dev info
+11. Rolling back gamelogic files
+12. Proposing simulate string
+
+# Builder run (first run will require cordova workfolder)
+php builder.php --app=checkers --release --simulate
+php builder.php --help
+
+
 
 # TODO
-0. Делать свои достижения или все таки переходить на гугло-гейм-сервисы
 0. Предлагать обновление приложения (забирать метку из конфига, управлять меткой из админки)
 0. Разделение способов подключения к онлайну и наследование Connection -> Ajax , Socket , Bluetooth
 1. Исключить возможность играть с самим собой

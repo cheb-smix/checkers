@@ -7,14 +7,23 @@ let components = {
 
 export default function Routing(route = "/home", addonAction = () => {}, timeout = 700)
 {
-    for (let s in components) {
-        let a = document.querySelectorAll(s);
-        for (let i = 0; i < a.length; i++) {
-            a[i].className = components[s];
-        }
-    };
+    if (timeout) {
 
-    addonAction();
+        for (let s in components) {
+            let a = document.querySelectorAll(s);
+            for (let i = 0; i < a.length; i++) {
+                a[i].className = components[s];
+            }
+        };
 
-    setTimeout(() => window.loft.history.push(route), timeout);
+        addonAction();
+
+        setTimeout(() => window.loft.history.push(route), timeout);
+        
+    } else {
+
+        addonAction();
+        window.loft.history.push(route);
+
+    }
 }

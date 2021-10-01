@@ -3,6 +3,8 @@ import Lang from '../Components/Localization';
 import postData from "./PostDataFuncs";
 import sha1 from "./Sha1";
 
+import {privacyPolicy, termsConditions} from "../Components/About";
+
 export default class Acc
 {
     constructor(setAppState = () => {}) {
@@ -42,7 +44,7 @@ export default class Acc
                             theme="link"
                         />
                     </div>
-                    <div className="col-md-6 col-12">
+                    <div className="col-12">
                         <Button
                             action={this.gogoSign} 
                             href="" 
@@ -103,7 +105,7 @@ export default class Acc
                     <div className="col-12">
                         <input type="text" id="email" placeholder={Lang("emailText")} minLength="4" maxLength="70" />
                     </div>
-                    <div className="col-md-6 col-12">
+                    <div className="col-12">
                         <Button
                             action={this.gogoRessurect} 
                             href="" 
@@ -195,13 +197,31 @@ export default class Acc
                     <div className="col-12">
                         <input type="password" id="pass" placeholder={Lang("passwordText")} minLength="6" maxLength="60" />
                     </div>
-                    <div className="col-md-6 col-12">
+                    <div className="col-12">
                         <Button
                             action={this.gogoRegister} 
                             href="" 
                             value={Lang("signUpText")} 
                             theme="neon"
                             strong="true"
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={privacyPolicy} 
+                            href="" 
+                            value={Lang("privacyPolicyText")} 
+                            theme="white"
+                            strong="false"
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Button
+                            action={termsConditions} 
+                            href="" 
+                            value={Lang("termsConditionsText")} 
+                            theme="white"
+                            strong="false"
                         />
                     </div>
                 </div>
