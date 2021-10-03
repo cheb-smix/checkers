@@ -225,6 +225,7 @@ export default class App extends React.Component {
         this.act({
             action: 'quit'
         });
+        window.loft.hideModal();
     }
 
     startGame = (game) => {

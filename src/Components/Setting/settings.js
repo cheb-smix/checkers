@@ -79,8 +79,12 @@ export default class Settings {
     }
 
     get = (key = '') => {
-        let item = JSON.parse(localStorage.getItem(key));
-        if (item) {
+        let item = localStorage.getItem(key);
+        try {
+            item = JSON.parse(item);
+        } catch (e) {}
+        
+        if (item && typeof item === 'object') {
             if (!item.expiry || item.expiry === 0 || item.expiry > new Date().getTime()) {
                 return item.value;
             } else {
