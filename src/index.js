@@ -90,6 +90,7 @@ window.loft = {
     socket: null,
     reqtype: "xhr",
     chart: {},
+    chartLength: 0,
     lastInterstitialShown: (new Date()).getTime(),
     preparingInterstitial: false,
 };
@@ -186,13 +187,13 @@ async function checkConnection()
         window.loft.settings.set("serverInfo", res.serverInfo, 360);
 
         if (!React.empty(res.chart)) {
-            window.loft.chart.length = 0;
+            window.loft.chartLength = 0;
             for (let k in res.chart) {
                 if (!React.isset(window.loft.chart[k])) window.loft.chart[k] = {};
                 for (let d in res.chart[k]) {
                     window.loft.chart[k][d] = res.chart[k][d];
                 }
-                window.loft.chart.length = Object.keys(window.loft.chart[k]).length;
+                window.loft.chartLength = Object.keys(window.loft.chart[k]).length;
             }
             window.loft.settings.set("chart", res.chart, 3600 * 20);
         }

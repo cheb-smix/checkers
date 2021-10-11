@@ -277,9 +277,10 @@ export default class Fanfara extends React.Component {
                 stattext = [<p key="0" className="fanp">{Lang("lastEnemyStep")}</p>];
                 noise = "warning";
             } else {
-                if (window.loft.chart.length > 1) {
+                if (window.loft.chartLength > 1) {
                     stattext.unshift(<Charts 
                         data={window.loft.chart} 
+                        key={stattext.length} 
                         colors={['#f40', 'green', '#08f', '#eeff00']}
                         font="1.4vh Federo"
                         dots="false"

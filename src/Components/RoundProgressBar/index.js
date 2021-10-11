@@ -10,6 +10,7 @@ export default class RoundProgressBar extends React.Component{
 
     progressView = (current = false) => {   
         setTimeout(() => {
+            console.log('PW');
             document.querySelectorAll('.diagram').forEach((box, i) => {
                 if (!current || box.id === this.props.id) {
                     setTimeout(() => {

@@ -33,6 +33,8 @@ export default class Charts extends React.Component {
         this.canvas = document.getElementById('canvas'); 
         this.ctx = this.canvas.getContext('2d');
 
+        console.log(this.data);
+
         let interval = setInterval(() => {
             let LCW = window.getComputedStyle(this.canvas).getPropertyValue('width');
             if (LCW !== '100%' && LCW !== this.cwidth) {

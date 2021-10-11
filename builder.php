@@ -45,7 +45,7 @@ class Builder
             "build"         => 2019,
             "lastUpdate"    => "",
         ];
-        
+
         $this->loadDevInfo();
 
         foreach(getopt("", array_map(function($item) { return "$item::";}, array_keys(get_class_vars(get_class($this))))) as $k => $v) {
@@ -149,6 +149,7 @@ class Builder
     {
         if (file_exists($this->dev_info_file) && $dev_info = json_decode(file_get_contents($this->dev_info_file), true)) {
             $this->dev_info = (object) array_merge((array) $this->dev_info, $dev_info);
+            $this->dev_info->version = (object) $this->dev_info->version;
         }
 
         $this->cordova_workfolder = (file_exists($this->workfolder_file) && $cordova_workfolder = file_get_contents($this->workfolder_file)) ? $cordova_workfolder : $this->cordova_workfolder;
