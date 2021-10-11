@@ -225,6 +225,7 @@ export default class App extends React.Component {
         this.act({
             action: 'quit'
         });
+        window.loft.hideModal();
     }
 
     startGame = (game) => {
@@ -336,7 +337,7 @@ export default class App extends React.Component {
                 for (let d in res.chart[k]) {
                     window.loft.chart[k][d] = res.chart[k][d];
                 }
-                window.loft.chart.length = Object.keys(window.loft.chart[k]).length;
+                window.loft.chartLength = Object.keys(window.loft.chart[k]).length;
             }
         }
 
@@ -585,15 +586,15 @@ export default class App extends React.Component {
 
     // Animations and logic
 
-    // suggestNewOneGame = (text = "") => {
-    //     window.loft.showModal(
-    //         <div>
-    //             <Button action={() => this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
-    //             <Button action={() => this.startNewSearch()} href="" value={Lang("yesText")} />
-    //         </div>,
-    //         text + "<br />" + Lang("findAnewGame")
-    //     );
-    // }
+    suggestNewOneGame = (text = "") => {
+        window.loft.showModal(
+            <div>
+                <Button action={() => this.clearPlayerInfoAfterGameOver()} href="" value={Lang("noText")} />
+                <Button action={() => this.startNewSearch()} href="" value={Lang("yesText")} />
+            </div>,
+            text + "<br />" + Lang("findAnewGame")
+        );
+    }
 
 
     quitGameConfirmer = (onconfirm = () => { }) => {
