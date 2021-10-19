@@ -308,13 +308,17 @@ class Builder
         $res = explode("\n", $res);
         $res = array_shift($res);
 
-        $this->printer("Copiing to project folder", "info");
-        $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}", "console");
-        $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
+        if (!stristr($res, ".aab") && !stristr($res, ".apk")) {
+            $this->printer("Result file is not correct!!! Check build log!", "error");
+        } else {
+            $this->printer("Copiing to project folder", "info");
+            $this->printer("cp {$this->cordova_workfolder}$res ./{$appFileName}", "console");
+            $this->printer(`cp {$this->cordova_workfolder}$res ./{$appFileName}`);
 
-        if (!$this->silent) {
-            $this->printer("Sending file via Telegram", "success");
-            Telegram::sendAdminNotices("New build " . $this->dev_info->build . " has been built " . $this->dev_info->lastUpdate, ["version $currentVersion build " . $this->dev_info->build => $this->cordova_workfolder . $res]);
+            if (!$this->silent) {
+                $this->printer("Sending file via Telegram", "success");
+                Telegram::sendAdminNotices("New build " . $this->dev_info->build . " has been built " . $this->dev_info->lastUpdate, ["version $currentVersion build " . $this->dev_info->build => $this->cordova_workfolder . $res]);
+            }
         }
     }
 
