@@ -37,6 +37,7 @@
 - Also you can use `avdmanager list` to get list of available emulators
 - Install cordova-simulate (`sudo npm install -g cordova-simulate`)
 - Cordova-simulate usage: `simulate --device=Nexus10 --dir=<DIR> --target=opera`
+- Admob plugin installation example: `cordova plugin add cordova-plugin-admobpro --save --variable ADMOB_APP_ID="ca-app-pub-6494744503444482~9646056273"`
 
 # Signing app
 - [Outdated] `cordova build --release` to build a release app version
