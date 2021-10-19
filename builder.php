@@ -18,6 +18,7 @@ class Builder
     private $debug = false;
     private $telegram = false;
     private $silent = false;
+    private $apk = false;
 
     private $major = false;
     private $minor = false;
@@ -70,6 +71,7 @@ class Builder
             $this->printer("--buildonly\t| Use --buildonly to skip ReactJS building steps and build current cordova project");
             $this->printer("--telegram\t| Use --telegram to get telegram bot updates");
             $this->printer("--silent\t| Use --silent to disable telegram informer for the build");
+            $this->printer("--apk\t| Use --apk to force apk build instead aab");
 
             $this->printer("--major\t| Use it to increase major version number");
             $this->printer("--minor\t| Use it to increase minor version number");
@@ -288,7 +290,7 @@ class Builder
         $options = [ $this->emulator ? "--emulator" : "--device" ];
 
         if ($this->release) {
-            $appFileName = "app-release.aab";
+            $appFileName = $this->apk ? "app-release.apk" : "app-release.aab";
             $options[] = "--release";
         } else {
             $appFileName = "app-debug.apk";
