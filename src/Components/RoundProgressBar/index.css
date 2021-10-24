@@ -28,7 +28,7 @@
 }
 
 .diagram.rpb-red .text, .diagram.rpb-red .text span {
-    color: var(--neon-text-color);
+    color: var(--neon-border-color);
 }
 .diagram.rpb-red,
 .diagram.rpb-red.over_50 .left::before {
@@ -113,10 +113,10 @@
     border-radius: 50%;
 }
 .diagram .left::before {
-    background: var(--neon-bg-color-dark);
+    background: var(--neon-bg-color);
 }
 .diagram .right::before {
-    background: var(--neon-bg-color-dark);
+    background: var(--neon-bg-color);
 }
 
 .diagram.over_50 .piece.left {
@@ -151,7 +151,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--neon-bg-color-dark);
+    color: var(--neon-border-color);
 }
 .diagram .text b {
     font-size: var(--perc-font-size);
@@ -179,7 +179,7 @@
     color: #0f0 !important;
 }
 .rpb-red .text {
-    color: var(--neon-text-color) !important;
+    color: var(--neon-border-color) !important;
 }
 .rpb-orange .text {
     color: var(--theme-main-color) !important;
@@ -188,7 +188,7 @@
 
 .diagram.tooltip::after {
 	background: var(--theme-bg-color);
-	color: var(--neon-bg-color-dark);
+	color: var(--neon-border-color);
 	content: attr(data-tooltip); 
     top: var(--dia-bord);
     left: var(--dia-bord);

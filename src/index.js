@@ -160,6 +160,9 @@ function onDeviceReady()
     document.addEventListener("online", onOnline, false);
     document.addEventListener("offline", onOffline, false);
     window.loft.device = React.isset(window.device) ? window.device : {};
+    if (React.isset(window.loft.device.serial)) {
+        delete window.loft.device.serial;
+    }
     DOMLoaded();
 }
 

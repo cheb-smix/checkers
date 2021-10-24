@@ -290,7 +290,12 @@ class Builder
         $options = [ $this->emulator ? "--emulator" : "--device" ];
 
         if ($this->release) {
-            $appFileName = $this->apk ? "app-release.apk" : "app-release.aab";
+            if ($this->apk) {
+                $appFileName = "app-release.apk";
+                $options[] = "--packageType=apk";
+            } else {
+                $appFileName = "app-release.aab";
+            }
             $options[] = "--release";
         } else {
             $appFileName = "app-debug.apk";

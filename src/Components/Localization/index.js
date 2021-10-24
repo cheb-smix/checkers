@@ -42,6 +42,9 @@ export class Localization
             failed:             "Failed!",
             confirm:            "Confirm",
             finish:             "Finish",
+            tryText:            "Try",
+            stayOnPBTText:      "Stay on personalized",
+            generalProposeText: "You're doing well! However, at the moment a personalized opponent is being used, which involves using only those moves that he learned from you, and you have the opportunity to try switching to the general mode of the virtual opponent! You can always return to the personalized mode in the app settings.",
             // Home
             playWithBot:        "Versus Bot",
             playByBlueTooth:    "BlueTooth Game",
@@ -63,6 +66,9 @@ export class Localization
             soundSetting:       "Sounds volume",
             fanfarasSetting:    "Fanfare volume",
             musicSetting:       "Music volume",
+            bottypeSetting:     "Bot type",
+            bottypePersonalized:"Personalized",
+            bottypeGeneral:     "General",
             // Fanfaras
             congratulations:    "Congratulations!",
             youCrashedOpponent: "You won this one by a margin",
@@ -192,6 +198,9 @@ export class Localization
             failed:             "Ошибка!",
             confirm:            "Подтвердить",
             finish:             "Завершить",
+            tryText:            "Попробовать",
+            stayOnPBTText:      "Остаться в текущем режиме",
+            generalProposeText: "У Вас хорошо получается! Однако в данный момент используется персонализированный противник, что предполагает использование лишь тех ходов, которым он научился у Вас, и у Вас имеется возможность попробовать переключиться на всеобщий режим виртуального противника! Вы всегда можете вернуться к персонализированному режиму в настройках приложения.",
             // Home
             playWithBot:        "Против бота",
             playByBlueTooth:    "По BlueTooth",
@@ -213,6 +222,9 @@ export class Localization
             soundSetting:       "Громкость звуков",
             fanfarasSetting:    "Громкость фанфар",
             musicSetting:       "Громкость музыки",
+            bottypeSetting:     "Тип бота",
+            bottypePersonalized:"Персонализированный",
+            bottypeGeneral:     "Всеобщий",
             // Fanfaras
             congratulations:    "Поздравляем!",
             youCrashedOpponent: "Вы разбили противника с отрывом",
@@ -342,6 +354,9 @@ export class Localization
             error: "Error!",
             confirm: "Confirmar",
             finish: "Finalizar",
+            tryText:            "Probar",
+            stayOnPBTText:      "Permanecer en el modo actual",
+            generalProposeText: "¡Lo estás haciendo bien! Sin embargo, en este momento se usa un oponente personalizado, lo que implica usar solo los movimientos que aprendió de Usted, y Usted tiene la oportunidad de intentar cambiar al modo de oponente virtual general. Siempre puede volver al modo personalizado en la configuración de la aplicación.",
             // Home
             playWithBot: "Vs bot",
             playByBlueTooth: "Por BlueTooth",
@@ -363,6 +378,9 @@ export class Localization
             soundSetting: "Volumen de los sonidos",
             fanfarasSetting: "volumen de fanfarria",
             musicSetting: "Volumen de la música",
+            bottypeSetting:     "Tipo bot",
+            bottypePersonalized:"Personalizado",
+            bottypeGeneral:     "General",
             // Fanfaras
             congratulations: "¡Felicidades!",
             youCrashedOpponent: "has aplastado al oponente por un margen",
@@ -490,6 +508,9 @@ export class Localization
             failed: "Erro!",
             confirm: "Confirmar",
             finish: "Terminar",
+            tryText:            "Tentar",
+            stayOnPBTText:      "Permanecer no modo atual",
+            generalProposeText: "Você é bom! No entanto, no momento, um adversário personalizado é usado, o que envolve o uso apenas dos movimentos que ele aprendeu com você, e você tem a oportunidade de tentar mudar para o modo geral do inimigo Virtual! Você sempre pode voltar ao modo personalizado nas configurações do aplicativo.",
             // Home
             playWithBot: "Contra um bot",
             playByBlueTooth: "Por BlueTooth",
@@ -511,6 +532,9 @@ export class Localization
             soundSetting: "Volume dos sons",
             fanfarasSetting: "O volume da fanfarra",
             musicSetting: "Volume da música",
+            bottypeSetting:     "Tipo de bot",
+            bottypePersonalized:"Personalizado",
+            bottypeGeneral:     "Geral",
             // Fanfaras
             congratulations: "Parabéns!",
             youCrashedOpponent: "Você esmagou seu oponente por uma margem",

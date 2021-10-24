@@ -26,6 +26,15 @@ export default class Setting extends React.Component{
                     </div>
                     <div className="col-md-6 col-12">
                         <Droplist
+                            id="bottype"
+                            items={{"personalized":Lang("bottypePersonalized"),"general":Lang("bottypeGeneral")}}
+                            selected={window.loft.usersettings.bottype}
+                            placeholder={Lang("bottypeSetting")}
+                            onSelect={window.loft.settings.saveSetting}
+                        />
+                    </div>
+                    <div className="col-md-6 col-12">
+                        <Droplist
                             id="language"
                             items={window.loft.localization.langTitles}
                             selected={window.loft.usersettings.language}
