@@ -377,6 +377,48 @@ export default class App extends React.Component {
                 newState.game_status = res.game_results.status;
 
                 clearInterval(this.INT);
+
+                let WLR = window.loft.user_info.stat.total_wins / (window.loft.user_info.stat.total_failes ? window.loft.user_info.stat.total_failes : 1);
+
+                console.log(!window.loft.usersettings.generalTried , window.loft.usersettings.bottype === "personalized" , playerInfo.status === window.loft.constants.STATUS_WON , window.loft.user_info.stat.total_games > 3 , WLR > 1.2);
+
+                if (!window.loft.usersettings.generalTried && window.loft.usersettings.bottype === "personalized" && playerInfo.status === window.loft.constants.STATUS_WON && window.loft.user_info.stat.total_games > 3 && WLR > 1.2) {
+                    setTimeout(() => {
+                        window.loft.showModal(
+                            <div className="container">
+                                <div className="row">
+                                    <div className="col-12">
+                                        <p>{Lang("generalProposeText")}</p>
+                                    </div>
+                                    <div className="col-md-6 col-12">
+                                        <Button
+                                            action={window.loft.hideModal} 
+                                            href="" 
+                                            value={Lang("stayOnPBTText")} 
+                                            theme="grey"
+                                            strong="true"
+                                        />
+                                    </div>
+                                    <div className="col-md-6 col-12">
+                                        <Button
+                                            action={() => {
+                                                window.loft.usersettings.bottype = "general";
+                                                window.loft.usersettings.generalTried = true;
+                                                window.loft.settings.saveSetting("bottype", "general");
+                                                window.loft.hideModal();
+                                            }} 
+                                            href="" 
+                                            value={Lang("tryText")} 
+                                            theme="neon"
+                                            strong="true"
+                                        />
+                                    </div>
+                                </div>
+                            </div>,
+                            Lang("congratulations")
+                        );
+                    }, 500);
+                }
             }
         }
 
@@ -399,7 +441,8 @@ export default class App extends React.Component {
             data: {
                 playstage: window.loft.config.Debug ? 3 : this.state.playstage,
                 mask: this.getDeskMask(this.state.cells, true),
-                color: color
+                color: color,
+                bottype: window.loft.usersettings.bottype
             },
             success: (res) => {
                 if (!res.success) {
@@ -432,6 +475,7 @@ export default class App extends React.Component {
                     // path: cells[koordsfrom].possibilities[koordsto].path.join('-'),
                     game_id: this.state.game_id,
                     botstep: botstep,
+                    bottype: window.loft.usersettings.bottype,
                 },
 
                 success: (res) => {

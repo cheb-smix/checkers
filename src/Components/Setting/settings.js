@@ -4,6 +4,7 @@ export default class Settings {
         this.usersettings = {
             // animation: 1,
             difficulty: 1,
+            bottype: "personalized",
             fanfaravolume: 50,
             soundvolume: 70,
             musicvolume: 0,
@@ -12,10 +13,12 @@ export default class Settings {
             loaded: false,
             game: "checkers",
             language: 'auto',
+            generalTried: false,
         };
         this.defaultusersettings = {
             // animation: 1,
             difficulty: 1,
+            bottype: "personalized",
             fanfaravolume: 50,
             soundvolume: 70,
             musicvolume: 0,
@@ -24,6 +27,7 @@ export default class Settings {
             loaded: false,
             game: "checkers",
             language: 'auto',
+            generalTried: false,
         };
     }
 
@@ -69,6 +73,10 @@ export default class Settings {
 
         if (key === "game") {
             window.loft.isCheckers = ["checkers", "giveaway"].indexOf(value) >= 0;
+        }
+
+        if (key === "bottype" && value === "general") {
+            this.set("generalTried", true);
         }
     }
 
