@@ -392,7 +392,11 @@ export default class App extends React.Component {
                                     </div>
                                     <div className="col-md-6 col-12">
                                         <Button
-                                            action={window.loft.hideModal} 
+                                            action={() => {
+                                                window.loft.usersettings.generalTried = true;
+                                                window.loft.settings.saveSetting("generalTried", true);
+                                                window.loft.hideModal();
+                                            }} 
                                             href="" 
                                             value={Lang("stayOnPBTText")} 
                                             theme="grey"
