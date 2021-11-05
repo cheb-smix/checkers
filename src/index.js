@@ -223,7 +223,6 @@ function initAd()
                 adId: window.loft.config.ads.banner.admob,
                 position: window.AdMob.AD_POSITION.BOTTOM_CENTER,
                 autoShow: true,
-                isTesting: true,
                 overlap: true, 
             });
         }

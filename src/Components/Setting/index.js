@@ -4,6 +4,7 @@ import Button from '../Button';
 import Droplist from '../Droplist';
 import Slider from '../Slider';
 import Lang from '../Localization';
+import LangBtn from '../LangBtn';
 
 export default class Setting extends React.Component{
     state = {
@@ -13,6 +14,7 @@ export default class Setting extends React.Component{
     render() {
         return (
             <div className="container" id={this.state.modal === false ? 'btnContainer' : 'modalSettingsContainer'} >
+                <LangBtn />
                 {this.state.modal === false ? <h5 className="neon">{Lang("settingsText")}</h5> : ""}
                 <div className="row">
                     <div className="col-md-6 col-12">

@@ -3,10 +3,10 @@ import Button from '../Button';
 import LangBtn from '../LangBtn';
 import Lang from '../Localization';
 import Droplist from '../Droplist';
-import Acc from '../../Funcs/Acc';
 import './home.css';
 
-export default class Home extends React.Component{
+export default class Home extends React.Component
+{
     gameChoice = () => {
         if (window.gvar.length < 2) return;
 
@@ -45,12 +45,21 @@ export default class Home extends React.Component{
         return "/" + this.getGame();
     }
 
-    render(){
-        let acc = new Acc(this.props.setAppState);
-
+    render()
+    {
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated">
                 <LangBtn />
+                <Button 
+                    action="" 
+                    theme="grey" 
+                    href="/player" 
+                    value="" 
+                    round={true} 
+                    icon="fa fa-user" 
+                    styles={{position: "absolute", left: "0vh", top: "0vh"}} 
+                />
+
                 <h5 onClick={this.gameChoice}>{Lang(this.getGame() + "GameName")}</h5>
                 <Button 
                     action={()=>window.loft.settings.saveSetting("mode", "bot")} 
@@ -65,16 +74,6 @@ export default class Home extends React.Component{
                     value={Lang("playOnlineGame")} 
                 /> : ""
                 }
-                {
-                    this.props.isGuest 
-                    ? 
-                    <Button action={acc.signIn} href="" value={Lang("signInText")} /> 
-                    : 
-                    <React.Fragment>
-                        <Button action={acc.showAccStat} href="" value={window.loft.user_info.display_name} /> 
-                        <Button action={acc.signOut} href="" value={Lang("signOutText")} /> 
-                    </React.Fragment>
-                } 
                 <Button action="" href="/settings" value={Lang("settingsText")} />
                 <Button action="" href="/about" value={Lang("aboutText")} />
 

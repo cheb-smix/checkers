@@ -95,3 +95,23 @@
 .ubutton.link:nth-child(2){
     float: right;
 }
+
+.ubutton.round {
+    border-radius: 50% !important;
+    font-size: initial;
+    margin: 2vh;
+    padding: 1vh;
+    width: var(--flag-size);
+    height: var(--flag-size);
+    border-width: 2px;
+}
+
+.ubutton.round i {
+    position: absolute;
+    transform: translate(-50%, 30%);
+}
+
+.ubutton.round::after {
+    position: absolute;
+    padding-top: 100%;
+}
