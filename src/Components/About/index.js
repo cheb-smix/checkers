@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '../Button';
+import LangBtn from '../LangBtn';
 import Lang from '../Localization';
 
 import "./about.css";
@@ -64,6 +65,7 @@ export default class About extends React.Component{
     render(){
         return (
             <div id="btnContainer" className="animate__fadeIn animate__animated aboutPage">
+                <LangBtn />
                 <h5>{Lang("aboutText")}</h5>
                 <div className="container">
                 <table>

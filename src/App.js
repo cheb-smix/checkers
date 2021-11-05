@@ -9,6 +9,7 @@ import {
 import About from "./Components/About";
 import Home from "./Components/Home";
 import Setting from './Components/Setting';
+import Player from './Components/Player';
 
 import Corners from "./Components/Gameslogic/corners";
 import Checkers from "./Components/Gameslogic/checkers";
@@ -116,6 +117,8 @@ class App extends Component{
                     <Route path='/settings' render={(props) => <Setting {...props} modal={false} />} />
 
                     <Route path='/about' render={(props) => <About {...props} modal={false} />} />
+
+                    <Route path='/player' render={(props) => <Player {...props} modal={false} />} />
 
                     <Redirect from='/' to='/home'/>
 

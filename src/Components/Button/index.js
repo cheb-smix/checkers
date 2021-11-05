@@ -48,7 +48,6 @@ export default class Button extends React.Component
                         window.AdMob.prepareInterstitial({
                             adId: window.loft.config.ads[ISType].admob, 
                             autoShow: false,
-                            isTesting: true,
                         });
                     }
                 }
@@ -63,11 +62,13 @@ export default class Button extends React.Component
         if (this.props.href !== "" && this.props.href.indexOf("#") < 0) Routing(this.props.href, () => {}, immediate ? 0 : 700);
     }
 
-    render(){
-        let className = "ubutton" + (this.props.theme ? " " + this.props.theme : " maintheme");
+    render()
+    {
+        let styles = this.props.styles ? this.props.styles : {};
+        let className = "ubutton" + (this.props.theme ? " " + this.props.theme : " maintheme") + (this.props.round ? " round" : "");
         if (this.props.strong) className += " strong";
         return (
-            <div onClick={this.buttonAction} className={className}>{this.props.value}</div>
+            <div onClick={this.buttonAction} className={className} style={styles}>{this.props.round ? <i className={this.props.icon}></i> : this.props.value}</div>
         );
     }
 }

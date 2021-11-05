@@ -58,6 +58,9 @@
 .fa-sliders-h:before {
     content: "\f1de"; 
 }
+.fa-user:before {
+    content: "\f007"; 
+}
 .fa-pull-left {
     float: left; 
 }

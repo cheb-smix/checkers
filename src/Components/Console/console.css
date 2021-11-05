@@ -37,7 +37,7 @@
     padding: 2%;
     font-family: ForwardExtra-Light;
     font-weight: bold;
-    font-size: var(--regular-text-size);
+    font-size: 12px;
     vertical-align: top;
     text-align: left;
 }
